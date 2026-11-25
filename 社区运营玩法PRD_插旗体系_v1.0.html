@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRD · 社区运营玩法「插旗体系」 v1.0</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; background:#F4F6F9; color:#1E2A38; line-height:1.72; padding:0 16px 80px; }
+  .wrap { max-width:960px; margin:0 auto; }
+  nav { position:sticky; top:0; background:rgba(255,255,255,.95); backdrop-filter:blur(6px); z-index:99; border-bottom:1px solid #E2E8F0; margin:0 -16px; padding:9px 16px; text-align:center; }
+  nav a { display:inline-block; font-size:12px; color:#33414F; text-decoration:none; padding:3px 9px; border-radius:14px; margin:2px 1px; }
+  nav a:hover { background:#EEF4FB; color:#1D5A96; }
+  header { text-align:center; margin:34px 0 26px; }
+  header h1 { font-size:25px; }
+  header .sub { color:#5A6B7E; font-size:13.5px; margin-top:6px; }
+  section { background:#fff; border-radius:14px; padding:24px 28px; margin-bottom:20px; box-shadow:0 1px 4px rgba(30,42,56,.06); scroll-margin-top:60px; }
+  h2 { font-size:17.5px; margin-bottom:12px; padding-left:11px; border-left:4px solid #2A6FB8; }
+  h3 { font-size:14.5px; margin:16px 0 8px; }
+  p, li { font-size:13.8px; color:#33414F; }
+  ul, ol { padding-left:21px; }
+  li { margin-bottom:5px; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:12.8px; }
+  th, td { border:1px solid #E2E8F0; padding:7px 10px; text-align:left; vertical-align:top; }
+  th { background:#F2F5F9; font-weight:600; }
+  .k { font-weight:700; color:#1E2A38; }
+  .red { color:#A32D2D; font-weight:700; }
+  .green { color:#176043; font-weight:700; }
+  .blue { color:#1D5A96; font-weight:700; }
+  .small { font-size:12px; color:#5A6B7E; }
+  .note { background:#EEF4FB; border:1px solid #C8DCF0; border-radius:10px; padding:11px 16px; margin:10px 0; font-size:13.5px; }
+  .warn { background:#FDF2EF; border:1px solid #F0C8BC; border-radius:10px; padding:11px 16px; margin:10px 0; font-size:13.5px; }
+  .must { color:#A32D2D; font-weight:700; }
+  .should { color:#8A6B1F; font-weight:700; }
+  .could { color:#5A6B7E; font-weight:700; }
+  .v1 { background:#E6F4EC; color:#176043; border-radius:4px; padding:0 5px; font-size:11.5px; font-weight:700; }
+  .v15 { background:#E8F1FA; color:#1D5A96; border-radius:4px; padding:0 5px; font-size:11.5px; font-weight:700; }
+  .v2 { background:#F2ECFA; color:#4F3A78; border-radius:4px; padding:0 5px; font-size:11.5px; font-weight:700; }
+  .st { background:#F2F5F9; border-radius:6px; padding:9px 14px; font-size:12.8px; margin:8px 0; line-height:1.9; }
+  footer { text-align:center; color:#8A99AB; font-size:11.5px; margin-top:26px; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="#p1">一 文档信息</a><a href="#p2">二 背景与目标</a><a href="#p3">三 术语</a><a href="#p4">四 需求范围</a><a href="#p5">五 方案选型</a><a href="#p6">六 用户角色</a><a href="#p7">七 功能需求</a><a href="#p8">八 非功能</a><a href="#p9">九 流程与状态机</a><a href="#p10">十 数据与埋点</a><a href="#p11">十一 权限与安全</a><a href="#p12">十二 异常处理</a><a href="#p13">十三 上线计划</a><a href="#p14">十四 风险</a><a href="#p15">十五 附录</a>
+</nav>
+<div class="wrap">
+
+<header>
+  <h1>PRD · 社区运营玩法「插旗体系」</h1>
+  <div class="sub">插旗 / 护旗 / 拔旗 / 积分经济 / 信任分 / 举证验证（MVP 范围） · 含功能需求清单与原型制作指引</div>
+</header>
+
+<!-- ============ 一 ============ -->
+<section id="p1">
+  <h2>一 · 文档信息</h2>
+  <table>
+    <tr><th>项</th><th>内容</th></tr>
+    <tr><td>版本</td><td>v1.0（首次评审稿）</td></tr>
+    <tr><td>作者 / 日期</td><td>司南（产品） · 2026-11-17</td></tr>
+    <tr><td>上游输入</td><td>《插旗玩法头脑风暴与优化方案_v1》《举证验证与反刷分体系_v1》《Flag项目成果总览_v1》；既有原型 demo/miniapp（46 项冒烟通过）</td></tr>
+    <tr><td>状态词约定</td><td><span class="must">必须</span>=强制实现；<span class="should">应该</span>=默认实现，可协商；<span class="could">可以</span>=增强项；<span class="red">禁止</span>=任何情况不得出现</td></tr>
+    <tr><td>数值口径说明</td><td>文中积分、信任分、时长等数值均为<span class="k">初始估算值</span>，上线后按数据调整；调整走需求变更流程</td></tr>
+    <tr><td>评审记录</td><td>待评审（建议首轮评审聚焦第七节功能需求与第五节选型决策）</td></tr>
+  </table>
+</section>
+
+<!-- ============ 二 ============ -->
+<section id="p2">
+  <h2>二 · 背景与目标</h2>
+  <h3>2.1 背景</h3>
+  <p>产品核心假设是「别人是动机的供给侧」，既有设计已覆盖见证人（强关系）链路，但<b>围观者（弱关系）无参与路径</b>，社区扩张缺少自发动机。插旗体系把围观者变成玩家：立目标可公开为「旗」，围观者护旗（鼓励）或拔旗（激将），按旗的结局与行为质量结算积分，兑换平台特权。</p>
+  <h3>2.2 要解决的问题</h3>
+  <ul>
+    <li>弱关系用户参与成本高（只能成为见证人），社区密度不足；</li>
+    <li>传播缺素材（打卡截图无戏剧性）；</li>
+    <li>打卡真实性无验证体系（Pact 死因），插旗玩法会放大刷分动机。</li>
+  </ul>
+  <h3>2.3 成功指标与口径</h3>
+  <table>
+    <tr><th>指标</th><th>口径</th><th>目标值（估算）</th></tr>
+    <tr><td>旗场渗透率</td><td>统计周期内浏览旗场的周活用户 ÷ 周活用户</td><td>≥ 30%（Phase 2）；Phase 1 班级场景 ≥ 50%</td></tr>
+    <tr><td>首旗响应时长</td><td>旗生效 → 首条站队留言的中位时长</td><td>≤ 24h（冷启动期运营兜底）</td></tr>
+    <tr><td>护旗→注册转化</td><td>战况卡访问游客中完成注册的比例，按访客去重</td><td>≥ 15%</td></tr>
+    <tr><td>复活反转率</td><td>旗落后 7 日内重启的旗 ÷ 落幕旗</td><td>≥ 25%（对比无复活窗版本）</td></tr>
+    <tr><td>免战/关闭率</td><td>体验拔旗后关闭该功能的用户 ÷ 被拔旗用户</td><td class="red">≤ 8%，超线收缩拔旗策略</td></tr>
+    <tr><td>失败用户 7 日回访</td><td>旗落用户 7 日内回到产品 ÷ 旗落用户</td><td class="red">≥ 无旗场版本基线，违反即回滚</td></tr>
+    <tr><td>举报率</td><td>被举报站队内容 ÷ 站队内容总量</td><td>≤ 0.5%</td></tr>
+    <tr><td>打卡摩擦流失</td><td>进入举证流程未完成打卡 ÷ 进入举证流程</td><td class="red">≤ 10%（验证不能杀死打卡）</td></tr>
+  </table>
+</section>
+
+<!-- ============ 三 ============ -->
+<section id="p3">
+  <h2>三 · 名词与术语定义</h2>
+  <table>
+    <tr><th>术语</th><th>定义</th></tr>
+    <tr><td>旗</td><td>目标选择「全部公开」后生成的公开实体，含进度、留言流、成色、状态；一面旗对应一个目标</td></tr>
+    <tr><td>插旗</td><td>创建旗的行为；主角=插旗人</td></tr>
+    <tr><td>护旗 / 拔旗</td><td>围观者对旗的两种站队：护旗=留言鼓励；拔旗=从官方话术模板选择诱惑内容</td></tr>
+    <tr><td>成色</td><td>旗的验证强度等级：仅自证 / 见证人点验 / 自动核验（V2 增加：机构结果），决定积分乘数</td></tr>
+    <tr><td>威胁值</td><td>近 7 日拔旗强度量化值，展示于旗面，用于营造对抗氛围（不直接改变目标数据）</td></tr>
+    <tr><td>复活窗</td><td>旗落后 7 天内可用重启券换新旗的期间；期间结算分按复活规则重算</td></tr>
+    <tr><td>宿敌对决</td><td>V2：同目标模板的两面旗互为对手，任一方落幕即分胜负，双方都满期则共斗胜利</td></tr>
+    <tr><td>信任分</td><td>用户信用分（初始 100），影响可参与能力；实锤造假清零</td></tr>
+    <tr><td>点验 / 抽检</td><td>点验=见证人发起的限时取证请求；抽检=系统随机发起的取证请求</td></tr>
+  </table>
+</section>
+
+<!-- ============ 四 ============ -->
+<section id="p4">
+  <h2>四 · 需求范围</h2>
+  <table>
+    <tr><th>包含（本期）</th><th>不包含（后续版本 / 永不做）</th></tr>
+    <tr>
+      <td>
+        · 插旗流程（公开范围 + 举证等级 + 拔旗开关）<br>
+        · 旗面详情页与旗场列表<br>
+        · 护旗 / 拔旗留言（拔旗走官方模板）<br>
+        · 旗状态机与复活窗<br>
+        · 积分结算（行为分 + 结果分 + 成色乘数）与积分商店<br>
+        · 信任分与基础风控（限票 / 冷却 / 设备聚类）<br>
+        · 举证验证 MVP（L1/L2 + 实时拍摄 + 点验 + 抽检）<br>
+        · 战况卡 / 喜报卡生成与分享<br>
+        · 运营后台（精选 / 官方账号 / 七指标看板）
+      </td>
+      <td>
+        · 宿敌对决（<span class="v2">V2</span>）<br>
+        · 验旗挑战、存疑标记（<span class="v15">V1.5</span>）<br>
+        · AI 图像场景识别（<span class="v2">V2</span>）<br>
+        · 第三方 App 数据授权（<span class="v2">V2</span>）、L3 机构成绩单通道（<span class="v2">V2</span>）<br>
+        · 积分兑现 / 转让 / 现金化（<span class="red">禁止，永不</span>）<br>
+        · 匿名站队（<span class="red">禁止，永不</span>）<br>
+        · 任何人脸 / 生物特征验证（<span class="red">禁止，永不</span>）<br>
+        · 旗场公开信息流评论回复盖楼（<span class="v2">V2</span> 视审核成本）
+      </td>
+    </tr>
+  </table>
+</section>
+
+<!-- ============ 五 ============ -->
+<section id="p5">
+  <h2>五 · 方案对比与选型说明</h2>
+  <table>
+    <tr><th>选型点</th><th>方案 A</th><th>方案 B</th><th>结论</th></tr>
+    <tr>
+      <td>拔旗默认状态</td>
+      <td><b>默认关闭</b>，插旗时勾选开启</td>
+      <td>默认开启，可关闭</td>
+      <td><span class="green">选 A</span>。首批用户心理承受度未知，关闭率红线 ≤8% 未验证前不从默认开启起步</td>
+    </tr>
+    <tr>
+      <td>拔旗内容形态</td>
+      <td><b>官方模板即选即发</b> + 自定义先审后发</td>
+      <td>自由文本 + 事后审核</td>
+      <td><span class="green">选 A</span>。事后审核无法拦截金额许诺类合规风险；自定义文案审核未上墙期间给用户明确状态提示</td>
+    </tr>
+    <tr>
+      <td>积分发放时点</td>
+      <td><b>结算后 T+7 发放</b></td>
+      <td>实时到账</td>
+      <td><span class="green">选 A</span>。给反刷与实锤追缴留缓冲；UI 明示「结算中→已到账」两态，避免不可信感</td>
+    </tr>
+    <tr>
+      <td>弱验证旗处理</td>
+      <td><b>定价不禁止</b>：乘数 ×0.5、不进排行榜</td>
+      <td>禁止 L1 旗公开</td>
+      <td><span class="green">选 A</span>。早睡读书类目标天然只能自证，禁止即把该人群挡在玩法外；低价+无曝光使刷分无利可图</td>
+    </tr>
+    <tr>
+      <td>举证材料可见范围</td>
+      <td><b>仅主角、见证人、风控可见</b></td>
+      <td>公开可看</td>
+      <td><span class="green">选 A</span>。围观者只看「已举证」状态标记；隐私最小化，避免打卡照片被围观评头论足</td>
+    </tr>
+  </table>
+</section>
+
+<!-- ============ 六 ============ -->
+<section id="p6">
+  <h2>六 · 用户角色与使用场景</h2>
+  <table>
+    <tr><th>角色</th><th>定义</th><th>核心场景</th><th>关键诉求</th></tr>
+    <tr><td>主角</td><td>插旗的目标拥有者</td><td>插旗、每日打卡举证、被拔旗后坚持、旗落后重启</td><td>被见证、失败不被羞辱</td></tr>
+    <tr><td>见证人</td><td>主角邀请的强关系者（既有体系）</td><td>录胶囊、送礼物、每周点验</td><td>表达关心、确认真实性</td></tr>
+    <tr><td>护旗手</td><td>站队蓝营的注册用户</td><td>留言鼓励、标记精品、（V1.5）存疑标记</td><td>低门槛参与、被看见</td></tr>
+    <tr><td>拔旗手</td><td>站队红营的注册用户</td><td>选模板诱惑、（V1.5）验旗挑战</td><td>对抗乐趣、身份成长</td></tr>
+    <tr><td>游客</td><td>未注册访问者（来自战况卡）</td><td>浏览旗与战况、被引导注册</td><td>看懂热闹、参与有路</td></tr>
+    <tr><td>运营 / 风控</td><td>内部角色（后台）</td><td>精选旗场、审核自定义文案、处理举报与申诉、看指标</td><td>工具效率、风险可视</td></tr>
+  </table>
+  <p class="small">B 端场景（Phase 1）：班主任=特殊见证人，只可护旗与查看班级旗场，禁止拔旗（权力不对等，见风险 RK-05）。</p>
+</section>
+
+<!-- ============ 七 ============ -->
+<section id="p7">
+  <h2>七 · 功能需求清单</h2>
+  <p class="small">优先级：<span class="must">M=必须</span> / <span class="should">S=应该</span> / <span class="could">C=可以</span>；版本：<span class="v1">V1</span> 本期 MVP、<span class="v15">V1.5</span>、<span class="v2">V2</span>。验收要点为 Given/When/Then 简式，可测试。</p>
+
+  <h3>A · 插旗模块</h3>
+  <table>
+    <tr><th style="width:70px">编号</th><th style="width:110px">需求</th><th>规则与口径</th><th>验收要点</th><th style="width:90px">优先级 / 版本</th></tr>
+    <tr><td>FR-A01</td><td>公开范围选择</td><td>立目标流程在「选见证人」后追加第 3 步：私密 / 仅见证人 / 全部公开（生成旗）。<span class="must">必须</span>默认「仅见证人」</td><td>G 立目标到第 3 步 W 选「全部公开」并下一步 T 出现插旗确认页；选私密则无旗</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-A02</td><td>插旗确认页</td><td>展示目标摘要；选择举证等级（L1 仅自证 / L2 过程型）；拔旗开关（<span class="must">必须</span>默认关）；展示旗规则摘要（含「拔旗是激将玩法、可随时免战」）；确认后旗生效</td><td>G 确认页 W 不选举证等级直接确认 T 按钮置灰并提示；开拔旗开关 T 出现规则二次说明</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-A03</td><td>旗面详情页</td><td>展示：进度环与里程碑、成色徽章、状态徽章、威胁值、站队双 Tab（护旗/拔旗）、留言流；顶部固定站队入口</td><td>G 旗生效 W 打开详情页 T 六要素全部可见且与目标数据一致；拔旗关闭时红 Tab 隐藏</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-A04</td><td>旗场列表</td><td>Tab：热门 / 最新 / 即将到期；热门与排序<span class="must">必须</span>排除仅自证旗；每项展示旗名、进度、阵营人数、威胁值、成色徽章</td><td>G 存在 L1 旗 W 查看热门 Tab T 不出现该旗；最新 Tab 出现且带「自证」灰标</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-A05</td><td>旗状态展示</td><td>五态：生效中 / 已达成 / 已掉落（复活窗内）/ 已落幕 / 已作废（实锤造假）；徽章样式全局统一</td><td>G 任一状态旗 W 查看任意入口 T 徽章与状态机（九节）一致</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-A06</td><td>降级与转私密</td><td>主角<span class="must">必须</span>可随时：关闭拔旗（仅护旗）/ 转私密（旗保留但退出旗场）；转私密时站队入口关闭，已产生结算分冻结</td><td>G 旗生效中 W 转私密 T 旗场与战况卡入口即时不可见；再公开 T 重新出现且历史保留</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+  </table>
+
+  <h3>B · 站队模块</h3>
+  <table>
+    <tr><th style="width:70px">编号</th><th style="width:110px">需求</th><th>规则与口径</th><th>验收要点</th><th style="width:90px">优先级 / 版本</th></tr>
+    <tr><td>FR-B01</td><td>护旗留言</td><td>≤100 字；每人每旗每日 1 条；主角可操作「收进旗帜」（精选，每旗上限 10 条）与「戳到我」（每旗每日 3 次）；精选与被戳均计行为分</td><td>G 已护旗 W 当日再留言 T 入口置灰提示明日再来；G 精选满 10 条 W 再收 T 提示已满</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-B02</td><td>拔旗开关与红营</td><td>主角开启拔旗后旗面出现红营 Tab；关闭即时隐藏历史红营留言保留但不展示；开启/关闭<span class="must">必须</span>即时生效不审核</td><td>G 拔旗开 W 关闭开关 T 红 Tab 消失且威胁值停止累计</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-B03</td><td>拔旗话术模板</td><td>官方模板库 ≥30 条，分 3 类（撒娇型 / 激将型 / 共情型）；每条带「口嗨免责」角标；选模板即发；自定义文案先审后发（上墙 SLA ≤10 分钟，见八节）</td><td>G 红营 W 点自定义 T 显示「审核中」占位且他人不可见；审核通过 T 自动上墙</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-B04</td><td>金额类内容拦截</td><td>对所有站队内容执行敏感词过滤：转账 / 金额数字 + 元 / 代付 / 红包等组合命中即拦截并提示改用模板；模板库内容由运营维护不受此限</td><td>G 自定义含「放弃给你转 500」W 提交 T 拦截并提示；G 模板选择 T 不经过该过滤</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-B05</td><td>威胁值</td><td>威胁值 = 近 7 日拔旗留言数 × 1 + 验旗挑战数 × 3（<span class="v15">V1.5</span>）；展示于旗面；仅作氛围与埋点口径，不回写目标数据</td><td>G 3 条近 7 日拔旗 W 查看旗面 T 威胁值 = 3；第 8 日 T 该条不再计入</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-B06</td><td>存疑标记</td><td>护旗手可对某次打卡标「存疑」；每人每月 3 次；单旗存疑 ≥3 人触发 1 次官方抽检；抽检通过则标记者信任分 −2</td><td>G 2 人存疑 W 第 3 人标记 T 触发抽检任务；抽检通过 T 3 名标记者各 −2</td><td><span class="should">S</span> <span class="v15">V1.5</span></td></tr>
+    <tr><td>FR-B07</td><td>验旗挑战</td><td>拔旗手每旗每周 1 次发起；主角 2 小时内实时举证；主角按时举证则挑战方信任 −5；超时未举证记抽检缺席 −5；每旗被挑战间隔 ≥3 天</td><td>G 发起挑战 W 1 小时内举证 T 挑战方 −5 并公示结果；W 超时 T 主角 −5</td><td><span class="should">S</span> <span class="v15">V1.5</span></td></tr>
+    <tr><td>FR-B08</td><td>点将</td><td>主角可消耗积分指定某用户对自家旗拔旗一次；对方可拒绝；被点将者获行为分加成 ×2</td><td>G 积分足够 W 点将 T 对方收到邀请卡；拒绝 T 积分全额退回</td><td><span class="could">C</span> <span class="v2">V2</span></td></tr>
+  </table>
+
+  <h3>C · 对抗与结局</h3>
+  <table>
+    <tr><th style="width:70px">编号</th><th style="width:110px">需求</th><th>规则与口径</th><th>验收要点</th><th style="width:90px">优先级 / 版本</th></tr>
+    <tr><td>FR-C01</td><td>结局判定</td><td>期满且全部里程碑达成 → 旗成；主角主动放弃或期满未达成 → 旗落（进入复活窗）；目标中断（stalled）不改变旗状态，仅累计威胁氛围</td><td>G 最后里程碑达成 W 期满判定 T 旗状态=已达成且触发喜报卡；G 放弃 T 状态=已掉落并开启 7 日复活窗</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-C02</td><td>旗落叙事保护</td><td>主角端旗落<span class="red">禁止</span>出现「拔旗方得分 / 拔旗方胜利」字样与庆祝动效；只展示：降旗动画 + 护旗留言合集 + 重启入口；战果仅在拔旗手端与旗详情公开态展示</td><td>G 旗落 W 主角打开结果页 T 无任何红营得分元素；G 拔旗手打开 T 可见战果</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-C03</td><td>复活窗</td><td>旗落 7 日内消耗重启券 1 张 → 换新旗（进度重置、留言流归档保留可回看）；该旗已产生结算分：拔旗方减半、护旗方翻倍（发放时重算）；复活后重新进入旗场</td><td>G 旗落第 5 日 W 用重启券 T 新旗生效且阵营分按减半/翻倍重算；G 第 8 日 W 操作 T 提示复活窗已关闭</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-C04</td><td>宿敌对决</td><td>同模板且期长接近（±20%）的旗可配对宿敌；互见对方进度与威胁值；任一方旗落即对方阵营胜；双方都满期达成则双阵营按满额结算（共斗）</td><td>G 配对成功 W 一方旗落 T 对方旗面显示「宿敌已倒」并结算；G 双方达成 T 双方阵营均获满额结算分</td><td><span class="could">C</span> <span class="v2">V2</span></td></tr>
+  </table>
+
+  <h3>D · 积分经济</h3>
+  <table>
+    <tr><th style="width:70px">编号</th><th style="width:110px">需求</th><th>规则与口径</th><th>验收要点</th><th style="width:90px">优先级 / 版本</th></tr>
+    <tr><td>FR-D01</td><td>行为分</td><td>初始值（估算，可调）：留言上墙 +2；被收进旗帜 +10；被戳到我 +3（每人每旗每日上限 9）；自定义文案审核通过 +5。行为分实时累计、T+7 发放</td><td>G 留言被精选 W 结算 T +10 记入「结算中」；第 8 日 T 转入余额</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-D02</td><td>结算分与成色乘数</td><td>旗成：护旗方每人 +20 × 成色乘数，拔旗方仅行为分；旗落：拔旗方每人 +15 × 乘数（复活重算后减半），护旗方 +5；乘数：仅自证 ×0.5 / 点验中 ×0.8 / 自动核验 ×1.2（L2）；实锤造假 → 该旗全部关联结算分作废，站队者连带</td><td>G L2 旗旗成 W 护旗方结算 T 20×1.2=24 分；G 实锤 W 结算 T 该旗全部结算分从「结算中/已到账」中扣除（已到账部分扣至负数冻结）</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-D03</td><td>积分账本</td><td>三态：结算中（T+7）/ 已到账 / 已扣除；明细流水可查（来源旗、事件、时间）；积分<span class="red">禁止</span>兑现、转让、赠予</td><td>G 任意积分变动 W 查看明细 T 有对应流水行且与 FR-D01/D02 口径一致</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-D04</td><td>积分商店</td><td>商品与限购（初始）：延期卡 300 分（每季度 1 张）/ 重启券+1 200 分（每年上限 3 张，叠加基础 3 次）/ 免战盾 150 分（30 天禁拔，每旗同时仅 1 枚）/ 旗面皮肤 100–500 分 / 周边抽奖 50 分一次</td><td>G 本季度已购延期卡 W 再购 T 置灰提示下季度再来；G 免战盾生效 W 对方拔旗 T 入口不可用并显示盾牌剩余天数</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-D05</td><td>参与冷却</td><td>每旗每人每日限 1 次站队（护/拔合计）；注册 ≤7 天用户可留言但不参与结算；积分延迟发放期（D01）内实锤追缴有效</td><td>G 新注册第 3 天用户 W 站队 T 可留言、旗面计分标注「不计分」</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-D06</td><td>排行榜</td><td>护旗手榜 / 拔旗手榜，赛季制（季度）；仅统计自动核验旗与点验中旗的行为分与结算分；仅自证旗贡献不计入</td><td>G 用户全部行为发生在 L1 旗 W 查看榜单 T 不出现该用户</td><td><span class="should">S</span> <span class="v1">V1</span></td></tr>
+  </table>
+
+  <h3>E · 信任分与风控</h3>
+  <table>
+    <tr><th style="width:70px">编号</th><th style="width:110px">需求</th><th>规则与口径</th><th>验收要点</th><th style="width:90px">优先级 / 版本</th></tr>
+    <tr><td>FR-E01</td><td>信任分规则</td><td>初始 100；点验/抽检通过 +1（每次）；存疑误报 −2；点验/抽检缺席 −5；实锤造假清零。信任分 &lt;60：不可发起验旗挑战（V1.5）与点将（V2）；=0：仅保留打卡与护旗浏览</td><td>G 信任 55 W 发起验旗挑战 T 拦截并提示分值门槛</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-E02</td><td>实锤认定与处罚</td><td>认定来源：抽检实锤（证据矛盾）或举报核实；处罚：信任清零 + 禁插旗 90 天 + 积分清零 + 历史旗面公开标记「已作废」；<span class="must">必须</span>提供申诉通道，48h 内人工复核，误判全额恢复并补偿信任 +10</td><td>G 实锤 W 生效 T 四项处罚同时生效且旗面出现作废标；G 申诉成功 T 全部恢复</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-E03</td><td>设备聚类</td><td>同一设备聚类 ≥3 账号对同一旗站队 → 仅最早注册账号计分；聚类规则命中不提示用户（风控静默）</td><td>G 3 小号同设备站队同旗 W 结算 T 仅 1 账号得分</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-E04</td><td>异常评分（规则版）</td><td>规则：感知哈希与历史打卡图重复 / 连续 7 天 23:50–23:59 打卡 / 设备聚类特征；评分只用于把用户移入高抽检池，<span class="red">禁止</span>自动判罚、禁止向用户展示评分</td><td>G 哈希重复 W 次日打卡 T 正常上墙但该用户进入高抽检池（后台可见）</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+  </table>
+
+  <h3>F · 举证验证（MVP）</h3>
+  <table>
+    <tr><th style="width:70px">编号</th><th style="width:110px">需求</th><th>规则与口径</th><th>验收要点</th><th style="width:90px">优先级 / 版本</th></tr>
+    <tr><td>FR-F01</td><td>举证等级</td><td>插旗时选：L1 仅自证（打卡自报）/ L2 过程型（每次打卡须实时拍摄）；等级插旗后不可升级（可降级，降级则成色乘数即时下调）</td><td>G L2 旗 W 打卡选相册图片 T 判「待核验」不计入连续打卡（同 FR-F02）</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-F02</td><td>实时拍摄水印</td><td>调用相机现场拍摄（<span class="must">必须</span>禁相册），叠加时间 + 昵称后缀水印；相册导入仅允许在 L1 旗；打卡摩擦流程 ≤3 步</td><td>G L2 旗 W 完成拍摄打卡 T 图片带水印并计入连续；全流程操作步数 T ≤3</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-F03</td><td>见证人点验</td><td>每见证人对每主角每周 1 次；2 小时内响应（现场自拍或 10 秒视频）；响应 +1 信任；缺席 −5；请求文案用「牵挂式」模板（运营维护文案库），<span class="red">禁止</span>「自证 / 证明你在」类措辞</td><td>G 发起点验 W 1h 内响应 T 双方收到结果 +1；W 2h 超时 T −5 并归档</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-F04</td><td>随机抽检</td><td>每 L2 旗每周系统随机抽 1–2 天（不提前告知）；抽中当日要求 24h 内补交实时证据；缺席 −5；规则面向全量用户公示「每周可能被抽检」</td><td>G 抽中 W 24h 内补交 T +1 信任；W 超时 T −5；G 未抽中 T 用户无感知</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+  </table>
+
+  <h3>G · 分享传播</h3>
+  <table>
+    <tr><th style="width:70px">编号</th><th style="width:110px">需求</th><th>规则与口径</th><th>验收要点</th><th style="width:90px">优先级 / 版本</th></tr>
+    <tr><td>FR-G01</td><td>战况卡</td><td>素材：旗名 + 进度 + 威胁值 + 1 条精选留言 + 阵营人数；主角与站队者均可生成；<span class="red">禁止</span>在卡片与分享链路出现任何奖励引导文案；卡面带小程序码直达旗详情</td><td>G 生成战况卡 W 分享 T 游客打开落旗详情页并见注册引导；全链路 T 无积分奖励提示</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-G02</td><td>喜报卡</td><td>仅「旗成」可生成；样式与战况卡区分；同样无奖励引导</td><td>G 旗落 W 尝试生成喜报 T 无入口（仅战况卡）</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+  </table>
+
+  <h3>H · 内容安全与保护机制</h3>
+  <table>
+    <tr><th style="width:70px">编号</th><th style="width:110px">需求</th><th>规则与口径</th><th>验收要点</th><th style="width:90px">优先级 / 版本</th></tr>
+    <tr><td>FR-H01</td><td>免战与连败保护</td><td>免战盾即时生效（FR-D04）；未持盾时主角可「本旗禁拔」一键操作（等同关闭拔旗）；连落 2 面旗后 30 天内新旗默认禁拔且不可开启</td><td>G 连落 2 旗 W 第 3 次插旗 T 拔旗开关锁定为关并显示 30 天倒计时</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-H02</td><td>举报处理</td><td>全部站队内容可举报；运营 24h 内处理（SLA）；举报成立：内容删除 + 涉事者信任 −5；恶意举报（月 ≥3 次不成立）：举报权限暂停 30 天</td><td>G 举报成立 W 处理 T 内容下架 + 双方通知；G 3 次不成立 W 再举报 T 入口提示暂停</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-H03</td><td>推送文案规范</td><td>旗落 / 中断相关推送<span class="red">禁止</span>「你又没做到 / 失败 / 拔旗手赢了」类表述；仅允许：降旗告知 + 护旗留言摘要 + 重启邀请；重启邀请每旗限 2 次（旗落时 + 复活窗最后 1 天）</td><td>G 旗落 W 推送送达 T 文案命中运营文案库白名单（后台校验）</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-H04</td><td>高危目标禁拔</td><td>减重 / 体重相关模板旗固定禁拔且插旗页不出现拔旗开关；模板清单由运营维护</td><td>G 选减脂模板 W 到插旗确认页 T 无拔旗开关并显示「此类目标只护不拔」</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+  </table>
+
+  <h3>I · 运营后台</h3>
+  <table>
+    <tr><th style="width:70px">编号</th><th style="width:110px">需求</th><th>规则与口径</th><th>验收要点</th><th style="width:90px">优先级 / 版本</th></tr>
+    <tr><td>FR-I01</td><td>旗场精选</td><td>运营从班级 / 全站旗中精选 ≤20 面置顶旗场「编辑推荐」位；操作留痕</td><td>G 精选 1 旗 W 用户打开旗场 T 该旗置顶展示</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-I02</td><td>官方账号体系</td><td>官方拔旗队 / 护旗队账号全局唯一「官方」标识，<span class="red">禁止</span>伪装普通用户；官方账号行为计入威胁值但不计入排行榜</td><td>G 官方号留言 W 展示 T 带官方标识；G 排行榜 T 无官方号</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-I03</td><td>指标看板</td><td>按二节 2.3 八项指标出日报与周报；免战/关闭率与失败回访两项超红线时后台红色告警</td><td>G 关闭率 9% W 打开看板 T 告警标出现</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-I04</td><td>功能开关</td><td>旗场、拔旗、积分商店、战况卡分享四个功能各自独立开关，支持按比例灰度；拔旗关闭时既有红营数据保留</td><td>G 拔旗全局关闭 W 用户访问 T 红 Tab 全站隐藏且无报错</td><td><span class="must">M</span> <span class="v1">V1</span></td></tr>
+    <tr><td>FR-I05</td><td>插旗订阅授权点（D-R4 待补项）</td><td>两个授权点：插旗成功后请求订阅「战况通知」；旗落结算前请求订阅「结局通知」。F1 里程碑启动时随 Q-TC2（插旗深度用例）一并细化，不阻塞基座 S1–S3</td><td>G 插旗成功 W 弹授权 T 接受后旗落通知可达；拒绝后 7 天内不再弹（对齐基座 FR-I01 节奏）</td><td><span class="should">S</span> <span class="v15">V1.5</span></td></tr>
+  </table>
+
+  <div class="note"><b>需求统计（2026-11-17 自查评审 D-R3 冻结口径，以 FR 表实际行数为准）</b>：共 46 项（M 37 / S 3 / C 6），其中 V1 41 项 / V1.5 3 项 / V2 2 项。评审时逐条确认优先级。</div>
+</section>
+
+<!-- ============ 八 ============ -->
+<section id="p8">
+  <h2>八 · 非功能需求</h2>
+  <table>
+    <tr><th>类别</th><th>要求</th></tr>
+    <tr><td>性能</td><td>旗场列表首屏 P95 ≤ 1.5s（50 面旗）；留言发布 P95 ≤ 800ms；战况卡生成 ≤ 3s；威胁值/积分结算为异步任务，延迟 ≤ 5 分钟</td></tr>
+    <tr><td>内容审核时效</td><td>自定义拔旗文案先审后发，上墙 P95 ≤ 10 分钟（模板即选即发不受限）；举报处理 SLA 24h；申诉复核 48h</td></tr>
+    <tr><td>隐私</td><td>举证材料（照片/视频）仅主角、其见证人、风控角色可见，<span class="must">必须</span>私有存储 + 鉴权读取；围观者仅见「已举证」状态；举证材料保留期 = 旗落幕 + 90 天后删除；不做任何生物特征采集</td></tr>
+    <tr><td>合规</td><td>积分体系无资金流（不可兑现/转让），不适用支付三件套；涉个人信息遵循最小化与告知同意；未成年人账号禁用拔旗功能（实名年龄可用时生效，V1 以「青少年模式」开关兜底）</td></tr>
+    <tr><td>可用性</td><td>核心链路（打卡 → 站队 → 看旗）每步有成功/失败反馈；断网时留言本地暂存重试；所有列表有空状态文案</td></tr>
+  </table>
+</section>
+
+<!-- ============ 九 ============ -->
+<section id="p9">
+  <h2>九 · 业务流程与状态流转</h2>
+  <h3>9.1 旗状态机</h3>
+  <div class="st">
+    <b>待生效</b>（插旗确认前）→ 确认 → <b>生效中</b> → 期满且全里程碑 → <b>已达成</b>（终态，可生成喜报）<br>
+    <b>生效中</b> → 主动放弃 / 期满未达 → <b>已掉落</b>（复活窗 7 天）→ 用重启券 → <b>生效中</b>（新旗，旧留言归档）<br>
+    <b>已掉落</b> → 7 日未复活 → <b>已落幕</b>（终态，仅战况卡）<br>
+    任意状态 → 实锤造假认定 → <b>已作废</b>（终态，处罚生效，申诉成功可回退到原状态）
+  </div>
+  <table>
+    <tr><th>状态</th><th>允许操作</th><th>不允许</th></tr>
+    <tr><td>生效中</td><td>打卡举证、站队留言、降级/转私密、免战</td><td>生成喜报</td></tr>
+    <tr><td>已掉落</td><td>重启（消耗券）、查看留言合集</td><td>新站队留言（冻结）</td></tr>
+    <tr><td>已达成 / 已落幕</td><td>生成卡片、回看、宿敌结算（V2）</td><td>一切新站队</td></tr>
+    <tr><td>已作废</td><td>申诉</td><td>插旗（禁插 90 天）、积分使用</td></tr>
+  </table>
+  <h3>9.2 站队主流程</h3>
+  <div class="st">
+    围观者进入旗详情 → 选阵营（护 / 拔）→ 护：输入留言（≤100 字）即上墙 / 拔：选官方模板（或自定义→审核队列）→ 上墙 → 计行为分（结算中）→ 旗结局触发 → 结算分按成色乘数计算 → T+7 发放（复活窗可能重算）
+  </div>
+  <h3>9.3 点验 / 抽检流程</h3>
+  <div class="st">
+    发起（见证人手动 / 系统随机）→ 主角收到「牵挂式」请求 → 2h / 24h 内实时取证 → 系统核验（真实性规则 + 风控复核）→ 通过：信任 +1 / 缺席：信任 −5 → 高抽检池联动（FR-E04）
+  </div>
+</section>
+
+<!-- ============ 十 ============ -->
+<section id="p10">
+  <h2>十 · 数据与埋点需求</h2>
+  <p>公共属性沿用既有埋点 schema：<code>user_id / goal_id / flag_id / has_witness / group / goal_age_days / timestamp</code>。新增事件：</p>
+  <table>
+    <tr><th>事件名</th><th>触发时机</th><th>关键属性</th></tr>
+    <tr><td>flag_plant</td><td>插旗确认成功</td><td>proof_level（L1/L2）、pull_enabled、template_id</td></tr>
+    <tr><td>flag_view</td><td>旗详情页曝光</td><td>flag_state、from（旗场/战况卡/搜索）、is_guest</td></tr>
+    <tr><td>defend_send / tempt_send</td><td>护旗 / 拔旗留言上墙</td><td>content_type（custom/template_id）、word_count</td></tr>
+    <tr><td>flag_optout_pull</td><td>关闭拔旗 / 免战盾生效</td><td>trigger（manual/shield/lose_streak）、threat_value_at</td></tr>
+    <tr><td>flag_result</td><td>结局判定</td><td>result（achieved/fallen/closed）、threat_total、defender_n、tempter_n</td></tr>
+    <tr><td>flag_revive</td><td>复活窗内重启</td><td>days_after_fall、cost_ticket</td></tr>
+    <tr><td>points_settle / points_grant / points_spend</td><td>结算入账 / T+7 发放 / 商店消耗</td><td>amount、flag_id、item_id、multiplier</td></tr>
+    <tr><td>trust_change</td><td>信任分变动</td><td>delta、reason（verify_pass/absent/misreport/cheat）</td></tr>
+    <tr><td>proof_request / proof_submit</td><td>点验/抽检发起与响应</td><td>type（witness_random/system_random）、latency_min、pass</td></tr>
+    <tr><td>share_card_send</td><td>战况卡 / 喜报卡分享</td><td>card_type、visitor_register（回包归因）</td></tr>
+  </table>
+  <p class="small">口径红线：<code>flag_optout_pull</code> 与失败回访两项指标每日出数；报告口径与二节 2.3 定义一致，不得在报表层重定义。</p>
+</section>
+
+<!-- ============ 十一 ============ -->
+<section id="p11">
+  <h2>十一 · 权限与安全</h2>
+  <table>
+    <tr><th>角色</th><th>旗内容</th><th>举证材料</th><th>后台</th></tr>
+    <tr><td>游客</td><td>旗详情公开部分（进度 / 留言 / 状态）</td><td>不可见</td><td>无</td></tr>
+    <tr><td>注册站队者</td><td>+ 站队、举报</td><td>不可见</td><td>无</td></tr>
+    <tr><td>见证人</td><td>+ 点验发起</td><td>该主角材料可见</td><td>无</td></tr>
+    <tr><td>主角</td><td>本旗全部管理</td><td>本人材料</td><td>无</td></tr>
+    <tr><td>运营</td><td>精选 / 官方号发言</td><td>涉举报单条可见</td><td>精选 / 审核 / 文案库 / 开关</td></tr>
+    <tr><td>风控</td><td>—</td><td>抽检范围内可见</td><td>异常池 / 处罚 / 申诉复核</td></tr>
+  </table>
+  <p class="small">后台全部敏感操作（处罚 / 实锤认定 / 精选）留操作日志（操作人 / 时间 / 对象 / 前后值）。</p>
+</section>
+
+<!-- ============ 十二 ============ -->
+<section id="p12">
+  <h2>十二 · 异常处理清单</h2>
+  <table>
+    <tr><th>#</th><th>场景</th><th>处理</th></tr>
+    <tr><td>E-01</td><td>主角注销 / 90 天未活跃，旗仍生效</td><td>第 30 天起旗标注「失联」；第 90 天自动判「已落幕」，按旗落结算（不触发庆祝类通知）</td></tr>
+    <tr><td>E-02</td><td>见证人全部解绑，点验旗失去点验来源</td><td>成色降级为「仅自证」乘数并通知主角；系统随机抽检仍有效</td></tr>
+    <tr><td>E-03</td><td>留言超过 100 字 / 空内容提交</td><td>前端字数计数 + 提交校验；空内容按钮置灰</td></tr>
+    <tr><td>E-04</td><td>自定义审核队列积压 &gt; 30 分钟</td><td>提示用户「审核延迟」并允许撤回；超 2h 未审自动退款（点将分，V2）或不计失败</td></tr>
+    <tr><td>E-05</td><td>抽检 / 点验与打卡同日冲突</td><td>当日已实时拍摄打卡可直接引用为点验证据（一键引用，不重复拍摄）</td></tr>
+    <tr><td>E-06</td><td>复活窗最后一日提交重启但券不足</td><td>提示可在商店购重启券（FR-D04），窗口截止以提交支付成功时间为准顺延 10 分钟</td></tr>
+    <tr><td>E-07</td><td>宿敌一方中途转私密（V2）</td><td>对决中止，已产生行为分正常结算，无胜负方</td></tr>
+    <tr><td>E-08</td><td>旗场整体故障</td><td>FR-I04 总开关降级：旗场入口隐藏，打卡与见证人链路不受影响</td></tr>
+  </table>
+</section>
+
+<!-- ============ 十三 ============ -->
+<section id="p13">
+  <h2>十三 · 上线计划、依赖与上线后验证</h2>
+  <h3>13.1 阶段计划</h3>
+  <table>
+    <tr><th>阶段</th><th>范围</th><th>进入条件 / 复审</th></tr>
+    <tr><td>Phase 0（W1–W3）</td><td>不开发。微信群人工旗榜 + 人工收集胶囊，验证「愿插旗 / 愿站队 / 亲友愿录视频」三个零证据假设</td><td>30 人内测；≥60% 参与过站队 → 进入 Phase 1 开发立项</td></tr>
+    <tr><td>Phase 1（V1 开发）</td><td>本 PRD 全部 V1 项；旗场仅机构班级可见 + 官方精选旗场</td><td>灰度 2 个班级 × 2 周；关闭率 ≤8%、失败回访不降 → 扩量</td></tr>
+    <tr><td>Phase 2</td><td>公开旗场 + 战况卡全量 + V1.5（存疑 / 验旗挑战）立项</td><td>旗场渗透率 ≥30%；护旗→注册 ≥15%</td></tr>
+  </table>
+  <h3>13.2 依赖评估</h3>
+  <table>
+    <tr><th>依赖</th><th>分级</th><th>最晚就绪</th><th>替代方案</th></tr>
+    <tr><td>内容审核服务（自定义拔旗文案）</td><td>阻塞</td><td>V1 联调前</td><td>先审后发降级为「仅官方模板」（功能降级不阻塞上线）</td></tr>
+    <tr><td>推送通道</td><td>并行</td><td>灰度前</td><td>站内信 + 短信兜底</td></tr>
+    <tr><td>相机 / 水印能力</td><td>并行</td><td>V1 开发期</td><td>水印为前端 Canvas 自绘，无外部依赖</td></tr>
+    <tr><td>机构班级体系（B 端）</td><td>并行</td><td>Phase 1 上线前</td><td>首发仅官方精选旗场，班级旗场延后</td></tr>
+    <tr><td>实名 / 青少年模式开关</td><td>可绕过</td><td>V2</td><td>V1 以青少年模式手动开关兜底</td></tr>
+  </table>
+  <h3>13.3 上线后验证</h3>
+  <ul>
+    <li>灰度期（Phase 1）每 3 日出一次八指标快报（FR-I03）；</li>
+    <li>两条<span class="red">硬回滚线</span>：免战/关闭率 &gt;8% 持续一周 → 收缩拔旗（模板分类下线激将型）；失败用户 7 日回访低于基线 → 拔旗功能整体下线并复盘；</li>
+    <li>复活反转率、护旗→注册转化两项达标后，宿敌对决（V2）进入排期评审。</li>
+  </ul>
+</section>
+
+<!-- ============ 十四 ============ -->
+<section id="p14">
+  <h2>十四 · 风险登记册</h2>
+  <table>
+    <tr><th>编号</th><th>风险描述</th><th>类别</th><th>概率</th><th>影响</th><th>等级</th><th>应对措施</th><th>状态</th></tr>
+    <tr><td>RK-01</td><td>社区密度不足，旗场无人站队，玩法空转</td><td>需求</td><td>4</td><td>4</td><td>16 高</td><td>Phase 1 绑定班级场景；官方账号兜底首旗响应；渗透率 &lt;15% 两周触发证伪评审</td><td>跟踪中</td></tr>
+    <tr><td>RK-02</td><td>拔旗毒性致脆弱用户流失</td><td>体验</td><td>3</td><td>5</td><td>15 高</td><td>默认关 + 免战 + 连败保护 + 高危禁拔（FR-H01/H04）；关闭率红线 ≤8% 硬回滚</td><td>跟踪中</td></tr>
+    <tr><td>RK-03</td><td>小号刷分薅积分商店</td><td>风控</td><td>3</td><td>4</td><td>12 中</td><td>五条防线（限票/冷却/聚类/延迟/不可兑现）；成色乘数使刷弱旗无利可图</td><td>跟踪中</td></tr>
+    <tr><td>RK-04</td><td>分享链路被认定利诱互动（合规）</td><td>合规</td><td>2</td><td>5</td><td>10 中</td><td>战况卡全程无奖励文案（FR-G01）；法务评审为上线前置项</td><td>跟踪中</td></tr>
+    <tr><td>RK-05</td><td>点验被感知为监控，班级场景权力不对等</td><td>体验</td><td>3</td><td>4</td><td>12 中</td><td>牵挂式文案库（FR-F03）；班主任禁拔禁点验，仅护旗</td><td>跟踪中</td></tr>
+    <tr><td>RK-06</td><td>自定义文案审核成本超预期</td><td>进度</td><td>4</td><td>3</td><td>12 中</td><td>先审后发 + 依赖降级方案（仅模板）；审核量看板周报</td><td>跟踪中</td></tr>
+    <tr><td>RK-07</td><td>举证摩擦导致打卡流失（L2 旗）</td><td>体验</td><td>3</td><td>4</td><td>12 中</td><td>摩擦流失 ≤10% 红线（E-埋点）；超线则 L2 打卡流程减步并放宽相册（降级为待核验）</td><td>跟踪中</td></tr>
+  </table>
+</section>
+
+<!-- ============ 十五 ============ -->
+<section id="p15">
+  <h2>十五 · 附录</h2>
+  <h3>15.1 原型制作指引（下一步）</h3>
+  <p>基于既有 <code>demo/miniapp</code>（四 Tab 骨架、弹层系统、真实状态机）扩展。新增与改动页面清单：<b class="small">（D-R2 决议：本清单与工程结构的显式映射以《开工前自查评审报告》§5 映射表为准——新增路由 7 = 旗场列表 1（主包）+ flagpkg 4 + pointspkg 2；其余 4 项为既有页面改造/子区块，不新增路由。有出入时以 G-05 工程结构为准。）</b></p>
+  <table>
+    <tr><th>页面</th><th>类型</th><th>关联需求</th><th>要点</th></tr>
+    <tr><td>插旗流程第 3 步</td><td>改造</td><td>FR-A01/A02</td><td>公开范围 + 举证等级 + 拔旗开关，一屏完成；默认态高亮</td></tr>
+    <tr><td>旗面详情页</td><td>新增</td><td>FR-A03/B01–B05/C02</td><td>双阵营 Tab、威胁值、状态徽章、精选留言「收进旗帜」；主角视角与游客视角差异</td></tr>
+    <tr><td>旗场列表页</td><td>新增</td><td>FR-A04/D06/I01</td><td>三 Tab + 精选位 + L1 灰标；空状态文案「还没有人插旗，做第一个」</td></tr>
+    <tr><td>拔旗模板选择器</td><td>新增</td><td>FR-B03/B04</td><td>三类模板 + 口嗨免责角标 + 自定义「审核中」占位态</td></tr>
+    <tr><td>旗落结果页（主角端）</td><td>新增</td><td>FR-C02/C03</td><td>降旗动画 + 护旗留言合集 + 重启按钮 + 复活窗倒计时；<span class="red">无红营元素</span></td></tr>
+    <tr><td>积分账本与商店</td><td>新增</td><td>FR-D03/D04</td><td>三态流水 + 商品限购态 + 「结算中 T+7」提示</td></tr>
+    <tr><td>信任分卡（我的页内）</td><td>改造</td><td>FR-E01/E02</td><td>分数 + 变动记录 + 申诉入口</td></tr>
+    <tr><td>点验请求弹层</td><td>新增</td><td>FR-F03</td><td>牵挂式文案 + 实时拍摄/一键引用今日打卡 + 2h 倒计时</td></tr>
+    <tr><td>战况卡生成器</td><td>新增</td><td>FR-G01/G02</td><td>Canvas 生成 + 小程序码；预览即所见</td></tr>
+    <tr><td>打卡页（L2 旗）</td><td>改造</td><td>FR-F01/F02</td><td>禁相册 + 水印预览 + ≤3 步完成</td></tr>
+    <tr><td>运营后台（简版）</td><td>新增</td><td>FR-I01–I04</td><td>精选拖拽排序 + 文案库管理 + 八指标看板 + 开关面板</td></tr>
+  </table>
+  <h3>15.2 需求追踪（关键链路 RTM 节选）</h3>
+  <table>
+    <tr><th>需求编号</th><th>PRD 章节</th><th>原型落点</th><th>测试关注</th><th>状态</th></tr>
+    <tr><td>FR-A02 插旗确认</td><td>七.A</td><td>插旗流程第 3 步</td><td>默认态 / 按钮置灰 / 二次说明</td><td>待开发</td></tr>
+    <tr><td>FR-C03 复活窗</td><td>七.C / 九.1</td><td>旗落结果页</td><td>7 日边界 / 减半翻倍重算</td><td>待开发</td></tr>
+    <tr><td>FR-D02 成色乘数</td><td>七.D / 九.2</td><td>积分账本</td><td>三种乘数 / 实锤作废连带</td><td>待开发</td></tr>
+    <tr><td>FR-F03 点验</td><td>七.F / 九.3</td><td>点验弹层</td><td>周频限 1 / 2h 超时 / 文案白名单</td><td>待开发</td></tr>
+  </table>
+  <h3>15.3 交付自检</h3>
+  <p class="small">☑ 背景与目标可衡量（2.3 八项含口径）☑ 范围含/不含明确（四）☑ 方案对比与推荐理由（五）☑ 需求逐条编号+可测验收（七，37 项）☑ 非功能有数值（八）☑ 状态机与异常清单（九/十二）☑ 埋点与口径（十）☑ 权限模型（十一）☑ 依赖三档与回滚（十三）☑ 风险登记册（十四）☑ 红线贯穿（FR-C02/G01/H03 与「禁止」项）</p>
+  <p class="small" style="margin-top:10px">本方案为产品设计参考，具体实施请结合公司合规与法务要求确认。</p>
+</section>
+
+<footer>PRD · 社区运营玩法「插旗体系」 v1.0 · 上游：插旗玩法方案 v1 / 举证验证体系 v1 / Flag 项目总览 v1 · 2026-11-17</footer>
+</div>
+</body>
+</html>

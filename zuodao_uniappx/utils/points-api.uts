@@ -1,0 +1,34 @@
+// 积分账本、商店、排行榜与信任分 API 封装
+import { api } from '@/utils/api.uts'
+
+export function pointsSummary(): Promise<UTSJSONObject> {
+    return api('/api/points/summary')
+}
+
+export function pointsLedger(): Promise<UTSJSONObject> {
+    return api('/api/points/ledger')
+}
+
+export function pointsShop(): Promise<UTSJSONObject> {
+    return api('/api/points/shop')
+}
+
+export function buyPointsItem(sku: string): Promise<UTSJSONObject> {
+    return api('/api/points/shop/buy', 'POST', { 'sku': sku } as UTSJSONObject)
+}
+
+export function useShield(flagId: string): Promise<UTSJSONObject> {
+    return api('/api/points/shop/use-shield', 'POST', { 'flagId': flagId } as UTSJSONObject)
+}
+
+export function leaderboard(side: string): Promise<UTSJSONObject> {
+    return api('/api/points/leaderboard?side=' + side)
+}
+
+export function trustMe(): Promise<UTSJSONObject> {
+    return api('/api/trust/me')
+}
+
+export function appeal(reason: string): Promise<UTSJSONObject> {
+    return api('/api/trust/appeal', 'POST', { 'reason': reason } as UTSJSONObject)
+}

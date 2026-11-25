@@ -1,0 +1,73 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <text class="h2">选一句，再拔旗</text>
+            <text class="small gap-8">即选即发 · 口嗨免责 · 激将玩法可随时免战</text>
+
+            <view v-for="(t, i) in templates" :key="t.id" class="card tpl-card" @click="choose(t.id, t.text)">
+                <view class="row">
+                    <text class="sec-label">{{ t.category }}</text>
+                    <view class="spacer"></view>
+                    <text class="dim">{{ t.id }}</text>
+                </view>
+                <text class="body-text gap-12">{{ t.text }}</text>
+                <text class="small gap-8">{{ t.disclaimer }}</text>
+            </view>
+
+            <view class="card">
+                <text class="sec-label">自定义文案 · 先审后发</text>
+                <textarea class="textarea gap-12" v-model="custom" placeholder="涉及金额、转账的内容会被拦截" />
+                <text class="small gap-8">审核 P95 ≤ 10 分钟；审核中他人不可见。</text>
+                <view class="btn btn-tonal gap-16" @click="chooseCustom">
+                    <text class="btn-text-gold-sm">提交自定义文案</text>
+                </view>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { standingTemplates } from '@/utils/flag-api.uts'
+    import { templateFrom, StandingTemplate } from '@/utils/flag-models.uts'
+    import { errText } from '@/utils/api.uts'
+
+    export default {
+        data() {
+            return {
+                templates: [] as Array<StandingTemplate>,
+                custom: '',
+                err: ''
+            }
+        },
+        onLoad() {
+            standingTemplates()
+                .then((res: UTSJSONObject) => {
+                    const list: Array<StandingTemplate> = []
+                    const arr = res.getArray('templates')
+                    if (arr != null) {
+                        arr.forEach((e: any | null) => {
+                            if (e instanceof UTSJSONObject) list.push(templateFrom(e as UTSJSONObject))
+                        })
+                    }
+                    this.templates = list
+                })
+                .catch((e: any | null) => { this.err = errText(e) })
+        },
+        methods: {
+            choose(id: string, text: string) {
+                uni.setStorageSync('zd_selected_template', text)
+                uni.setStorageSync('zd_selected_template_id', id)
+                uni.navigateBack()
+            },
+            chooseCustom() {
+                const text = this.custom.trim()
+                if (text.length == 0) { this.err = '请先写下文案'; return }
+                this.choose('CUSTOM', text)
+            }
+        }
+    }
+</script>
+
+<style>
+    .tpl-card { padding: 24rpx; }
+</style>

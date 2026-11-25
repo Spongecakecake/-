@@ -1,0 +1,90 @@
+// 插旗体系 API 封装
+import { api } from '@/utils/api.uts'
+
+export function flagField(tab: string, limit: number): Promise<UTSJSONObject> {
+    return api('/api/flags/field?tab=' + tab + '&limit=' + limit.toString())
+}
+
+export function flagMine(): Promise<UTSJSONObject> {
+    return api('/api/flags/mine')
+}
+
+export function flagDetail(id: string): Promise<UTSJSONObject> {
+    return api('/api/flags/' + id)
+}
+
+export function flagCard(id: string): Promise<UTSJSONObject> {
+    return api('/api/flags/' + id + '/card')
+}
+
+export function plantFlag(goalId: string, privacy: string, proofLevel: string, pullEnabled: boolean): Promise<UTSJSONObject> {
+    const body = {
+        'goalId': goalId,
+        'privacy': privacy,
+        'proofLevel': proofLevel,
+        'pullEnabled': pullEnabled
+    } as UTSJSONObject
+    return api('/api/flags/plant', 'POST', body)
+}
+
+export function setFlagPrivacy(id: string, privacy: string): Promise<UTSJSONObject> {
+    return api('/api/flags/' + id + '/privacy', 'POST', { 'privacy': privacy } as UTSJSONObject)
+}
+
+export function setFlagPull(id: string, enabled: boolean): Promise<UTSJSONObject> {
+    return api('/api/flags/' + id + '/pull', 'POST', { 'enabled': enabled } as UTSJSONObject)
+}
+
+export function reviveFlag(id: string): Promise<UTSJSONObject> {
+    return api('/api/flags/' + id + '/revive', 'POST', null)
+}
+
+export function standingTemplates(): Promise<UTSJSONObject> {
+    return api('/api/standings/templates')
+}
+
+export function flagStandings(id: string): Promise<UTSJSONObject> {
+    return api('/api/standings/flag/' + id)
+}
+
+export function sendStanding(flagId: string, side: string, contentType: string, content: string, templateId: string): Promise<UTSJSONObject> {
+    const body = {
+        'flagId': flagId,
+        'side': side,
+        'contentType': contentType,
+        'content': content,
+        'templateId': templateId
+    } as UTSJSONObject
+    return api('/api/standings', 'POST', body)
+}
+
+export function featureStanding(id: string): Promise<UTSJSONObject> {
+    return api('/api/standings/' + id + '/feature', 'POST', null)
+}
+
+export function pokeStanding(id: string): Promise<UTSJSONObject> {
+    return api('/api/standings/' + id + '/poke', 'POST', null)
+}
+
+export function reportStanding(id: string, reason: string): Promise<UTSJSONObject> {
+    return api('/api/standings/' + id + '/report', 'POST', { 'reason': reason } as UTSJSONObject)
+}
+
+export function proofStatus(flagId: string): Promise<UTSJSONObject> {
+    return api('/api/proofs/status?flagId=' + flagId)
+}
+
+export function requestProof(flagId: string): Promise<UTSJSONObject> {
+    return api('/api/proofs/request', 'POST', { 'flagId': flagId } as UTSJSONObject)
+}
+
+export function submitProof(flagId: string, dataUrl: string, source: string, requestId: string, checkinId: string): Promise<UTSJSONObject> {
+    const body = {
+        'flagId': flagId,
+        'dataUrl': dataUrl,
+        'source': source,
+        'requestId': requestId,
+        'checkinId': checkinId
+    } as UTSJSONObject
+    return api('/api/proofs/submit', 'POST', body)
+}

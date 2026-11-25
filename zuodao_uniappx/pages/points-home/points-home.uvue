@@ -1,0 +1,112 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <view class="card points-hero">
+                <text class="sec-label">积分账户 · 行为分 + 结算分</text>
+                <text class="points-balance">{{ balance }}</text>
+                <text class="points-pending gap-8">结算中 {{ pending }} · 结算后 T+7 发放</text>
+                <text class="small gap-12">积分不可兑现、不可转让；仅用于商店与玩法权益。</text>
+            </view>
+
+            <view class="card">
+                <view class="row">
+                    <text class="sec-label">信任分</text>
+                    <view class="spacer"></view>
+                    <text class="h3">{{ score }}</text>
+                </view>
+                <text class="small gap-8">{{ canPlant ? '可正常插旗' : '禁插旗期内' }}{{ noPullUntil.length > 0 ? ' · 连败保护至 ' + noPullUntil.substring(0, 10) : '' }}</text>
+                <view class="btn-sm btn-outlined gap-16" @click="goTrust">
+                    <text class="btn-text-green-sm">信任记录 / 申诉</text>
+                </view>
+            </view>
+
+            <view class="card link-card" @click="goLedger">
+                <view class="row">
+                    <text class="h3">积分账本</text>
+                    <view class="spacer"></view>
+                    <text class="dim">›</text>
+                </view>
+                <text class="small gap-8">已到账 / 结算中 / 已扣除，来源旗与事件可追溯</text>
+            </view>
+
+            <view class="card link-card" @click="goShop">
+                <view class="row">
+                    <text class="h3">积分商店</text>
+                    <view class="spacer"></view>
+                    <text class="dim">›</text>
+                </view>
+                <text class="small gap-8">延期卡 · 重启券 · 免战盾 · 旗面皮肤 · 周边抽奖</text>
+            </view>
+
+            <view class="card link-card" @click="goBoard">
+                <view class="row">
+                    <text class="h3">阵营排行榜</text>
+                    <view class="spacer"></view>
+                    <text class="dim">›</text>
+                </view>
+                <text class="small gap-8">仅点验中 / 自动核验旗计入，仅自证旗不贡献榜单分</text>
+            </view>
+
+            <view class="card">
+                <text class="sec-label">积分规则</text>
+                <text class="muted-lh gap-12">留言上墙 +2 · 自定义文案审核通过 +5 · 收进旗帜 +10 · 戳到我 +3（同旗每人每日上限 9）。结局分：达成护旗 +20×成色，旗落拔旗 +15×成色；复活重算后护旗翻倍、拔旗减半。</text>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { pointsSummary, trustMe } from '@/utils/points-api.uts'
+    import { errText } from '@/utils/api.uts'
+
+    export default {
+        data() {
+            return {
+                balance: 0,
+                pending: 0,
+                score: 100,
+                canPlant: true,
+                noPullUntil: ''
+            }
+        },
+        onShow() { this.load() },
+        methods: {
+            load() {
+                pointsSummary()
+                    .then((res: UTSJSONObject) => {
+                        const p = res.getJSON('points')
+                        if (p != null) {
+                            this.balance = (p as UTSJSONObject).getNumber('balance', 0)
+                            this.pending = (p as UTSJSONObject).getNumber('pending', 0)
+                        }
+                    })
+                    .catch((e: any | null) => { uni.showToast({ title: errText(e), icon: 'none' }) })
+                trustMe()
+                    .then((res: UTSJSONObject) => {
+                        const t = res.getJSON('trust')
+                        if (t != null) {
+                            this.score = (t as UTSJSONObject).getNumber('score', 100)
+                            this.canPlant = (t as UTSJSONObject).getBoolean('canPlant', true)
+                            this.noPullUntil = (t as UTSJSONObject).getString('noPullUntil', '')
+                        }
+                    })
+                    .catch(() => {})
+            },
+            goLedger() { uni.navigateTo({ url: '/pagesPoints/points-ledger/points-ledger' }) },
+            goShop() { uni.navigateTo({ url: '/pagesPoints/points-shop/points-shop' }) },
+            goBoard() { uni.navigateTo({ url: '/pagesPoints/points-ledger/points-ledger?tab=board' }) },
+            goTrust() {
+                uni.showModal({
+                    title: '信任分说明',
+                    content: '实锤造假将清零积分并禁插旗 90 天；有误判可在 48 小时内申诉，复核通过后补偿 10 分。',
+                    showCancel: false
+                } as any)
+            }
+        }
+    }
+</script>
+
+<style>
+    .points-hero { background-color: #F3EAD6; }
+    .link-card { margin-bottom: 20rpx; }
+</style>

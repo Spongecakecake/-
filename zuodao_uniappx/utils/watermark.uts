@@ -1,0 +1,63 @@
+// V1 举证 L2：选择相册图片 → 读取为 base64 → 叠加时间/昵称水印 → 输出可上传 dataURL。
+// 不依赖相机与原生模块；Web/小程序/App 端统一走「上传模拟」。
+
+function escapeXml(s: string): string {
+    let out = s
+    out = out.split('&').join('&amp;')
+    out = out.split('<').join('&lt;')
+    out = out.split('>').join('&gt;')
+    out = out.split('"').join('&quot;')
+    return out
+}
+
+function two(n: number): string {
+    return n < 10 ? '0' + n.toString() : n.toString()
+}
+
+function nowText(): string {
+    const d = new Date()
+    return d.getFullYear().toString() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate()) + ' ' + two(d.getHours()) + ':' + two(d.getMinutes())
+}
+
+function wrapSvg(src: string, text: string): string {
+    const label = escapeXml(text)
+    const time = nowText()
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1280" viewBox="0 0 720 1280">'
+        + '<image href="' + src + '" x="0" y="0" width="720" height="1280" preserveAspectRatio="xMidYMid slice"/>'
+        + '<rect x="0" y="1080" width="720" height="200" fill="#101613" fill-opacity="0.62"/>'
+        + '<text x="40" y="1150" fill="#FFFFFF" font-size="34" font-weight="600">做到 · ' + label + '</text>'
+        + '<text x="40" y="1215" fill="#B9E7CF" font-size="28">' + time + ' · 仅供举证核验</text>'
+        + '</svg>'
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
+}
+
+function readAsBase64(path: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+        uni.getFileSystemManager().readFile({
+            filePath: path,
+            encoding: 'base64',
+            success: (res: any) => {
+                const data = res.data as string
+                resolve('data:image/png;base64,' + data)
+            },
+            fail: (_: any) => reject(new Error('读取图片失败'))
+        } as any)
+    })
+}
+
+export function chooseWatermarkedProof(text: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+        uni.chooseImage({
+            count: 1,
+            success: (res: any) => {
+                const paths = res.tempFilePaths as Array<string>
+                if (paths == null || paths.length == 0) {
+                    reject(new Error('未选择图片'))
+                    return
+                }
+                readAsBase64(paths[0]).then((src: string) => resolve(wrapSvg(src, text))).catch((e: any | null) => reject(e))
+            },
+            fail: (_: any) => reject(new Error('已取消选择'))
+        } as any)
+    })
+}

@@ -1,0 +1,286 @@
+// 数据模型（对应后端 JSON 结构）+ UTSJSONObject 映射
+import { shortDate } from './theme.uts'
+
+export type Stats = {
+    total: number
+    approved: number
+    rejected: number
+    pending: number
+    bestStreak: number
+}
+
+export type Participant = {
+    id: string
+    nickname: string
+    role: string
+}
+
+export type Checkin = {
+    id: string
+    day: string
+    note: string
+    status: string
+    reviewMessage: string
+    createdAt: string
+    msg: string // 本地：批语输入（仅未批阅时使用）
+}
+
+export type GoalEvent = {
+    id: string
+    type: string
+    message: string
+    at: string
+}
+
+export type Proposal = {
+    result: string
+    proposedBy: string
+}
+
+export type Goal = {
+    id: string
+    title: string
+    template: string
+    description: string
+    startDate: string
+    endDate: string
+    rule: string
+    status: string
+    myRole: string
+    inviteCode: string
+    giftName: string
+    giftNote: string
+    encouragement: string
+    participants: Array<Participant>
+    checkins: Array<Checkin>
+    events: Array<GoalEvent>
+    stats: Stats
+    pendingToReview: number
+    proposal: Proposal | null
+}
+
+export type Invite = {
+    code: string
+    title: string
+    template: string
+    rule: string
+    startDate: string
+    endDate: string
+    giftName: string
+    ownerName: string
+    supTaken: boolean
+    witTaken: boolean
+}
+
+export type Chapter = {
+    no: number
+    title: string
+    text: string
+}
+
+export type Memoir = {
+    id: string
+    title: string
+    createdAt: string
+    participants: Array<string>
+    chapters: Array<Chapter>
+}
+
+export type MemoirItem = {
+    id: string
+    title: string
+    createdAt: string
+}
+
+function emptyStats(): Stats {
+    return { total: 0, approved: 0, rejected: 0, pending: 0, bestStreak: 0 }
+}
+
+export function emptyGoal(): Goal {
+    return {
+        id: '', title: '', template: 'other', description: '', startDate: '', endDate: '',
+        rule: '', status: 'awaiting', myRole: 'owner', inviteCode: '',
+        giftName: '', giftNote: '', encouragement: '',
+        participants: [], checkins: [], events: [],
+        stats: emptyStats(), pendingToReview: 0, proposal: null,
+    }
+}
+
+export function emptyMemoir(): Memoir {
+    return { id: '', title: '', createdAt: '', participants: [], chapters: [] }
+}
+
+export function emptyInvite(): Invite {
+    return {
+        code: '', title: '', template: 'other', rule: '', startDate: '', endDate: '',
+        giftName: '', ownerName: '—', supTaken: false, witTaken: false,
+    }
+}
+
+export function statsFrom(j: UTSJSONObject | null): Stats {
+    if (j == null) return emptyStats()
+    return {
+        total: j.getNumber('total', 0),
+        approved: j.getNumber('approved', 0),
+        rejected: j.getNumber('rejected', 0),
+        pending: j.getNumber('pending', 0),
+        bestStreak: j.getNumber('bestStreak', 0),
+    }
+}
+
+export function participantFrom(j: UTSJSONObject): Participant {
+    return {
+        id: j.getString('id', ''),
+        nickname: j.getString('nickname', ''),
+        role: j.getString('role', ''),
+    }
+}
+
+export function checkinFrom(j: UTSJSONObject): Checkin {
+    return {
+        id: j.getString('id', ''),
+        day: j.getString('day', ''),
+        note: j.getString('note', ''),
+        status: j.getString('status', ''),
+        reviewMessage: j.getString('reviewMessage', ''),
+        createdAt: j.getString('createdAt', ''),
+        msg: '',
+    }
+}
+
+export function eventFrom(j: UTSJSONObject): GoalEvent {
+    return {
+        id: j.getString('id', ''),
+        type: j.getString('type', ''),
+        message: j.getString('message', ''),
+        at: j.getString('at', ''),
+    }
+}
+
+export function goalFrom(j: UTSJSONObject): Goal {
+    const gift = j.getJSON('gift')
+    const enc = j.getJSON('encouragement')
+    const prop = j.getJSON('resultProposal')
+    const participants: Array<Participant> = []
+    const plist = j.getArray('participants')
+    if (plist != null) {
+        plist.forEach((e: any | null) => {
+            if (e instanceof UTSJSONObject) participants.push(participantFrom(e as UTSJSONObject))
+        })
+    }
+    const checkins: Array<Checkin> = []
+    const clist = j.getArray('checkins')
+    if (clist != null) {
+        clist.forEach((e: any | null) => {
+            if (e instanceof UTSJSONObject) checkins.push(checkinFrom(e as UTSJSONObject))
+        })
+    }
+    const events: Array<GoalEvent> = []
+    const elist = j.getArray('events')
+    if (elist != null) {
+        elist.forEach((e: any | null) => {
+            if (e instanceof UTSJSONObject) events.push(eventFrom(e as UTSJSONObject))
+        })
+    }
+    let proposal: Proposal | null = null
+    if (prop != null) {
+        proposal = {
+            result: prop.getString('result', ''),
+            proposedBy: prop.getString('proposedBy', ''),
+        }
+    }
+    return {
+        id: j.getString('id', ''),
+        title: j.getString('title', ''),
+        template: j.getString('template', 'other'),
+        description: j.getString('description', ''),
+        startDate: j.getString('startDate', ''),
+        endDate: j.getString('endDate', ''),
+        rule: j.getString('rule', ''),
+        status: j.getString('status', ''),
+        myRole: j.getString('myRole', ''),
+        inviteCode: j.getString('inviteCode', ''),
+        giftName: gift == null ? '' : gift.getString('name', ''),
+        giftNote: gift == null ? '' : gift.getString('note', ''),
+        encouragement: enc == null ? '' : enc.getString('message', ''),
+        participants: participants,
+        checkins: checkins,
+        events: events,
+        stats: statsFrom(j.getJSON('stats')),
+        pendingToReview: j.getNumber('pendingToReview', 0),
+        proposal: proposal,
+    }
+}
+
+export function inviteFrom(j: UTSJSONObject): Invite {
+    const gift = j.getJSON('gift')
+    const taken = j.getJSON('taken')
+    const owner = j.getJSON('owner')
+    return {
+        code: j.getString('code', ''),
+        title: j.getString('title', ''),
+        template: j.getString('template', 'other'),
+        rule: j.getString('rule', ''),
+        startDate: j.getString('startDate', ''),
+        endDate: j.getString('endDate', ''),
+        giftName: gift == null ? '' : gift.getString('name', ''),
+        ownerName: owner == null ? '—' : owner.getString('nickname', '—'),
+        supTaken: taken == null ? false : taken.getBoolean('supervisor', false),
+        witTaken: taken == null ? false : taken.getBoolean('witness', false),
+    }
+}
+
+export function memoirFrom(j: UTSJSONObject): Memoir {
+    const chapters: Array<Chapter> = []
+    const clist = j.getArray('chapters')
+    if (clist != null) {
+        clist.forEach((e: any | null) => {
+            if (e instanceof UTSJSONObject) {
+                const c = e as UTSJSONObject
+                chapters.push({
+                    no: c.getNumber('no', 0),
+                    title: c.getString('title', ''),
+                    text: c.getString('text', ''),
+                })
+            }
+        })
+    }
+    const parts: Array<string> = []
+    const plist = j.getArray('participants')
+    if (plist != null) {
+        plist.forEach((e: any | null) => {
+            if (e instanceof UTSJSONObject) parts.push((e as UTSJSONObject).getString('nickname', ''))
+        })
+    }
+    return {
+        id: j.getString('id', ''),
+        title: j.getString('title', ''),
+        createdAt: j.getString('createdAt', ''),
+        participants: parts,
+        chapters: chapters,
+    }
+}
+
+export function memoirItemFrom(j: UTSJSONObject): MemoirItem {
+    return {
+        id: j.getString('id', ''),
+        title: j.getString('title', ''),
+        createdAt: j.getString('createdAt', ''),
+    }
+}
+
+export function memoirItems(res: UTSJSONObject): Array<MemoirItem> {
+    const list: Array<MemoirItem> = []
+    const arr = res.getArray('memoirs')
+    if (arr != null) {
+        arr.forEach((e: any | null) => {
+            if (e instanceof UTSJSONObject) list.push(memoirItemFrom(e as UTSJSONObject))
+        })
+    }
+    return list
+}
+
+// 「生成于 yyyy-mm-dd」
+export function memoirDate(m: MemoirItem): string {
+    return '生成于 ' + shortDate(m.createdAt)
+}

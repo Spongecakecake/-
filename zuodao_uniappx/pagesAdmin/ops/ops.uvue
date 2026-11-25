@@ -1,0 +1,178 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <view v-if="err.length > 0" class="card"><text class="err">{{ err }}</text></view>
+
+            <view class="card">
+                <text class="sec-label">功能开关</text>
+                <view v-for="(sw, i) in switches" :key="sw.key" class="row switch-row">
+                    <text class="body-text">{{ sw.name }}</text>
+                    <view class="spacer"></view>
+                    <view :class="switchOn(sw.key) ? 'btn-sm btn-filled' : 'btn-sm btn-outlined'" @click="toggle(sw.key)">
+                        <text :class="switchOn(sw.key) ? 'btn-text-sm' : 'btn-text-green-sm'">{{ switchOn(sw.key) ? '开' : '关' }}</text>
+                    </view>
+                </view>
+            </view>
+
+            <view class="card">
+                <text class="sec-label">编辑推荐位（最多 20 面旗）</text>
+                <input class="input gap-12" v-model="featuredInput" placeholder="输入旗 ID，用英文逗号分隔" />
+                <view class="btn-sm btn-tonal gap-12" @click="saveFeatured">
+                    <text class="btn-text-gold-sm">保存精选</text>
+                </view>
+                <text class="small gap-8">当前：{{ featuredText }}</text>
+            </view>
+
+            <view class="card">
+                <text class="sec-label">自定义文案审核（P95 ≤ 10 分钟）</text>
+                <view v-for="(s, i) in pending" :key="s.id" class="box gap-12">
+                    <text class="muted-lh">{{ s.content }}</text>
+                    <text class="small">旗 {{ s.flagId }} · {{ s.createdAt.substring(0, 16) }}</text>
+                    <view class="row gap-8">
+                        <view class="btn-sm btn-filled" @click="review(s.id, true)"><text class="btn-text-sm">通过</text></view>
+                        <view class="btn-sm btn-outlined" @click="review(s.id, false)"><text class="btn-text-green-sm">驳回</text></view>
+                    </view>
+                </view>
+                <text v-if="pending.length == 0" class="small gap-12">暂无待审文案</text>
+            </view>
+
+            <view class="card">
+                <text class="sec-label">举报处理（SLA 24h）</text>
+                <view v-for="(r, i) in reports" :key="r.id" class="box gap-12">
+                    <text class="muted-lh">{{ r.reason }}</text>
+                    <text class="small">目标 {{ r.targetId }} · {{ r.at.substring(0, 16) }}</text>
+                    <view class="row gap-8">
+                        <view class="btn-sm btn-danger" @click="handleReport(r.id, true)"><text class="btn-text-sm">成立</text></view>
+                        <view class="btn-sm btn-outlined" @click="handleReport(r.id, false)"><text class="btn-text-green-sm">不成立</text></view>
+                    </view>
+                </view>
+                <text v-if="reports.length == 0" class="small gap-12">暂无待处理举报</text>
+            </view>
+
+            <view class="card">
+                <text class="sec-label">八项指标</text>
+                <view class="metric" v-for="(m, i) in metricRows" :key="m.label">
+                    <text class="muted">{{ m.label }}</text>
+                    <text class="body-text">{{ m.value }}</text>
+                </view>
+                <text v-if="alerts.length > 0" class="err gap-12">{{ alertText }}</text>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { api, errText } from '@/utils/api.uts'
+
+    type SwitchDef = { key: string, name: string }
+    type MetricRow = { label: string, value: string }
+
+    export default {
+        data() {
+            return {
+                switches: [
+                    { key: 'flagsField', name: '旗场' },
+                    { key: 'pull', name: '拔旗' },
+                    { key: 'pointsShop', name: '积分商店' },
+                    { key: 'shareCard', name: '战况卡分享' }
+                ] as Array<SwitchDef>,
+                config: {} as UTSJSONObject,
+                featuredInput: '',
+                pending: [] as Array<UTSJSONObject>,
+                reports: [] as Array<UTSJSONObject>,
+                metrics: {} as UTSJSONObject,
+                alerts: [] as Array<string>,
+                err: ''
+            }
+        },
+        onShow() { this.load() },
+        computed: {
+            featuredText(): string {
+                const arr = this.config.getArray('featured')
+                return arr == null ? '空' : arr.join(', ')
+            },
+            metricRows(): Array<MetricRow> {
+                const m = this.metrics
+                const pct = (v: number): string => Math.round(v * 1000) / 10 + '%'
+                return [
+                    { label: '旗场渗透率', value: pct(m.getNumber('penetration', 0)) },
+                    { label: '首旗响应时长', value: m.getNumber('firstResponseMinutes', 0).toString() + ' 分钟' },
+                    { label: '护旗→注册转化', value: pct(m.getNumber('defendToRegister', 0)) },
+                    { label: '复活反转率', value: pct(m.getNumber('reviveRate', 0)) },
+                    { label: '免战/关闭率', value: pct(m.getNumber('optoutRate', 0)) },
+                    { label: '失败用户 7 日回访', value: pct(m.getNumber('failureReturnRate', 0)) },
+                    { label: '举报率', value: pct(m.getNumber('reportRate', 0)) },
+                    { label: '打卡摩擦流失', value: pct(m.getNumber('proofFriction', 0)) }
+                ] as Array<MetricRow>
+            },
+            alertText(): string {
+                return this.alerts.join('；')
+            }
+        },
+        methods: {
+            switchOn(key: string): boolean {
+                return this.config.getBoolean(key, false)
+            },
+            load() {
+                api('/api/admin/overview')
+                    .then((res: UTSJSONObject) => {
+                        const c = res.getJSON('config')
+                        if (c != null) this.config = c as UTSJSONObject
+                    })
+                    .catch((e: any | null) => { this.err = errText(e) })
+                api('/api/admin/moderation')
+                    .then((res: UTSJSONObject) => {
+                        const ps = res.getArray('standings')
+                        const rs = res.getArray('reports')
+                        this.pending = ps == null ? [] as Array<UTSJSONObject> : ps as Array<UTSJSONObject>
+                        this.reports = rs == null ? [] as Array<UTSJSONObject> : rs as Array<UTSJSONObject>
+                    })
+                    .catch(() => {})
+                api('/api/admin/metrics')
+                    .then((res: UTSJSONObject) => {
+                        const m = res.getJSON('metrics')
+                        if (m != null) {
+                            this.metrics = m as UTSJSONObject
+                            const arr = (m as UTSJSONObject).getArray('alerts')
+                            const out: Array<string> = []
+                            if (arr != null) arr.forEach((e: any | null) => out.push(e as string))
+                            this.alerts = out
+                        }
+                    })
+                    .catch(() => {})
+            },
+            toggle(key: string) {
+                const next = !this.config.getBoolean(key, false)
+                let payload = {} as UTSJSONObject
+                if (key == 'flagsField') payload = { 'flagsField': next } as UTSJSONObject
+                else if (key == 'pull') payload = { 'pull': next } as UTSJSONObject
+                else if (key == 'pointsShop') payload = { 'pointsShop': next } as UTSJSONObject
+                else if (key == 'shareCard') payload = { 'shareCard': next } as UTSJSONObject
+                api('/api/admin/feature-flags', 'POST', payload)
+                    .then(() => this.load())
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            saveFeatured() {
+                const ids: Array<string> = this.featuredInput.split(',')
+                api('/api/admin/featured', 'POST', { 'flagIds': ids } as UTSJSONObject)
+                    .then(() => { uni.showToast({ title: '已保存', icon: 'success' }); this.load() })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            review(id: string, approved: boolean) {
+                api('/api/admin/moderation/' + id, 'POST', { 'approved': approved, 'reason': '运营复核' } as UTSJSONObject)
+                    .then(() => this.load())
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            handleReport(id: string, uphold: boolean) {
+                api('/api/admin/reports/' + id, 'POST', { 'uphold': uphold, 'reason': '运营复核' } as UTSJSONObject)
+                    .then(() => this.load())
+                    .catch((e: any | null) => { this.err = errText(e) })
+            }
+        }
+    }
+</script>
+
+<style>
+    .switch-row { padding: 12rpx 0; }
+    .metric { flex-direction: row; justify-content: space-between; padding: 12rpx 0; }
+</style>

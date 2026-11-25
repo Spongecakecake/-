@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>「做到」App 产品需求文档 V0.2（初稿）</title>
+<style>
+  :root{
+    --green:#1f9d6b; --green-dark:#157a52; --green-soft:#e8f7f0;
+    --orange:#f08a24; --orange-soft:#fef3e5;
+    --ink:#1f2a37; --ink-2:#4b5563; --ink-3:#8a94a3;
+    --line:#e5e9ef; --bg:#f6f8fa; --card:#ffffff;
+    --red:#d9534f; --red-soft:#fdecec;
+    --blue:#2f6fed; --blue-soft:#eaf1fe;
+    --purple:#7c5cf0; --purple-soft:#f0edfe;
+    --pink:#e85a92; --pink-soft:#fdeef5;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.75;}
+  .layout{display:flex;max-width:1280px;margin:0 auto;}
+  nav.toc{width:272px;flex:0 0 272px;padding:32px 18px 40px 28px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  nav.toc .brand{font-weight:800;font-size:17px;color:var(--green-dark);margin-bottom:2px;}
+  nav.toc .brand small{display:block;font-weight:500;font-size:11px;color:var(--ink-3);margin-top:2px;}
+  nav.toc ol{list-style:none;margin:18px 0 0;padding:0;font-size:13px;}
+  nav.toc ol li{margin:2px 0;}
+  nav.toc ol a{color:var(--ink-2);text-decoration:none;display:block;padding:5px 10px;border-radius:8px;}
+  nav.toc ol a:hover{background:var(--green-soft);color:var(--green-dark);}
+  nav.toc ol li.sub a{padding-left:22px;font-size:12.5px;color:var(--ink-3);}
+  main{flex:1;min-width:0;padding:0 40px 80px;}
+  header.hero{background:linear-gradient(135deg,#1f9d6b 0%,#157a52 55%,#0f5c3e 100%);
+    color:#fff;border-radius:0 0 20px 20px;padding:44px 44px 38px;margin:0 -40px 30px;}
+  header.hero h1{margin:0 0 6px;font-size:29px;letter-spacing:.5px;}
+  header.hero .sub{opacity:.92;font-size:15px;margin-bottom:20px;}
+  .meta-grid{display:flex;flex-wrap:wrap;gap:10px;}
+  .meta-grid span{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);
+    padding:4px 12px;border-radius:20px;font-size:12.5px;}
+  section{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:28px 32px;margin:0 0 22px;scroll-margin-top:20px;}
+  h2{font-size:21px;margin:0 0 18px;padding-bottom:12px;border-bottom:2px solid var(--green-soft);
+    display:flex;align-items:center;gap:10px;}
+  h2 .num{background:var(--green);color:#fff;width:30px;height:30px;border-radius:8px;
+    display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 30px;}
+  h3{font-size:16.5px;margin:26px 0 10px;}
+  h4{font-size:14.5px;margin:18px 0 8px;color:var(--green-dark);}
+  p{margin:8px 0;}
+  ul,ol{padding-left:22px;margin:8px 0;}
+  li{margin:4px 0;}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.5px;}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+  th{background:#f2f5f8;font-weight:600;}
+  tr:nth-child(even) td{background:#fafbfc;}
+  .tag{display:inline-block;padding:1px 9px;border-radius:6px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+  .p0{background:var(--green-soft);color:var(--green-dark);}
+  .p1{background:var(--orange-soft);color:#b36514;}
+  .new{background:var(--pink-soft);color:var(--pink);}
+  .tbd{background:#fff7d6;color:#8a6d00;border:1px dashed #d9b94a;border-radius:6px;padding:0 6px;font-size:12px;font-weight:600;}
+  .assume{background:var(--blue-soft);color:var(--blue);border-radius:6px;padding:0 6px;font-size:12px;font-weight:600;}
+  .must{background:var(--red-soft);color:var(--red);border-radius:6px;padding:0 6px;font-size:12px;font-weight:600;}
+  .note{border-radius:10px;padding:14px 18px;margin:14px 0;font-size:13.5px;}
+  .note.good{background:var(--green-soft);border-left:4px solid var(--green);}
+  .note.warn{background:var(--red-soft);border-left:4px solid var(--red);}
+  .note.info{background:var(--blue-soft);border-left:4px solid var(--blue);}
+  .note.tip{background:var(--orange-soft);border-left:4px solid var(--orange);}
+  .note.love{background:var(--pink-soft);border-left:4px solid var(--pink);}
+  .note b{display:block;margin-bottom:4px;}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:16px 0;}
+  .flow .step{flex:1;min-width:128px;background:#f7faf8;border:1px solid #d8ece2;border-radius:10px;
+    padding:12px 14px;position:relative;margin-right:26px;}
+  .flow .step:last-child{margin-right:0;}
+  .flow .step .n{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;
+    font-size:12px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px;font-weight:700;}
+  .flow .step b{font-size:13.5px;display:block;}
+  .flow .step span{font-size:12px;color:var(--ink-3);}
+  .flow .step::after{content:"→";position:absolute;right:-21px;top:50%;transform:translateY(-50%);
+    color:var(--green);font-size:18px;font-weight:700;}
+  .flow .step:last-child::after{content:"";}
+  .states{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;}
+  .statechip{border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13px;background:#fff;min-width:120px;}
+  .statechip.draft{border-color:#b9c2cf;color:var(--ink-2);}
+  .statechip.live{border-color:var(--green);background:var(--green-soft);color:var(--green-dark);font-weight:600;}
+  .statechip.win{border-color:var(--blue);background:var(--blue-soft);color:var(--blue);font-weight:600;}
+  .statechip.fail{border-color:var(--red);background:var(--red-soft);color:var(--red);font-weight:600;}
+  .statechip.cancel{border-color:var(--ink-3);color:var(--ink-3);}
+  .arrow{align-self:center;color:var(--ink-3);font-weight:700;}
+  .fr{border:1px solid var(--line);border-radius:10px;margin:14px 0;overflow:hidden;}
+  .fr-head{background:#f4f8f6;padding:12px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line);}
+  .fr-head .id{font-weight:800;color:var(--green-dark);font-size:14px;}
+  .fr-head .ttl{font-weight:700;font-size:14.5px;}
+  .fr-body{padding:14px 18px;}
+  .fr-body h4{margin-top:14px;}
+  .fr-body h4:first-child{margin-top:4px;}
+  .legend{font-size:12.5px;color:var(--ink-3);margin:6px 0 0;}
+  .persona{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0;}
+  .persona .card{flex:1;min-width:220px;border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fcfdfd;}
+  .persona .card b{color:var(--green-dark);}
+  .role-tag{font-size:11px;padding:1px 8px;border-radius:5px;font-weight:700;}
+  .r-owner{background:var(--green-soft);color:var(--green-dark);}
+  .r-sup{background:var(--orange-soft);color:#b36514;}
+  .r-wit{background:var(--purple-soft);color:var(--purple);}
+  .r-fan{background:var(--blue-soft);color:var(--blue);}
+  .giftflow{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0;}
+  .giftcard{flex:1;min-width:200px;border:1.5px dashed #e0a95e;background:var(--orange-soft);
+    border-radius:10px;padding:12px 14px;font-size:13px;}
+  .giftcard b{color:#b36514;}
+  .memoir-demo{display:flex;gap:14px;flex-wrap:wrap;margin:16px 0;}
+  .m-page{flex:1;min-width:150px;max-width:210px;border-radius:14px;padding:16px 14px;min-height:220px;
+    color:#fff;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 6px 18px rgba(31,42,55,.12);
+    font-size:12.5px;}
+  .m-page b{font-size:13.5px;display:block;margin-bottom:4px;}
+  .m-page .tagline{opacity:.92;}
+  .m-page .pgno{position:relative;margin-top:12px;opacity:.75;font-size:11px;}
+  .m1{background:linear-gradient(160deg,#2b3a55,#1f2a37);}
+  .m2{background:linear-gradient(160deg,#1f9d6b,#0f5c3e);}
+  .m3{background:linear-gradient(160deg,#e85a92,#b0386c);}
+  .m4{background:linear-gradient(160deg,#f08a24,#c25e10);}
+  .m5{background:linear-gradient(160deg,#7c5cf0,#4e34b8);}
+  .m6{background:linear-gradient(160deg,#3a4a63,#20283a);}
+  footer{color:var(--ink-3);font-size:12.5px;text-align:center;padding:10px 0 30px;}
+  @media (max-width:980px){
+    nav.toc{display:none;}
+    main{padding:0 16px 60px;}
+    header.hero{margin:0 -16px 24px;padding:32px 24px;}
+    section{padding:22px 18px;}
+    .flow .step{margin-right:0;flex:1 1 45%;}
+    .flow .step::after{content:"↓";right:12px;top:auto;bottom:-18px;transform:none;}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc">
+  <div class="brand">做到 App<small>产品需求文档 · PRD</small></div>
+  <ol>
+    <li><a href="#s1">1. 背景与问题</a></li>
+    <li><a href="#s2">2. 竞品参考与产品判断</a></li>
+    <li><a href="#s3">3. 产品目标与定位</a></li>
+    <li><a href="#s4">4. 范围（P0 / P1）</a></li>
+    <li><a href="#s5">5. 角色与对象模型</a></li>
+    <li><a href="#s6">6. 核心旅程与状态流转</a></li>
+    <li><a href="#s7">7. 功能需求（P0）</a></li>
+    <li class="sub"><a href="#fr01">FR-01 账号与个人档案</a></li>
+    <li class="sub"><a href="#fr02">FR-02 创建目标（多类型模板）</a></li>
+    <li class="sub"><a href="#fr03">FR-03 每日打卡</a></li>
+    <li class="sub"><a href="#fr04">FR-04 心愿礼物与激励体系</a></li>
+    <li class="sub"><a href="#fr05">FR-05 邀请搭子监督人与见证人</a></li>
+    <li class="sub"><a href="#fr06">FR-06 审核与结果判定</a></li>
+    <li class="sub"><a href="#fr07">FR-07 过程动态与目标主页</a></li>
+    <li class="sub"><a href="#fr08">FR-08 社交互动与广场</a></li>
+    <li class="sub"><a href="#fr09">FR-09 大结局回忆录</a></li>
+    <li class="sub"><a href="#fr10">FR-10 消息与提醒</a></li>
+    <li class="sub"><a href="#fr11">FR-11 站外分享卡片</a></li>
+    <li><a href="#s8">8. P1 规划（不在首期）</a></li>
+    <li><a href="#s9">9. 共享规则与异常</a></li>
+    <li><a href="#s10">10. 开放问题</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <h1>「做到」— 和重要的人立约，把每个目标走完</h1>
+  <div class="sub">立下目标 · TA 监督也送礼 · 每天互相打气 · 达成时拆礼物，再收到一本属于你们的大结局回忆录</div>
+  <div class="meta-grid">
+    <span>文档版本：V0.2（初稿）</span>
+    <span>日期：2026-10-23</span>
+    <span>状态：待评审</span>
+    <span>平台：移动端 App（iOS / Android）<span style="opacity:.8">形态待定，见 Q1</span></span>
+    <span>相对 V0.1：目标类型泛化、新增礼物承诺与双向搭子、新增大结局回忆录</span>
+  </div>
+</header>
+
+<!-- ============ 1 ============ -->
+<section id="s1">
+<h2><span class="num">1</span>背景与问题</h2>
+
+<h3>1.1 目标用户与典型场景</h3>
+<div class="persona">
+  <div class="card">
+    <b>主要用户：心里有目标、却总差一口气的人</b><br>
+    20–35 岁为主。想做的事很多——减肥、早起、备考、戒糖、读完书单、坚持健身、学一门技能——但总在懒惰、贪吃、拖延中反复开始、反复放弃。
+  </div>
+  <div class="card">
+    <b>典型时刻</b><br>
+    ① 晚上刷到别人的成果，冲动立誓"这次一定坚持"；<br>
+    ② 第三天就破功，"反正没人知道"，心安理得放弃；<br>
+    ③ 就算做成了，也只是静静结束，没有人庆祝、没有留下什么。
+  </div>
+</div>
+
+<h3>1.2 问题拆解：目标为什么坚持不下去</h3>
+<table>
+  <tr><th style="width:150px">问题</th><th>具体表现</th><th>产品应对</th></tr>
+  <tr><td>目标模糊、没有截止</td><td>"我要变好"无法衡量、没有期限，拖延无成本</td><td>FR-02 三类结构化目标模板：数值型 / 习惯型 / 项目里程碑型，明确周期与成功标准</td></tr>
+  <tr><td>放弃零成本</td><td>承诺只对自己做出，偷懒没人知道、没有代价</td><td>FR-05 邀请熟人担任搭子监督人 / 见证人；目标公开化</td></tr>
+  <tr><td>缺乏即时正反馈</td><td>目标回报遥远，努力当天看不到甜头</td><td>FR-04 心愿礼物（TA 承诺送的礼就在终点）+ 里程碑 + 勋章；FR-08 点赞加油</td></tr>
+  <tr><td>一个人战斗太孤独</td><td>监督其实是双向的陪伴：一方打卡坚持，一方每天惦记，双方都需要被回应</td><td>FR-05/FR-08 双向鼓励：监督人的每日鼓励、主人的答谢、"互相搭子"关系</td></tr>
+  <tr><td>一次破功就崩盘</td><td>漏卡 / 一顿暴食后心态上"全盘放弃"</td><td>FR-03 补卡券、休息天；FR-06 驳回而非直接判负</td></tr>
+  <tr><td>结束时没有沉淀</td><td>努力过的日子散落在聊天记录和相册里，很快被遗忘</td><td><b>FR-09 大结局回忆录</b>：自动汇编成一本可翻看、可分享的旅程记录</td></tr>
+</table>
+
+<h3>1.3 产品要实现的可观察结果</h3>
+<div class="note good"><b>成功标准（定性，数据目标 <span class="tbd">TBD</span>）</b>
+用户能独立完成一次完整闭环：<b>立一个带期限、带成功标准的目标 → 邀请一位重要的人做搭子监督人（TA 可同时承诺一份达标礼物）→ 周期内打卡、被审核、被鼓励，双方持续互动 → 到期得到明确的成败判定 → 成功则拆礼物、收到系统生成的大结局回忆录并分享/珍藏</b>。
+</div>
+
+<div class="note love"><b>本产品的情感内核</b>
+"监督"只是表层动作，真正的留存动力是<b>关系</b>：有人把你的目标放在心上，每天等你打卡；你也不愿让那个准备了礼物、天天为你加油的人失望。目标达成的那一刻，礼物是奖励，而共同走完的这段经历本身，才是回忆录要留住的东西。</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="s2">
+<h2><span class="num">2</span>竞品参考与产品判断</h2>
+<table>
+  <tr><th style="width:130px">产品</th><th style="width:205px">核心机制</th><th>对本产品的启发</th></tr>
+  <tr>
+    <td><b>StickK</b><br><small>美国 · 承诺契约</small></td>
+    <td>用户签署 commitment contract，可押注金钱；设 Referee（裁判）核验进度、Supporters（支持者）围观评论；可公开承诺</td>
+    <td>借鉴<b>角色三分</b>与"立约仪式感"；本产品把"押注金钱"替换为"熟人承诺的礼物"，更温暖且无资金合规门槛</td>
+  </tr>
+  <tr>
+    <td><b>达目标</b><br><small>国内 · 目标打卡</small></td>
+    <td>发起目标缴押金；每日图文签到；可邀请"监督人"，监督人可提醒、判定打卡质量、裁定成败；他人可围观鼓励；成功押金返还，失败被围观者瓜分</td>
+    <td>借鉴<b>监督人三权</b>（提醒 + 审核 + 裁定）与围观社交场；不做押金瓜分，改为礼物承诺</td>
+  </tr>
+  <tr>
+    <td><b>脸疼</b><br><small>国内 · 挑战金打卡</small></td>
+    <td>挑战金对赌；失败押金被瓜分；设复活卡、休息天数</td>
+    <td>借鉴<b>容错配额</b>思想（本产品为补卡券 / 休息天）</td>
+  </tr>
+  <tr>
+    <td><b>DietBet</b><br><small>美国 · 减重对赌赛</small></td>
+    <td>付费入场、达标平分奖池；称重需"人站秤上 + 读数与当日随机校验词合影"两张照片，由 Referee 审核</td>
+    <td>借鉴<b>期末取证规范</b>（仅用于体重类目标，FR-06）；金钱奖池不进 P0/P1 优先序列</td>
+  </tr>
+  <tr>
+    <td><b>Cadoo / FitFam</b><br><small>美国 · 运动履约</small></td>
+    <td>AI 摄像头验证运动、同步健康数据；验证过的运动自动生成可分享的高光卡片；连击加分</td>
+    <td>"<b>履约证据 → 炫耀素材</b>"自动卡片化，在本产品升级为 FR-09 回忆录；AI 验证列 P1</td>
+  </tr>
+  <tr>
+    <td><b>吴鸭减肥 / 小日常类打卡工具</b><br><small>国内</small></td>
+    <td>连续天数一键生成分享卡；体重趋势看长期而非日波动；习惯打卡工具属性强但社交弱</td>
+    <td>借鉴<b>分享卡模板</b>与趋势呈现；本产品差异点是关系链与礼物、回忆录，而非工具效率</td>
+  </tr>
+  <tr>
+    <td><b>年度报告 / 平台年报类内容</b><br><small>通用参考</small></td>
+    <td>把用户一段时间的数据、图文、金句自动汇编成可滑动、可分享的"年报"，传播力强</td>
+    <td>直接启发 <b>FR-09 大结局回忆录</b>：但年报是"数据回顾"，回忆录必须讲"人"——TA 的鼓励、你的坚持、礼物揭晓的瞬间</td>
+  </tr>
+</table>
+
+<div class="note tip"><b>核心产品判断</b>
+现有产品要么偏"单人工具"（坚持靠自律），要么偏"金钱对赌"（有效但冰冷且合规门槛高）。<b>本产品的差异化是：用"熟人礼物承诺 + 双向陪伴 + 回忆沉淀"构成一份有温度的人情契约</b>——礼物不需要贵重，"做到了我请你吃火锅/送你那双跑鞋/陪你去看海"就足够；平台不碰钱，只负责让承诺被看见、让过程被记录、让结局被庆祝。</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="s3">
+<h2><span class="num">3</span>产品目标与定位</h2>
+<table>
+  <tr><th style="width:130px">项</th><th>说明</th></tr>
+  <tr><td>一句话定位</td><td>「做到」是一款帮用户<b>为任何想坚持的目标公开立约、由重要的人监督鼓励并承诺礼物、达成后拆礼庆祝并自动生成大结局回忆录</b>的打卡见证 App。</td></tr>
+  <tr><td>目标范围</td><td>通用目标，首期内置模板覆盖高频场景：减脂 / 健身运动、早起早睡、学习备考 / 阅读、戒断（戒糖戒酒戒熬夜）、攒钱、技能练习（乐器 / 语言 / 绘画）等；支持自定义目标。</td></tr>
+  <tr><td>核心用户</td><td>有想达成的目标但自律不足、需要外部推动与情感陪伴的人；以及<b>愿意为重要的人投入时间和一份礼物的"搭子"</b>（监督人同样是产品用户，而非纯工具人）。</td></tr>
+  <tr><td>触发起点</td><td>用户在某个冲动时刻打开 App 立目标；或收到朋友的邀请链接"我想请你当我的监督人"。</td></tr>
+  <tr><td>完成条件</td><td>目标到期，依据打卡记录与期末成果，由规则 + 监督人给出明确成败判定；成功则解锁礼物、生成大结局回忆录。</td></tr>
+  <tr><td>信任基础</td><td>① 打卡有证据且可审核；② 成功标准与礼物承诺提前确认、事后不反悔改规则；③ 礼物承诺是<b>人情约定而非平台交易</b>，平台不经手资金与物流。</td></tr>
+</table>
+
+<h3>3.1 设计原则</h3>
+<ul>
+  <li><b>轻工具、重关系</b>：打卡录入 30 秒内完成；产品重心放在两人的互动、礼物与回忆上。</li>
+  <li><b>监督是陪伴，不是审判</b>：驳回要给理由、给鼓励；不提供嘲讽、罚钱公示等羞辱机制。</li>
+  <li><b>双方都是主角</b>：监督人的鼓励、陪伴也被记录、被感谢、进入回忆录。</li>
+  <li><b>礼物轻量、人情优先</b>：允许"一杯奶茶""一次家务全包"这样的小承诺；不引导高价礼物，未成年人与大额场景设限制（9.4）。</li>
+  <li><b>规则前置、判定留痕</b>：成功标准、审核规则、礼物承诺在开始前确认，进行中不可单方更改。</li>
+  <li><b>健康安全</b>：仅针对减脂 / 体重类目标生效（9.3），不鼓励极端减重。</li>
+</ul>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="s4">
+<h2><span class="num">4</span>范围（P0 / P1）</h2>
+<p>首期交付<b>最小完整闭环</b>：立约（建目标、定礼物、邀人）→ 履约（打卡、审核、双向互动）→ 收尾（判定、拆礼、回忆录）。</p>
+
+<h3>4.1 P0：首期必做 <span class="tag p0">P0</span></h3>
+<table>
+  <tr><th style="width:60px">编号</th><th>能力</th><th>为什么是闭环必需</th></tr>
+  <tr><td>FR-01</td><td>账号、个人资料、基础设置（健康问卷仅在创建体重类目标时触发）</td><td>身份与关系的前提</td></tr>
+  <tr><td>FR-02</td><td>创建目标：三类目标模板（数值型 / 习惯型 / 里程碑型）+ 自定义、周期、频率、隐私、成功规则</td><td>承诺契约的载体</td></tr>
+  <tr><td>FR-03</td><td>每日打卡：数值 / 选项 / 图文 / 时长四种通用打卡；连续天数、补卡券、休息天</td><td>履约的最小动作</td></tr>
+  <tr><td>FR-04</td><td><b>心愿礼物与承诺机制</b>：心愿清单、监督人 / 亲友认捐承诺（明约 / 惊喜）、达成拆礼、兑现确认；积分勋章</td><td>核心激励，本产品的差异化引擎</td></tr>
+  <tr><td>FR-05</td><td>邀请搭子监督人 / 见证人（附礼物邀约）、受邀确认与权责告知、双向鼓励、互相搭子</td><td>关系建立与陪伴感</td></tr>
+  <tr><td>FR-06</td><td>打卡审核（通过 / 驳回）、期末取证与结果判定、监督人失联与申诉处理</td><td>承诺具备真实约束力</td></tr>
+  <tr><td>FR-07</td><td>过程动态流与目标主页（时间线、进度、礼物位、见证墙）</td><td>"全程晒过程"</td></tr>
+  <tr><td>FR-08</td><td>点赞、评论、"加油"、双向答谢；关注；公开广场</td><td>社交点赞与互相鼓励</td></tr>
+  <tr><td>FR-09</td><td><b>大结局回忆录</b>：自动汇编旅程、可编辑、拆礼页、见证寄语、可分享可珍藏（失败也有"旅程纪念册"）</td><td>情感沉淀与二次传播的核心资产</td></tr>
+  <tr><td>FR-10</td><td>消息与提醒（打卡、待审核、互动、礼物动态；免打扰）</td><td>履约留存与召回</td></tr>
+  <tr><td>FR-11</td><td>契约卡 / 打卡卡 / 拆礼卡 / 回忆录封面等站外分享卡片</td><td>裂变与公开承诺压力</td></tr>
+</table>
+
+<h3>4.2 P1：已识别但首期不做 <span class="tag p1">P1</span></h3>
+<p>详见第 8 节，摘要：礼物的线上交易闭环（电商链接 / 红包代付 / 礼品卡）、回忆录实体印刷与视频版、健康数据与穿戴设备接入、AI 识别防作弊、多人小队 PK 与排行榜、付费专业监督、官方人工仲裁队列、会员体系。</p>
+
+<h3>4.3 明确排除</h3>
+<ul>
+  <li>P0 不做任何资金托管、支付清算、现金对赌；平台不卖货、不做礼物电商。</li>
+  <li>不做课程库、直播课、医疗诊疗、代餐电商。</li>
+  <li>不做匿名树洞、陌生人私信交友等与履约无关的社交。</li>
+</ul>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="s5">
+<h2><span class="num">5</span>角色与对象模型</h2>
+
+<h3>5.1 角色定义</h3>
+<table>
+  <tr><th style="width:120px">角色</th><th>定义</th><th>核心权力与义务</th></tr>
+  <tr><td><span class="role-tag r-owner">目标主人</span></td><td>目标的创建者与履约人，一个目标有且仅有一位</td><td>编辑未开始的目标、打卡、申请补卡、邀请 / 更换角色、添加心愿礼物、提前终止、答谢互动</td></tr>
+  <tr><td><span class="role-tag r-sup">搭子监督人</span></td><td>由主人邀请并接受、对履约真实性负责的熟人，1–2 人 <span class="assume">上限 TBD</span>。<b>常同时是礼物承诺人</b>：接受角色时或目标进行中可承诺一份达标礼物</td><td>审核打卡、催打卡、到期判定、每天给一句鼓励；可承诺 / 加码礼物、成功后线下兑现；写见证寄语</td></tr>
+  <tr><td><span class="role-tag r-wit">见证人</span></td><td>围观全程的家人朋友，0–N 人；也可承诺"加码小礼物"</td><td>看时间线、点赞评论加油、结项寄语、承诺惊喜礼物；<b>无审核与判定权</b></td></tr>
+  <tr><td><span class="role-tag r-fan">粉丝 / 围观用户</span></td><td>在广场发现公开目标的站内用户</td><td>对公开内容点赞评论关注；不可承诺礼物（承诺礼物仅受邀关系可做）</td></tr>
+</table>
+<p class="legend">同一目标内角色互斥；跨目标可互为监督人——当 A、B 各自的进行中目标中互相担任监督人时，双方关系页展示"互相搭子"标识（P0 仅标识与聚合，结对玩法列 P1）。</p>
+
+<h3>5.2 核心对象与关键字段</h3>
+<table>
+  <tr><th style="width:120px">对象</th><th>关键字段（产品口径，非数据库设计）</th></tr>
+  <tr><td>用户</td><td>昵称、头像、登录方式、性别 / 年龄区间（选填）、身高体重（仅体重类目标需要，默认不公开）、关注关系、"我送出的 / 收到的礼物承诺"档案</td></tr>
+  <tr><td>目标 Goal</td><td>目标类型（数值型 / 习惯型 / 里程碑型 / 自定义）、模板类别（减脂、早起、备考…）、起始值与目标值、起止日期、打卡频率与内容要求、隐私级别、状态、成功规则、里程碑、角色名单</td></tr>
+  <tr><td>打卡 Check-in</td><td>所属目标、日期、打卡形式（数值 / 选项 / 图文 / 时长）、数值、单位、照片、文字心情、审核状态、是否补卡、当日获赞与鼓励</td></tr>
+  <tr><td><b>心愿礼物 GiftWish</b></td><td>礼物名称、图片、说明、参考预算（仅数字备忘）、模式（<b>明约</b>：立约即展示 / <b>惊喜</b>：达成才揭晓）、状态（待承诺 / 已承诺 / 已解锁 / 已兑现 / 已顺延下期）</td></tr>
+  <tr><td><b>礼物承诺 Pledge</b></td><td>礼物、承诺人（角色用户）、承诺时间、给主人的寄语（可在拆礼时才展示）、承诺人撤销 / 加码记录、双方兑现确认</td></tr>
+  <tr><td>动态 Post</td><td>来源（打卡自动生成 / 主动发布）、图文、关联目标、可见范围、点赞评论数</td></tr>
+  <tr><td>审核记录</td><td>关联打卡、审核人、结论、理由、时间</td></tr>
+  <tr><td><b>回忆录 Memoir</b></td><td>关联目标、自动生成的章节内容、主人编辑记录、他人内容授权状态、发布范围、生成 / 发布时间</td></tr>
+  <tr><td>见证寄语</td><td>目标、角色用户、结项评语（可标记"允许收入回忆录"）、时间</td></tr>
+</table>
+
+<h3>5.3 目标状态定义</h3>
+<div class="states">
+  <div class="statechip draft">草稿</div><span class="arrow">→</span>
+  <div class="statechip live">进行中</div><span class="arrow">→</span>
+  <div class="statechip win">成功 · 拆礼 · 回忆录</div>
+</div>
+<div class="states">
+  <div class="statechip live">进行中</div><span class="arrow">→</span>
+  <div class="statechip fail">失败 · 旅程纪念册</div>
+  <span class="arrow" style="margin:0 8px">·</span>
+  <div class="statechip cancel">已终止</div>
+</div>
+<p class="legend">打卡审核状态：待审核 → 通过 / 驳回（当天内可修改重交）；无监督人的目标提交即通过。礼物承诺状态流转见 9.2。</p>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="s6">
+<h2><span class="num">6</span>核心旅程与状态流转</h2>
+
+<h3>6.1 主旅程（P0 闭环）</h3>
+<div class="flow">
+  <div class="step"><span class="n">1</span><b>立约</b><span>选目标模板、定规则，写下"如果做到，我想要……"心愿</span></div>
+  <div class="step"><span class="n">2</span><b>邀人</b><span>把目标+心愿发给 TA："来监督我，做到了送我这个？"</span></div>
+  <div class="step"><span class="n">3</span><b>承诺</b><span>监督人接受并认下礼物，附上第一句鼓励</span></div>
+  <div class="step"><span class="n">4</span><b>履约陪伴</b><span>每日打卡交作业，TA 审核、点赞、催更；你答谢，双向互动</span></div>
+  <div class="step"><span class="n">5</span><b>判定拆礼</b><span>到期判定；成功→礼物解锁，仪式化拆开，线下兑现</span></div>
+  <div class="step"><span class="n">6</span><b>回忆录</b><span>系统汇编大结局：过程、金句、寄语、礼物，成册分享/珍藏</span></div>
+</div>
+
+<h3>6.2 礼物承诺旅程（差异化主线）</h3>
+<div class="giftflow">
+  <div class="giftcard"><b>① 写心愿</b><br>主人建目标时添加心愿礼物：名称、图片、预算备忘，可多选。可指定"希望由 XX 送"。</div>
+  <div class="giftcard"><b>② 发邀约</b><br>邀请监督人的卡片带上心愿："目标做到的话，你愿意送我 ____ 吗？" 监督人可：认下这份 / 换一份自选礼物 / 只监督不送礼。</div>
+  <div class="giftcard"><b>③ 明约或惊喜</b><br>明约：承诺立即出现在目标页"礼物位"，是全程看得见的动力；惊喜：进行中只显示"TA 准备了一个神秘礼物 🎁"，拆礼时揭晓。</div>
+  <div class="giftcard"><b>④ 加码</b><br>进行中监督人 / 见证人可随时加码（"坚持满 21 天再加一杯奶茶"），同样可选明约或惊喜。</div>
+  <div class="giftcard"><b>⑤ 拆礼兑现</b><br>成功后礼物解锁，逐一点开看寄语；双方线下完成后互相点"已兑现/已收到"。失败则承诺不兑现，可"顺延到下一期"。</div>
+</div>
+
+<h3>6.3 关键状态流转规则</h3>
+<table>
+  <tr><th style="width:170px">流转</th><th>规则</th></tr>
+  <tr><td>草稿 → 进行中</td><td>若已添加监督人，需至少 1 位接受邀请后生效，开始日顺延至满足条件次日 <span class="assume">假设，TBD</span>；无监督人可直接生效，但流程中强提示"邀一位搭子，完成率更高"</td></tr>
+  <tr><td>进行中 → 成功</td><td>到达结束日且满足该目标类型成功规则（9.2）：系统初判 + 监督人 72 小时内确认；多监督人取多数，平票 <span class="tbd">TBD</span></td></tr>
+  <tr><td>进行中 → 失败</td><td>到期未达标，或有效打卡率低于阈值（默认 60% <span class="assume">TBD</span>）且补卡券用尽</td></tr>
+  <tr><td>进行中 → 已终止</td><td>主人可主动终止，二次确认并填原因；礼物承诺自动失效并通知承诺人；时间线保留</td></tr>
+  <tr><td>结束之后</td><td>只读；可"再来一期"，继承目标参数、角色与<b>顺延的礼物承诺</b>（受邀人需再次确认）</td></tr>
+</table>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="s7">
+<h2><span class="num">7</span>功能需求（P0）</h2>
+<p class="legend">标注：<span class="tag p0">P0</span> 首期 · <span class="tag new">V0.2 新增/重写</span> · <span class="tbd">TBD</span> 待决策 · <span class="assume">假设</span> 暂定 · <span class="must">强规则</span> 健康/资金/不可逆操作。</p>
+
+<!-- FR-01 -->
+<div class="fr" id="fr01">
+  <div class="fr-head"><span class="id">FR-01</span><span class="ttl">账号注册登录与个人档案</span><span class="tag p0">P0</span></div>
+  <div class="fr-body">
+    <h4>目的</h4><p>建立身份与关系链；健康相关信息只在需要时采集，不做全量问卷。</p>
+    <ol>
+      <li>手机号验证码登录，支持微信 / Apple 第三方登录 <span class="assume">渠道按上架要求，TBD</span>。</li>
+      <li>首次登录仅设置：昵称、头像；性别、年龄区间选填。身高、当前体重<b>延迟到创建体重类目标时</b>才采集，并在采集前展示《健康风险提示与免责声明》（9.3），勾选确认后方可创建。</li>
+      <li>个人主页展示：进行中 / 已完成的目标、勋章墙、<b>"送出的礼物 ×N / 收到的礼物 ×N"</b>（人情档案，仅自己可见明细，公开页只显示数量徽章如"最佳搭子"）。</li>
+      <li>注销：公开内容下架、关系解除、进行中的礼物承诺标记失效并通知对方；注销前若担任他人监督人，引导先退出或与对方协商更换（9.5）。</li>
+    </ol>
+    <h4>异常</h4>
+    <ul>
+      <li>未确认健康声明可浏览广场、可创建非体重类目标，仅不能创建体重类目标。</li>
+      <li>体重输入超出 30–250kg、身高 120–230cm 判定误输入并阻断。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FR-02 -->
+<div class="fr" id="fr02">
+  <div class="fr-head"><span class="id">FR-02</span><span class="ttl">创建目标（三类模板 + 自定义）</span><span class="tag p0">P0</span><span class="tag new">V0.2 泛化</span></div>
+  <div class="fr-body">
+    <h4>目的</h4><p>把任何"想坚持的事"变成参数明确、规则可判定的契约。</p>
+    <h4>三类目标</h4>
+    <table>
+      <tr><th style="width:110px">类型</th><th>判定逻辑</th><th>典型模板</th><th>关键字段</th></tr>
+      <tr><td><b>数值型</b></td><td>期末数值达到目标 + 打卡率达标</td><td>减脂（起始体重→目标体重）、攒钱（金额）、阅读（本数）、体脂率</td><td>起始值、目标值、方向（变小/变大）、单位</td></tr>
+      <tr><td><b>习惯型</b></td><td>周期内完成率达标（频次 / 打卡天数）</td><td>早起、运动 ≥N 次/周、戒糖戒酒、背单词、冥想、喝够水</td><td>频次要求（每天 / 每周 N 天）、打卡形式（选项"今天做到了吗" / 图文 / 时长）</td></tr>
+      <tr><td><b>里程碑型</b></td><td>截止前全部必选里程碑完成</td><td>备考（一轮复习/模考/冲刺）、写论文、作品集、考证书、装修</td><td>里程碑清单（名称 + 计划完成日期 + 是否必选）</td></tr>
+    </ol>
+    <p>所有模板均可自定义文案；用户也可直接选"自定义目标"手动选择判定方式。</p>
+    <h4>通用字段</h4>
+    <ul>
+      <li>周期：21 / 30 / 60 / 90 天快捷项，自定义 7–180 天；开始日默认次日。</li>
+      <li>每周休息天：0–2 天，默认 1 <span class="assume">TBD</span>；休息天免打卡、不计违约。</li>
+      <li>打卡内容要求：按模板默认勾选，可改（照片 / 数值 / 时长 / 一句话），勾选后成为监督人审核依据。</li>
+      <li>里程碑：数值型按进度自动建议、习惯型按天数建议（第 7/21/结束日），可增删；里程碑可绑定加码礼物（FR-04）。</li>
+      <li>隐私：公开（广场可见）/ 仅受邀 / 仅自己，默认仅受邀。</li>
+      <li>心愿礼物：创建流程中引导添加（FR-04），可不填直接发布。</li>
+    </ul>
+    <h4>处理规则</h4>
+    <ul>
+      <li>发布后进行中目标：成功规则、周期、目标值不可修改；其他字段（打卡要求、礼物、隐私）修改需监督人确认且留痕。</li>
+      <li>体重类模板额外执行健康校验（9.3）：减重速率提示、BMI 下限阻断。</li>
+      <li>创建完成生成"契约卡"：目标 + 周期 + 心愿礼物 + 监督 / 见证席位，直接用于邀请与分享。</li>
+    </ul>
+    <h4>异常</h4>
+    <ul>
+      <li>必填缺失禁止发布并定位；同一用户同时最多 1 个体重类进行中目标、进行中目标总数 ≤3 <span class="assume">TBD</span>。</li>
+      <li>里程碑型若所有里程碑均为非必选，要求至少转为一个必选，否则无法判定成功。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FR-03 -->
+<div class="fr" id="fr03">
+  <div class="fr-head"><span class="id">FR-03</span><span class="ttl">每日打卡（通用四种形式）</span><span class="tag p0">P0</span><span class="tag new">V0.2 泛化</span></div>
+  <div class="fr-body">
+    <h4>打卡形式</h4>
+    <table>
+      <tr><th>形式</th><th>录入内容</th><th>适用</th></tr>
+      <tr><td>数值</td><td>数值（一位小数）+ 单位，可选照片（体重秤、记账截图、阅读页数等）</td><td>数值型目标</td></tr>
+      <tr><td>选项</td><td>一键"今天做到了 ✅ / 没做到 ❌"（戒断类可附"破戒了"并写原因）</td><td>习惯型</td></tr>
+      <tr><td>图文</td><td>照片（多张）+ 一句话心情；不提供强制热量库</td><td>饮食、学习、练习</td></tr>
+      <tr><td>时长</td><td>分钟数 + 类型 + 可选照片</td><td>运动、阅读、练习</td></tr>
+    </table>
+    <h4>处理规则</h4>
+    <ul>
+      <li>首页 / 目标页"今日打卡"按目标要求列出待打卡项，完成一项勾一项；目标全程平均录入成本控制在 30 秒内（选项打卡一键完成）。</li>
+      <li>自然日 00:00–23:59 为打卡窗口；提交后按隐私设置自动生成动态，可逐条取消同步。</li>
+      <li>连续天数（streak）常驻目标页顶部；体重类额外提供曲线 + 7 日均值线，日波动 &gt;1.5kg 标注"正常波动不必焦虑" <span class="assume">TBD</span>；其他类型展示完成率环形图。</li>
+      <li><b>补卡券</b>：每 30 天发 1 张、单期上限 3 <span class="assume">TBD</span>；漏卡 48 小时内可补交，有监督人需审核；补卡记录明确标记，不伪装正常打卡。</li>
+    </ul>
+    <h4>异常</h4>
+    <ul>
+      <li>体重日降 &gt;2kg：允许提交但在审核页高亮"数据异常请核实"。</li>
+      <li>图片上传失败：本地暂存，网络恢复后提示重试。</li>
+      <li>当日数值重复提交：覆盖更新并留痕；已审核通过的需重新审核。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FR-04 -->
+<div class="fr" id="fr04">
+  <div class="fr-head"><span class="id">FR-04</span><span class="ttl">心愿礼物与激励体系</span><span class="tag p0">P0</span><span class="tag new">V0.2 核心新增</span></div>
+  <div class="fr-body">
+    <h4>目的</h4><p>让终点有一个具体、有人情味的期待——"TA 答应我的礼物就在那里"，比抽象积分更能拉动每日行动；平台全程不经手资金与物流。</p>
+
+    <h4>4.1 心愿礼物（主人侧）</h4>
+    <ul>
+      <li>创建目标时及目标进行中均可添加心愿：礼物名称（1–20 字）、图片（可选）、一句话说明、参考预算（数字备忘，可隐藏）；单目标心愿 ≤5 件。</li>
+      <li>可标记心仪承诺人（"希望由 @TA 送"），仅作为邀请时的建议，不构成强制。</li>
+      <li>礼物不分贵贱：提供轻量灵感库（"一杯奶茶""请吃火锅""一双跑鞋""一次旅行""家务全包一个月""随便挑一本书"），文案引导心意而非价格。</li>
+    </ul>
+
+    <h4>4.2 礼物承诺（搭子侧）</h4>
+    <ul>
+      <li>监督人接受邀请时三选一：<b>认下主人指定的心愿 / 自选一份礼物承诺 / 先只当监督人</b>（不送礼完全不影响角色权责，避免人情绑架）。</li>
+      <li>见证人接受邀请后也可承诺加码小礼物；进行中任何受邀角色均可随时加码（常绑定里程碑："满 21 天加一杯奶茶"）。</li>
+      <li>每份承诺选择模式：<b>明约</b>（礼物名与承诺人全程可见）/ <b>惊喜</b>（进行中目标页只显示"🎁 TA 准备了一个神秘礼物"，内容与寄语在拆礼时揭晓）。</li>
+      <li>承诺时可写一句寄语（可设为"拆礼时才显示"）；承诺即时生成系统通知告知主人（惊喜模式不透露内容）。</li>
+    </ul>
+
+    <h4>4.3 拆礼与兑现</h4>
+    <ul>
+      <li><b>目标成功</b>：结果页进入拆礼流程，礼物逐一点开（开礼物动效 + 寄语展示）；加码礼物按里程碑解锁情况分别处理（未达标的加码不解锁）。</li>
+      <li>线下兑现：双方自行完成购买 / 赠送；产品内提供"标记已兑现"（承诺人）与"确认收到"（主人）两步确认，完成后礼物进入双方人情档案与回忆录。</li>
+      <li><b>目标失败</b>：承诺不兑现、不追责；承诺人可一键选择"<b>约定顺延到下一期</b>"或只发一句鼓励；顺延的承诺在主人开启新目标时自动带入等待确认。</li>
+      <li><b>目标终止</b>：承诺自动失效并通知承诺人，不产生任何违约责任。</li>
+    </ul>
+
+    <h4>4.4 边界与防滥用 <span class="must">强规则</span></h4>
+    <ul>
+      <li>全链路固定文案："礼物是朋友间的心意约定，由双方线下自行兑现，平台不参与购买、支付、配送，也不强制履行。"承诺页、心愿页、拆礼页三处展示。</li>
+      <li>不提供收货地址填写、转账入口、商品外链（P0）；不显示"礼物市场"类交易导向页面。</li>
+      <li>承诺人可在目标开始前无条件撤销；目标开始后撤销需主人确认（防止半途抽走动力），撤销记录不公开 <span class="assume">规则假设，TBD</span>。</li>
+      <li>参考预算为选填且仅双方可见；不做礼物价格排行；禁止承诺现金、虚拟货币及违规商品（词库 + 举报，9.4）。</li>
+      <li>未成年账号：礼物相关功能默认关闭，需成年后开启 <span class="assume">准入策略见 Q5，TBD</span>。</li>
+    </ul>
+
+    <h4>4.5 积分与勋章（辅助激励）</h4>
+    <table>
+      <tr><th>类型</th><th>获得条件（分值 / 阈值 TBD）</th></tr>
+      <tr><td>打卡积分</td><td>首次打卡、带图打卡、时长打卡加分；连续 7/21/50/100 天连击勋章</td></tr>
+      <tr><td>里程碑 / 成功勋章</td><td>达成里程碑、目标成功</td></tr>
+      <tr><td><b>搭子勋章</b></td><td>监督人侧：连续鼓励 7/21 天、审核及时率、"TA 带出来的成功目标"数；双方互授"最佳搭子"致谢徽章</td></tr>
+    </table>
+    <p>P0 积分仅用于勋章展示，不兑换现金实物；P1 是否兑换权益见 Q6。</p>
+  </div>
+</div>
+
+<!-- FR-05 -->
+<div class="fr" id="fr05">
+  <div class="fr-head"><span class="id">FR-05</span><span class="ttl">邀请搭子监督人与见证人</span><span class="tag p0">P0</span><span class="tag new">V0.2 重写</span></div>
+  <div class="fr-body">
+    <h4>邀请流程</h4>
+    <ol>
+      <li>主人选角色 → 站内好友或微信邀请链接；邀请卡片展示目标摘要 + 心愿礼物 + 文案"我想认真做完这件事，你来当我的搭子监督人好不好？做到了，你答应我的礼物可就要兑现啦～"。</li>
+      <li>被邀人落地页先看<b>权责说明</b>：监督人 = 每天看打卡、通过 / 驳回、到期判定（约每天 1 分钟）；并展示礼物邀约，三选一（FR-04.2）。</li>
+      <li>接受后角色生效、进入见证墙，系统通知主人；监督人接受时被引导写下<b>第一句鼓励</b>（这句话将进入回忆录"启程"章节）。</li>
+      <li>婉拒可附一句鼓励（仅主人可见），不公开、不影响双方其他关系。</li>
+    </ol>
+    <h4>双向鼓励（陪伴感的核心）</h4>
+    <ul>
+      <li><b>监督人侧</b>：工作台每条打卡可"通过 + 选一句鼓励贴纸 / 写一句话"；驳回必须附理由，且引导同时留鼓励语；每日可主动催打卡一次（带俏皮文案模板，限频防骚扰）。</li>
+      <li><b>主人侧</b>：收到审核 / 鼓励后可一键回"爱心 / 感谢"，或回复文字；连续被鼓励时系统引导"也去看看 TA 的目标"。</li>
+      <li><b>互相搭子</b>：双方在各自目标中互为监督人时，关系页出现"互相搭子"标识与双人聚合视图（两人的进度并排、共同坚持天数）；P0 不做强制结对 PK（P1）。</li>
+      <li>鼓励互动（每日鼓励、答谢、驳回后重交通过的瞬间）自动标记为"<b>搭子瞬间</b>"，作为回忆录素材（FR-09）。</li>
+    </ul>
+    <h4>边界</h4>
+    <ul>
+      <li>监督人 1–2 人；见证人上限 <span class="tbd">建议 20，TBD</span>；进行中可追加。</li>
+      <li>监督人退出：目标在 72h 内无监督人时打卡免审核但每日提醒主人补人，超 7 天标记"无人监督"，成败规则不变；其礼物承诺随退出失效（若已承诺）。</li>
+      <li>主人可更换监督人（无待审核打卡时），通知双方、审核历史保留。</li>
+      <li>催打卡 / 邀请限频：同一对象每日 1 次；被邀人可关闭此类邀请。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FR-06 -->
+<div class="fr" id="fr06">
+  <div class="fr-head"><span class="id">FR-06</span><span class="ttl">打卡审核与到期结果判定</span><span class="tag p0">P0</span></div>
+  <div class="fr-body">
+    <h4>日常审核</h4>
+    <ul>
+      <li>监督工作台按目标聚合待审核：提交时间、图文、数值、异常标记；操作通过 / 驳回。</li>
+      <li>驳回必选理由（证据不清 / 疑似不实 / 与目标不符 / 其他）并允许补文字；主人当天可修改重交，不消耗补卡券。</li>
+      <li>审核时限：24h 未处理提醒 1 次；48h 未处理<b>自动通过</b>并标注"超时自动通过"。</li>
+    </ul>
+    <h4>到期判定（按目标类型）</h4>
+    <ol>
+      <li>结束日 20:00 <span class="assume">TBD</span> 锁定数据，生成《履约报告》：有效打卡率、数值变化 / 完成率、里程碑、驳回与补卡记录。</li>
+      <li>体重类：结束日提交期末体重 + 秤照片，引导（非强制）"读数与当日随机校验词合影"；未称重则取最后 7 天末次有效记录并标注。监督人 48h 内确认证据，异常可驳回补交。</li>
+      <li>系统按 9.2 规则初判 → 监督人 72h 内确认或推翻（推翻需理由、留痕、通知主人）。</li>
+      <li>异议：主人 48h 内可发起一次申诉并提交补充证据，监督人复核；仍有异议挂"争议中"，P0 走客服联系方式，官方人工队列与时限列 P1。</li>
+    </ol>
+    <h4>权限矩阵</h4>
+    <table>
+      <tr><th>操作</th><th>主人</th><th>监督人</th><th>见证人</th><th>围观用户</th></tr>
+      <tr><td>提交 / 修改打卡</td><td>✓</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>审核 / 到期判定</td><td>—</td><td>✓</td><td>—</td><td>—</td></tr>
+      <tr><td>查看完整时间线</td><td>✓</td><td>✓</td><td>✓</td><td>仅公开动态</td></tr>
+      <tr><td>承诺 / 兑现礼物</td><td>收礼 / 确认</td><td>✓</td><td>加码</td><td>—</td></tr>
+      <tr><td>发起申诉 / 终止目标</td><td>✓</td><td>—</td><td>—</td><td>—</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- FR-07 -->
+<div class="fr" id="fr07">
+  <div class="fr-head"><span class="id">FR-07</span><span class="ttl">过程动态与目标主页</span><span class="tag p0">P0</span></div>
+  <div class="fr-body">
+    <h4>目标主页布局</h4>
+    <ul>
+      <li><b>顶部</b>：目标一句话 + 状态徽章 + 进度（数值型当前/目标与剩余天数；习惯型周期完成率；里程碑型清单进度）。</li>
+      <li><b>礼物位</b>：明约礼物以礼物卡片展示（礼物图 + 承诺人头像）；惊喜礼物显示"🎁 神秘礼物 ×N"；无承诺时显示"邀请搭子立一个礼物约定"引导。</li>
+      <li><b>见证墙</b>：监督人 / 见证人头像与角色标；结项后展示寄语。</li>
+      <li><b>时间线</b>：每日打卡（图文/数值/时长）、审核标记、里程碑动效、补卡标记、<b>搭子瞬间</b>（鼓励/答谢）。</li>
+    </ul>
+    <h4>动态规则</h4>
+    <ul>
+      <li>打卡默认生成动态，也可主动发纯图文动态；可见范围继承目标隐私，单条只能收窄不能放大。</li>
+      <li>敏感数值（体重、金额等）默认仅受邀可见；广场只展示成就口径（"已减重 X kg""第 N 天""攒下 X 元"），精确数字隐藏。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FR-08 -->
+<div class="fr" id="fr08">
+  <div class="fr-head"><span class="id">FR-08</span><span class="ttl">社交互动与广场</span><span class="tag p0">P0</span></div>
+  <div class="fr-body">
+    <h4>互动能力</h4>
+    <ul>
+      <li><b>点赞</b>：可取消、可查看名单。<b>加油</b>：一键轻互动（图标 + 随机鼓励短句），专用于未打卡 / 被驳回场景，降低互动门槛。<b>评论与回复</b>：监督人评论带身份标。</li>
+      <li><b>关注</b>：单向，关注后进关注流。<b>答谢</b>：主人对鼓励 / 礼物承诺的专属回应动作（FR-05）。</li>
+    </ul>
+    <h4>广场</h4>
+    <ul>
+      <li>以"目标卡片"为主（摘要 + 进度 + 搭子数 + 礼物徽章 + 获赞），穿插打卡动态；P0 综合时间 / 热度 / 完整度排序，不做榜单（P1）。</li>
+      <li>支持按模板类别浏览（减脂、学习、早起…）；新用户曝光保护规则 <span class="tbd">TBD</span>。</li>
+      <li>举报入口：广告、极端节食 / 身材焦虑、违规礼物承诺、不实内容；处置见 9.4。</li>
+    </ul>
+    <h4>氛围 <span class="must">强规则</span></h4>
+    <ul>
+      <li>失败 / 终止目标下默认优先展示加油向评论；恶意评论主人可删除举报；不提供任何羞辱类互动入口。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FR-09 -->
+<div class="fr" id="fr09">
+  <div class="fr-head"><span class="id">FR-09</span><span class="ttl">大结局回忆录</span><span class="tag p0">P0</span><span class="tag new">V0.2 核心新增</span></div>
+  <div class="fr-body">
+    <h4>目的</h4><p>把一段共同走完的经历自动沉淀成"作品"：它是给坚持者的颁奖礼，是给搭子的感谢信，也是产品最值得被转发的传播资产。成功目标生成《大结局回忆录》，失败 / 终止目标生成调性不同的《旅程纪念册》。</p>
+
+    <h4>生成时机</h4>
+    <ul>
+      <li>成功：礼物拆礼流程结束后自动生成草稿并推送"你的大结局已经写好了"。</li>
+      <li>失败：结果页提供"领取旅程纪念册"，文案口径为感谢陪伴与复盘（"这一程没到终点，但你们走过的每一天都算数"），不出现失败羞辱。</li>
+      <li>终止：默认不生成，用户可手动领取纪念册。</li>
+    </ul>
+
+    <h4>章节结构（系统自动汇编）</h4>
+    <div class="memoir-demo">
+      <div class="m-page m1"><b>封面 · 启程</b><span class="tagline">目标名、起止日期、契约卡、TA 接受邀请时说的第一句话</span><span class="pgno">01</span></div>
+      <div class="m-page m2"><b>数据高光</b><span class="tagline">总天数、最长连击、打卡率、减重/攒钱/读完等成果数字；体重类放前后对比曲线</span><span class="pgno">02</span></div>
+      <div class="m-page m3"><b>闪光日常</b><span class="tagline">打卡照片墙、里程碑达成瞬间、获赞最高的动态</span><span class="pgno">03</span></div>
+      <div class="m-page m4"><b>小波折</b><span class="tagline">漏卡与补卡、被驳回又重新提交的日子——真实的坚持比完美更动人</span><span class="pgno">04</span></div>
+      <div class="m-page m5"><b>搭子瞬间</b><span class="tagline">TA 的每日鼓励金句、你的答谢、互相加油最多的一天</span><span class="pgno">05</span></div>
+      <div class="m-page m6"><b>大结局 · 礼物与寄语</b><span class="tagline">拆礼物时刻、每份礼物与寄语、见证墙留言、主人写给自己/TA 的收尾话</span><span class="pgno">06</span></div>
+    </div>
+    <ul>
+      <li>失败 / 终止的纪念册：保留 01、02（改口径为"走过的路"）、03、05 章；04 章改为"下一次会更好"复盘页；无拆礼章，顺延礼物以"约定还在"卡片收尾。</li>
+      <li>素材选取规则：照片优先选带图打卡与里程碑日；金句优先选高互动评论与监督人鼓励；数据从履约报告自动取数，不做手工统计。素材不足（如打卡很少）时章节自动精简，不留空白页。</li>
+    </ul>
+
+    <h4>编辑与授权</h4>
+    <ul>
+      <li>生成后主人可：替换封面模板与配色、增删页面、修改系统文案、挑选照片、撰写序言和给搭子的致谢页；<b>不可篡改数据数字本身</b>（保证真实）。</li>
+      <li>涉及他人内容（头像、评论、寄语、礼物承诺人）默认仅双方与受邀人可见；公开发布 / 分享前出现授权清单，逐项可移除他人内容；见证寄语在征集时即让作者勾选"允许收入回忆录"。</li>
+    </ul>
+
+    <h4>产出与分享</h4>
+    <ul>
+      <li>P0 形态：App 内可上下滑动的 H5 长页 + 一键导出长图（分页保存）+ 链接分享（微信 / 朋友圈）；封面同步生成 FR-11 分享卡。</li>
+      <li>访问权限：仅自己 / 受邀可见 / 公开链接（持链接可看，未登录可见）；公开链接落地页引导下载。</li>
+      <li>回忆录永久保存在双方账号（"我的回忆"书架）；目标删除 <span class="assume">P0 目标不可删仅可终止，TBD</span> 与账号注销时按 9.4 处理。</li>
+    </ul>
+
+    <h4>P1（不在本期）</h4><p>回忆录短视频自动剪辑、实体照片书印刷付费、搭子双人视角合刊、周年回顾（"去年的今天你做到了什么"）。</p>
+  </div>
+</div>
+
+<!-- FR-10 -->
+<div class="fr" id="fr10">
+  <div class="fr-head"><span class="id">FR-10</span><span class="ttl">消息与提醒</span><span class="tag p0">P0</span></div>
+  <div class="fr-body">
+    <table>
+      <tr><th>通知</th><th>接收人</th><th>时机</th></tr>
+      <tr><td>打卡提醒</td><td>主人</td><td>按自设时间；已打卡不发；连续 2 天未打卡额外通知监督人去催</td></tr>
+      <tr><td>待审核提醒</td><td>监督人</td><td>新打卡待审；24h 未处理再提醒</td></tr>
+      <tr><td>审核结果 / 鼓励</td><td>主人</td><td>通过（附鼓励语）/ 驳回（附理由）即时通知</td></tr>
+      <tr><td>礼物动态</td><td>双方</td><td>被承诺、加码、解锁、拆礼、兑现确认、顺延（惊喜类不透露内容）</td></tr>
+      <tr><td>互动通知</td><td>内容主人</td><td>点赞 / 加油 / 评论 / 关注 / 答谢，点赞合并推送</td></tr>
+      <tr><td>回忆录</td><td>主人 + 受邀角色</td><td>回忆录生成、被致谢、寄语征集</td></tr>
+    </table>
+    <ul><li>免打扰时段默认 22:00–8:00 <span class="assume">TBD</span>；自设打卡提醒不静默。</li></ul>
+  </div>
+</div>
+
+<!-- FR-11 -->
+<div class="fr" id="fr11">
+  <div class="fr-head"><span class="id">FR-11</span><span class="ttl">站外分享卡片</span><span class="tag p0">P0</span></div>
+  <div class="fr-body">
+    <table>
+      <tr><th>卡片</th><th>内容</th></tr>
+      <tr><td>契约卡</td><td>目标、周期、心愿礼物、监督 / 见证席位（用于邀请与立约公示）</td></tr>
+      <tr><td>打卡卡</td><td>第 N 天、连续天数、打卡拼图、心情</td></tr>
+      <tr><td>里程碑 / 加码卡</td><td>"已坚持 21 天，TA 的礼物加码了 🎁"</td></tr>
+      <tr><td>拆礼卡</td><td>礼物揭晓、承诺人寄语（可隐去具体礼物只晒心意）</td></tr>
+      <tr><td>回忆录封面卡</td><td>回忆录封面 + 二维码，导向完整回忆录 H5</td></tr>
+    </table>
+    <ul>
+      <li>出口：微信好友 / 朋友圈 / 保存图片；小红书以保存图片 + 引导话题文案支持 <span class="assume">渠道 TBD</span>。</li>
+      <li>精确数值（体重 / 金额）默认隐藏，成就口径优先；未登录访客看公开摘要并引导下载。</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="s8">
+<h2><span class="num">8</span>P1 规划（首期不做）</h2>
+<table>
+  <tr><th style="width:180px">方向</th><th>说明</th><th>前置条件</th></tr>
+  <tr><td>礼物线上闭环</td><td>电商礼品链接、红包 / 代付、礼品卡；平台仍不碰对赌资金</td><td>支付与商品合规专项评估（Q2）</td></tr>
+  <tr><td>回忆录增值形态</td><td>短视频自动剪辑、实体照片书印刷付费、双人合刊、周年回顾</td><td>P0 回忆录打开 / 分享数据验证后</td></tr>
+  <tr><td>健康数据 / AI</td><td>Health Connect / 苹果健康接入、AI 食物与称重识别（仅辅助不自动判负）</td><td>体重类模板规模化后</td></tr>
+  <tr><td>多人玩法</td><td>互相搭子结对 PK、小队挑战、排行榜</td><td>双人关系验证后</td></tr>
+  <tr><td>专业监督与会员</td><td>付费教练 / 营养师、订阅会员、积分权益</td><td>商业模式探索（Q6）</td></tr>
+  <tr><td>官方仲裁队列</td><td>申诉审核团队与 SLA</td><td>审核量增长后</td></tr>
+</table>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="s9">
+<h2><span class="num">9</span>共享规则与异常</h2>
+
+<h3>9.1 成功判定规则（创建时锁定、双方确认）</h3>
+<ul>
+  <li><b>数值型</b>：结束日成果数值达到目标值（变小 / 变大按设定方向）+ 有效打卡率 ≥60%（默认 <span class="assume">TBD</span>，休息天不计入分母）；体重类取期末确认体重，未称重取最后 7 天末次记录并标注。</li>
+  <li><b>习惯型</b>：完成率 ≥80%；戒断类"未做到 / 破戒"记录 ≤2 次 <span class="assume">TBD</span>。</li>
+  <li><b>里程碑型</b>：全部必选里程碑在截止前完成（需打卡证据且通过审核）。</li>
+  <li>有效打卡 = 审核通过或超时自动通过；被驳回未重交、缺卡未补均不计。</li>
+</ul>
+
+<h3>9.2 礼物承诺状态机</h3>
+<div class="states">
+  <div class="statechip draft">待承诺（心愿）</div><span class="arrow">→</span>
+  <div class="statechip live">已承诺（明约 / 惊喜）</div><span class="arrow">→</span>
+  <div class="statechip win">已解锁 · 已兑现</div>
+</div>
+<div class="states">
+  <div class="statechip live">已承诺</div><span class="arrow">→</span>
+  <div class="statechip fail">失败：顺延下期 / 失效</div>
+  <span class="arrow" style="margin:0 8px">·</span>
+  <div class="statechip cancel">终止 / 撤销：失效并通知</div>
+</div>
+<table>
+  <tr><th>情形</th><th>规则</th></tr>
+  <tr><td>加码礼物未达对应里程碑</td><td>不解锁、不追责；可顺延</td></tr>
+  <tr><td>承诺人目标中途退出角色 / 注销</td><td>承诺随角色退出自动失效，通知主人</td></tr>
+  <tr><td>双方对"是否已兑现"有分歧</td><td>P0 不裁判线下履行：任一方可取消自己侧的确认状态，礼物保留"待兑现"标记；提供纠纷引导文案（自行协商），不支持举报"不送礼"</td></tr>
+  <tr><td>违规礼物（现金、违禁品、高价诱导）</td><td>命中词库或举报核实：移除礼物内容、通知双方，情节严重限制功能（9.4）</td></tr>
+</table>
+
+<h3>9.3 健康安全规则（仅体重类目标） <span class="must">强规则</span></h3>
+<ul>
+  <li>首次创建体重类目标前展示健康声明（孕期 / 哺乳期、进食障碍史、心血管 / 糖尿病、未成年人遵医嘱），确认后记录。</li>
+  <li>减重速率 0.3–1.0 kg/周显示合理区间，&gt;1.0 弹警示（不阻断），目标体重低于 BMI 18.5 阻断 <span class="assume">阈值需专业顾问确认，TBD</span>。</li>
+  <li>广场不允许催吐、长期断食、减肥药等内容，命中限曝光并给健康提示。</li>
+</ul>
+
+<h3>9.4 隐私、内容与举报</h3>
+<ul>
+  <li>隐私三级：公开 / 仅受邀 / 仅自己，默认仅受邀；精确数值（体重、金额）默认不进广场。</li>
+  <li>回忆录他人内容授权清单（FR-09）；打卡照片界面禁用保存，协议中声明技术防护边界 <span class="assume">TBD</span>。</li>
+  <li>举报处置：明显违规先下架后复核；举报双向匿名；软删除留存期限依合规意见 <span class="tbd">TBD</span>。</li>
+  <li>注销：回忆录含双方内容，注销方内容从公开链接下架；另一方账号内的回忆录保留但移除注销方头像昵称与寄语（默认匿名化），公开链接关闭 <span class="assume">TBD</span>。</li>
+</ul>
+
+<h3>9.5 异常与恢复路径汇总</h3>
+<table>
+  <tr><th>异常</th><th>处理</th></tr>
+  <tr><td>监督人失联（48h 不审核）</td><td>自动通过；连续 3 次超时通知主人更换</td></tr>
+  <tr><td>监督人恶意驳回</td><td>主人可申诉、可更换，审核记录保留</td></tr>
+  <tr><td>监督人注销 / 退出</td><td>身份与礼物承诺解除，72h / 7 天补位规则（FR-05）</td></tr>
+  <tr><td>漏打卡</td><td>当晚提醒；48h 内补卡券可救；超出按缺卡计</td></tr>
+  <tr><td>期末未提交证据</td><td>取末次有效数据判定并标注；监督人可要求补交</td></tr>
+  <tr><td>结果争议</td><td>48h 申诉 → 监督人复核 → P0 客服挂起"争议中"</td></tr>
+  <tr><td>礼物承诺人反悔</td><td>开始前可无条件撤销；开始后需主人确认；产品不追责、不公示</td></tr>
+  <tr><td>刷赞 / 虚假互动</td><td>P0 基础频控；反作弊系统 P1</td></tr>
+</table>
+
+<h3>9.6 权限总表</h3>
+<table>
+  <tr><th>能力</th><th>主人</th><th>监督人</th><th>见证人</th><th>围观用户</th><th>未登录访客</th></tr>
+  <tr><td>查看目标主页</td><td>✓</td><td>✓</td><td>✓</td><td>仅公开</td><td>仅公开摘要</td></tr>
+  <tr><td>查看精确数值</td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>—</td></tr>
+  <tr><td>打卡 / 发动态</td><td>✓</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td>点赞 / 加油 / 评论</td><td>不可给自己 <span class="assume">TBD</span></td><td>✓（身份标）</td><td>✓</td><td>✓</td><td>—</td></tr>
+  <tr><td>审核 / 判定</td><td>—</td><td>✓</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td>承诺礼物</td><td>—</td><td>✓</td><td>加码</td><td>—</td><td>—</td></tr>
+  <tr><td>终止目标 / 申诉</td><td>✓</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+</table>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="s10">
+<h2><span class="num">10</span>开放问题（需评审决策）</h2>
+<table>
+  <tr><th style="width:50px">编号</th><th style="width:220px">问题</th><th>影响与倾向</th></tr>
+  <tr><td>Q1</td><td>首期形态：原生 App 双端，还是微信小程序先行？</td><td>小程序在熟人邀请、礼物邀约、回忆录传播链路上更顺；App 在推送、后续数据接入上更强。资源有限时倾向小程序先行</td></tr>
+  <tr><td>Q2</td><td>礼物是否做线上交易闭环（红包代付 / 电商链接）？时点？</td><td>影响激励强度与合规成本；建议 P0 纯线下心意、P1 再评估</td></tr>
+  <tr><td>Q3</td><td>监督人判定平票、推翻系统初判时谁说了算？</td><td>影响信任底线，需定稿</td></tr>
+  <tr><td>Q4</td><td>模板上线优先级：首批做哪几个目标模板？</td><td>建议减脂、早起、运动、学习/阅读、戒断 5 类先行，其余自定义覆盖</td></tr>
+  <tr><td>Q5</td><td>未成年人准入：禁止注册，还是允许非礼物 / 非体重类功能？</td><td>影响商店分级、礼物功能默认策略</td></tr>
+  <tr><td>Q6</td><td>积分是否兑换权益、是否引入会员？回忆录实体书是否做付费？</td><td>影响商业模式与积分前期设计</td></tr>
+  <tr><td>Q7</td><td>回忆录素材的版权与肖像授权文案、注销后双方内容归属</td><td>需法务确认用户协议条款</td></tr>
+  <tr><td>Q8</td><td>广场冷启动内容来源（运营 seeded / 邀新活动 / 模板话题）</td><td>影响首月氛围</td></tr>
+</table>
+
+<div class="note info"><b>下一步建议</b>
+评审 V0.2、确认 P0 范围与 Q1–Q8 后，优先产出 5 个关键页面的低保真原型：① 创建目标 + 心愿礼物 ② 邀请搭子（含礼物邀约）③ 打卡 + 监督工作台（配对设计）④ 拆礼仪式 ⑤ 大结局回忆录。</div>
+</section>
+
+<footer>
+「做到」App 产品需求文档 V0.2（初稿） · 2026-10-23 · 待评审<br>
+所有阈值与默认值标注 TBD / 假设 的内容均非最终决策；礼物为用户间人情约定，平台不经手资金；健康规则上线前需专业审核。
+</footer>
+
+</main>
+</div>
+</body>
+</html>

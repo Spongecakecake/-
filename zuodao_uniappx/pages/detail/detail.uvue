@@ -1,0 +1,472 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll detail-scroll" scroll-y>
+            <view v-if="!loaded" class="center-box">
+                <text class="muted t-center">{{ err.length > 0 ? err : '加载中…' }}</text>
+            </view>
+            <view v-else>
+                <!-- 契约正文 -->
+                <view class="card">
+                    <view class="row">
+                        <view class="dot" style="background-color: #1E4B3A"></view>
+                        <text class="dim gap-left">契约书</text>
+                        <view class="spacer"></view>
+                        <view v-if="g.status == 'achieved'" class="chip-badge chip-badge-gold">
+                            <text class="chip-badge-text">{{ statusText(g.status) }}</text>
+                        </view>
+                        <view v-else-if="g.status == 'failed'" class="chip-line chip-line-red">
+                            <text class="chip-line-text-red">{{ statusText(g.status) }}</text>
+                        </view>
+                        <view v-else class="chip-line">
+                            <text class="chip-line-text">{{ statusText(g.status) }}</text>
+                        </view>
+                    </view>
+                    <text class="h2 contract-title">{{ g.title }}</text>
+                    <text v-if="g.description.length > 0" class="muted-lh gap-8">{{ g.description }}</text>
+                    <view class="row gap-20">
+                        <text class="dim">{{ g.startDate }} 起</text>
+                        <text class="dim gap-left-lg">为期 {{ totalDays() == 0 ? '—' : totalDays().toString() }} 天</text>
+                    </view>
+                    <view class="box gap-24">
+                        <text class="sec-label">每日规则</text>
+                        <text class="body-text gap-8">{{ g.rule }}</text>
+                    </view>
+                    <view v-for="(p, i) in g.participants" :key="p.id" class="row part-row">
+                        <view class="avatar-sm">
+                            <text class="avatar-sm-text">{{ p.nickname.length > 0 ? p.nickname.charAt(0) : '?' }}</text>
+                        </view>
+                        <text class="muted gap-left">{{ p.nickname }}</text>
+                        <view :class="p.role == 'owner' ? 'chip-line chip-line-green role-chip' : 'chip-line chip-line-gold role-chip'">
+                            <text :class="p.role == 'owner' ? 'chip-line-text-green' : 'chip-line-text-gold'">{{ roleText(p.role) }}</text>
+                        </view>
+                    </view>
+                    <text v-if="g.encouragement.length > 0" class="gold-note gap-16">附言：「{{ g.encouragement }}」</text>
+                    <!-- 待接受：邀请码 -->
+                    <view v-if="g.status == 'awaiting' && g.myRole == 'owner' && g.inviteCode.length > 0">
+                        <view class="divider"></view>
+                        <text class="sec-label t-center">邀请码（等待接受）</text>
+                        <text class="code-big t-center gap-8">{{ g.inviteCode }}</text>
+                    </view>
+                    <!-- 履约进度 -->
+                    <view v-if="g.status == 'active'">
+                        <view class="bar gap-24">
+                            <view class="bar-fill" :style="'width:' + daysPct().toString() + '%'"></view>
+                        </view>
+                        <text class="dim gap-8">通过 {{ g.stats.approved }} / {{ totalDays() }} 天 · 最长连续 {{ g.stats.bestStreak }} 天</text>
+                    </view>
+                </view>
+
+                <!-- 今日打卡（立约人） -->
+                <view v-if="g.status == 'active' && g.myRole == 'owner'" class="card">
+                    <text class="sec-label">今日打卡</text>
+                    <text class="dim gap-8">{{ checkedToday() ? '今日已打卡，明日请早' : todayText + ' · 一句实话，写下来' }}</text>
+                    <textarea class="textarea gap-16" v-model="note" placeholder="今天做到了什么？" />
+                    <view class="btn-sm btn-tonal gap-12" @click="pickProof">
+                        <text class="btn-text-gold-sm">{{ photoData.length > 0 ? '已选择举证图 · 重选' : 'L2 举证：选图并加水印' }}</text>
+                    </view>
+                    <text v-if="photoData.length > 0" class="small gap-8">图片已加昵称与时间水印，将随打卡一起保存</text>
+                    <view class="row gap-8">
+                        <view class="spacer"></view>
+                        <view :class="checkinBtnClass" @click="checkin">
+                            <text :class="checkinBtnTextClass">提交打卡</text>
+                        </view>
+                    </view>
+                </view>
+
+                <!-- 打卡记录 -->
+                <view v-if="g.checkins.length > 0">
+                    <text class="h3 list-title">打卡记录</text>
+                    <view v-for="(c, i) in g.checkins" :key="c.id" class="card checkin-card">
+                        <view class="row">
+                            <text class="muted">{{ c.day }}</text>
+                            <view class="spacer"></view>
+                            <view v-if="c.status == 'pending'" class="chip-line">
+                                <text class="chip-line-text-gold">待批阅</text>
+                            </view>
+                            <view v-else-if="c.status == 'approved'" class="chip-badge chip-badge-green">
+                                <text class="chip-badge-text">通过</text>
+                            </view>
+                            <view v-else-if="c.status == 'rejected'" class="chip-badge chip-badge-red">
+                                <text class="chip-badge-text">驳回</text>
+                            </view>
+                        </view>
+                        <text class="sub lh gap-8">{{ c.note }}</text>
+                        <text v-if="c.reviewMessage.length > 0"
+                            :class="c.status == 'rejected' ? 'review-msg review-red' : 'review-msg review-green'">批语：「{{ c.reviewMessage }}」</text>
+                        <view v-if="c.status == 'pending' && isReviewer()">
+                            <input class="input gap-16" v-model="c.msg" placeholder="批语（可空）" />
+                            <view class="row gap-16">
+                                <view class="btn-sm btn-filled btn-wide" @click="review(c, true)">
+                                    <text class="btn-text-sm">通过</text>
+                                </view>
+                                <view class="btn-sm btn-danger btn-wide gap-left">
+                                    <text class="btn-text-red-sm">驳回</text>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+
+                <!-- 结局判定 -->
+                <view v-if="g.status == 'active'" class="card">
+                    <text class="sec-label">结局判定</text>
+                    <text class="dim gap-8">任一方可发起；双方确认后生效。</text>
+                    <view v-if="hasProposal() && proposedByMe()">
+                        <text class="gold-note gap-16">已发起「{{ proposalText() }}」，待对方确认…</text>
+                    </view>
+                    <view v-else-if="hasProposal() && !proposedByMe()">
+                        <text class="sub gap-16">对方判定此约：{{ proposalText() }}</text>
+                        <view class="row gap-16">
+                            <view class="btn-sm btn-filled btn-wide" @click="confirmResult(true)">
+                                <text class="btn-text-sm">同意</text>
+                            </view>
+                            <view class="btn-sm btn-outlined btn-wide gap-left" @click="confirmResult(false)">
+                                <text class="btn-text-green-sm">不同意</text>
+                            </view>
+                        </view>
+                    </view>
+                    <view v-else>
+                        <view class="row gap-24">
+                            <view class="btn-sm btn-tonal btn-wide" @click="propose('achieved')">
+                                <text class="btn-text-gold-sm">判定：做到了</text>
+                            </view>
+                            <view class="btn-sm btn-danger btn-wide gap-left" @click="propose('failed')">
+                                <text class="btn-text-red-sm">判定：未做到</text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+
+                <!-- 心愿达成 -->
+                <view v-if="g.status == 'achieved'" class="card center-col">
+                    <text class="sec-label-gold">心愿达成</text>
+                    <view v-if="!giftOpened" class="center-col">
+                        <view class="gift-btn" @click="openGift">
+                            <text class="gift-btn-text">拆</text>
+                        </view>
+                        <text class="dim gap-16">点按开启心愿礼物</text>
+                    </view>
+                    <view v-else class="center-col">
+                        <view class="seal-done">
+                            <text class="seal-done-text">成</text>
+                        </view>
+                        <text class="h2 t-center gap-16">{{ g.giftName.length > 0 ? g.giftName : '此约无奖励，达成即可' }}</text>
+                        <text v-if="g.giftNote.length > 0" class="muted t-center gap-8">{{ g.giftNote }}</text>
+                        <text class="gold-note t-center gap-16">礼物由立约人线下兑现，平台不经手资金与物品</text>
+                        <view class="btn-sm btn-tonal gap-24" @click="openMemoir">
+                            <text class="btn-text-gold-sm">查看回忆录</text>
+                        </view>
+                    </view>
+                </view>
+
+                <!-- 未达成 -->
+                <view v-if="g.status == 'failed'" class="card center-col">
+                    <view class="seal-regret">
+                        <text class="seal-regret-text">憾</text>
+                    </view>
+                    <text class="h3 t-center gap-16">此约未达成</text>
+                    <text class="gold-note t-center gap-8">无妨。许过的愿，还可以再许。</text>
+                </view>
+
+                <!-- 动态 -->
+                <view v-if="g.events.length > 0">
+                    <text class="h3 list-title">动态</text>
+                    <view class="card">
+                        <view v-for="(e, i) in g.events" :key="e.id" class="event-row">
+                            <text class="muted-lh">{{ e.message }}</text>
+                        </view>
+                    </view>
+                </view>
+
+                <text v-if="err.length > 0 && loaded" class="err t-center gap-16">{{ err }}</text>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { api, myId, myNick, errText } from '@/utils/api.uts'
+    import { chooseWatermarkedProof } from '@/utils/watermark.uts'
+    import { statusText as statusTextOf, roleText as roleTextOf, todayStr, daysBetween } from '@/utils/theme.uts'
+    import { goalFrom, emptyGoal, Goal, Checkin } from '@/utils/models.uts'
+
+    export default {
+        data() {
+            return {
+                id: '',
+                loaded: false,
+                g: emptyGoal() as Goal,
+                busy: false,
+                giftOpened: false,
+                note: '',
+                photoData: '',
+                err: ''
+            }
+        },
+        computed: {
+            todayText(): string {
+                return todayStr()
+            },
+            checkinBtnClass(): string {
+                const disabled = this.busy || this.checkedToday() || this.note.trim().length == 0
+                return disabled ? 'btn-sm btn-disabled' : 'btn-sm btn-filled'
+            },
+            checkinBtnTextClass(): string {
+                const disabled = this.busy || this.checkedToday() || this.note.trim().length == 0
+                return disabled ? 'btn-text-gray-sm' : 'btn-text-sm'
+            }
+        },
+        onLoad(options: OnLoadOptions) {
+            this.id = options['id'] ?? ''
+        },
+        onShow() {
+            if (this.id.length > 0) this.load()
+        },
+        methods: {
+            statusText(s: string): string { return statusTextOf(s) },
+            roleText(s: string): string { return roleTextOf(s) },
+            totalDays(): number {
+                return daysBetween(this.g.startDate, this.g.endDate)
+            },
+            daysPct(): number {
+                const d = this.totalDays()
+                if (d <= 0) return 0
+                let r = this.g.stats.approved * 1.0 / d
+                if (r < 0) r = 0
+                if (r > 1) r = 1
+                return Math.round(r * 100)
+            },
+            checkedToday(): boolean {
+                const t = todayStr()
+                for (let i = 0; i < this.g.checkins.length; i++) {
+                    if (this.g.checkins[i].day == t) return true
+                }
+                return false
+            },
+            isReviewer(): boolean {
+                return this.g.myRole == 'supervisor' || this.g.myRole == 'witness'
+            },
+            hasProposal(): boolean {
+                return this.g.proposal != null
+            },
+            proposedByMe(): boolean {
+                const p = this.g.proposal
+                if (p == null) return false
+                return p.proposedBy == myId()
+            },
+            proposalText(): string {
+                const p = this.g.proposal
+                if (p == null) return ''
+                return p.result == 'achieved' ? '做到了' : '未做到'
+            },
+            load() {
+                this.err = ''
+                api('/api/goals/' + this.id)
+                    .then((res: UTSJSONObject) => {
+                        const gj = res.getJSON('goal')
+                        if (gj != null) {
+                            this.g = goalFrom(gj as UTSJSONObject)
+                            this.loaded = true
+                        }
+                    })
+                    .catch((e: any | null) => {
+                        this.err = errText(e)
+                        this.loaded = true
+                    })
+            },
+            pickProof() {
+                chooseWatermarkedProof(myNick())
+                    .then((url: string) => { this.photoData = url; this.err = '' })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            checkin() {
+                if (this.busy || this.checkedToday() || this.note.trim().length == 0) return
+                this.busy = true
+                this.err = ''
+                const body = { 'note': this.note.trim(), 'photo': this.photoData } as UTSJSONObject
+                api('/api/goals/' + this.id + '/checkins', 'POST', body)
+                    .then((res: UTSJSONObject) => {
+                        this.note = ''
+                        this.photoData = ''
+                        this.busy = false
+                        this.load()
+                    })
+                    .catch((e: any | null) => {
+                        this.busy = false
+                        this.err = errText(e)
+                    })
+            },
+            review(c: Checkin, approved: boolean) {
+                if (this.busy) return
+                this.busy = true
+                this.err = ''
+                api('/api/checkins/' + c.id + '/review', 'POST', {
+                    'approved': approved,
+                    'message': c.msg.trim()
+                })
+                    .then((res: UTSJSONObject) => {
+                        this.busy = false
+                        this.load()
+                    })
+                    .catch((e: any | null) => {
+                        this.busy = false
+                        this.err = errText(e)
+                    })
+            },
+            propose(result: string) {
+                if (this.busy) return
+                this.busy = true
+                this.err = ''
+                api('/api/goals/' + this.id + '/result', 'POST', { 'result': result })
+                    .then((res: UTSJSONObject) => {
+                        this.busy = false
+                        this.load()
+                    })
+                    .catch((e: any | null) => {
+                        this.busy = false
+                        this.err = errText(e)
+                    })
+            },
+            confirmResult(agree: boolean) {
+                if (this.busy) return
+                this.busy = true
+                this.err = ''
+                api('/api/goals/' + this.id + '/result/confirm', 'POST', { 'agree': agree })
+                    .then((res: UTSJSONObject) => {
+                        this.busy = false
+                        this.load()
+                    })
+                    .catch((e: any | null) => {
+                        this.busy = false
+                        this.err = errText(e)
+                    })
+            },
+            openGift() {
+                this.giftOpened = true
+            },
+            openMemoir() {
+                api('/api/me/memoirs')
+                    .then((res: UTSJSONObject) => {
+                        const arr = res.getArray('memoirs')
+                        if (arr != null) {
+                            for (let i = 0; i < arr.length; i++) {
+                                const e = arr[i]
+                                if (e instanceof UTSJSONObject) {
+                                    const o = e as UTSJSONObject
+                                    if (o.getString('goalId', '') == this.id) {
+                                        uni.navigateTo({ url: '/pages/memoir/memoir?id=' + o.getString('id', '') })
+                                        return
+                                    }
+                                }
+                            }
+                        }
+                        uni.showToast({ title: '回忆录尚未生成', icon: 'none' })
+                    })
+                    .catch((e: any | null) => {
+                        this.err = errText(e)
+                    })
+            }
+        }
+    }
+</script>
+
+<style>
+    .detail-scroll {
+        padding-bottom: 120rpx;
+    }
+    .center-box {
+        padding-top: 200rpx;
+        padding-bottom: 200rpx;
+        align-items: center;
+    }
+    .gap-left {
+        margin-left: 16rpx;
+    }
+    .gap-left-lg {
+        margin-left: 36rpx;
+    }
+    .contract-title {
+        margin-top: 24rpx;
+    }
+    .part-row {
+        margin-top: 12rpx;
+    }
+    .role-chip {
+        margin-left: 16rpx;
+    }
+    .list-title {
+        margin-top: 16rpx;
+        margin-bottom: 20rpx;
+    }
+    .checkin-card {
+        margin-bottom: 20rpx;
+    }
+    .lh {
+        line-height: 46rpx;
+    }
+    .review-msg {
+        font-size: 26rpx;
+        margin-top: 16rpx;
+    }
+    .review-red { color: #BA1A1A; }
+    .review-green { color: #1E4B3A; }
+    .sec-label-gold {
+        font-size: 26rpx;
+        font-weight: 600;
+        color: #8A6B32;
+    }
+    .center-col {
+        align-items: center;
+        justify-content: center;
+    }
+    .gift-btn {
+        width: 176rpx;
+        height: 176rpx;
+        border-radius: 88rpx;
+        background-color: #F7E9E3;
+        align-items: center;
+        justify-content: center;
+        margin-top: 28rpx;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
+    }
+    .gift-btn-text {
+        font-size: 56rpx;
+        font-weight: 700;
+        color: #4A120A;
+    }
+    .seal-done {
+        width: 104rpx;
+        height: 104rpx;
+        border-radius: 23rpx;
+        background-color: #8A6B32;
+        align-items: center;
+        justify-content: center;
+        margin-top: 28rpx;
+    }
+    .seal-done-text {
+        font-size: 50rpx;
+        font-weight: 700;
+        color: #FFFFFF;
+    }
+    .seal-regret {
+        width: 96rpx;
+        height: 96rpx;
+        border-radius: 21rpx;
+        background-color: #E3E7DE;
+        align-items: center;
+        justify-content: center;
+        margin-top: 8rpx;
+    }
+    .seal-regret-text {
+        font-size: 44rpx;
+        font-weight: 700;
+        color: #404943;
+    }
+    .event-row {
+        padding-top: 12rpx;
+        padding-bottom: 12rpx;
+        border-bottom-width: 1px;
+        border-bottom-style: solid;
+        border-bottom-color: #C1C9C0;
+    }
+</style>

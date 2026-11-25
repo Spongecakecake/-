@@ -1,0 +1,170 @@
+<template>
+    <view class="page-dark">
+        <view v-if="!loaded" class="loading-wrap">
+            <text class="loading-text">{{ err.length > 0 ? err : '加载中…' }}</text>
+        </view>
+        <scroll-view v-else class="scroll-dark" scroll-y>
+            <view class="prologue">
+                <text class="pro-label">回忆录</text>
+                <text class="pro-title t-center">{{ m.title }}</text>
+                <text class="pro-parts t-center">{{ partsText() }}</text>
+                <view class="pro-line"></view>
+            </view>
+
+            <view v-for="(c, i) in m.chapters" :key="i" class="chapter">
+                <text class="ch-no">{{ two(c.no) }}</text>
+                <text class="ch-title">{{ c.title }}</text>
+                <text class="ch-text">{{ c.text }}</text>
+            </view>
+
+            <view class="epilogue">
+                <view class="seal-end">
+                    <text class="seal-end-text">做到</text>
+                </view>
+                <text class="ep-note">此约已入册 · 一诺既出，做到了</text>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { api, errText } from '@/utils/api.uts'
+    import { memoirFrom, emptyMemoir, Memoir } from '@/utils/models.uts'
+    import { two as twoOf } from '@/utils/theme.uts'
+
+    export default {
+        data() {
+            return {
+                id: '',
+                m: emptyMemoir() as Memoir,
+                loaded: false,
+                err: ''
+            }
+        },
+        onLoad(options: OnLoadOptions) {
+            this.id = options['id'] ?? ''
+        },
+        onShow() {
+            this.load()
+        },
+        methods: {
+            two(n: number): string { return twoOf(n) },
+            partsText(): string {
+                let s = ''
+                for (let i = 0; i < this.m.participants.length; i++) {
+                    if (i > 0) s += ' × '
+                    s += this.m.participants[i]
+                }
+                return s
+            },
+            load() {
+                this.err = ''
+                api('/api/memoirs/' + this.id)
+                    .then((res: UTSJSONObject) => {
+                        const j = res.getJSON('memoir')
+                        if (j != null) {
+                            this.m = memoirFrom(j as UTSJSONObject)
+                            this.loaded = true
+                        } else {
+                            this.err = '回忆录不存在'
+                        }
+                    })
+                    .catch((e: any | null) => {
+                        this.err = errText(e)
+                    })
+            }
+        }
+    }
+</script>
+
+<style>
+    .page-dark {
+        flex: 1;
+        background-color: #101613;
+    }
+    .loading-wrap {
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+    }
+    .loading-text {
+        font-size: 26rpx;
+        color: #C0C9C2;
+    }
+    .scroll-dark {
+        flex: 1;
+        padding: 16rpx 40rpx 120rpx;
+    }
+    .prologue {
+        align-items: center;
+        margin-top: 16rpx;
+    }
+    .pro-label {
+        font-size: 24rpx;
+        font-weight: 600;
+        color: #B9E7CF;
+    }
+    .pro-title {
+        font-size: 52rpx;
+        font-weight: 700;
+        color: #E1E3DC;
+        margin-top: 16rpx;
+    }
+    .pro-parts {
+        font-size: 24rpx;
+        color: #C0C9C2;
+        margin-top: 16rpx;
+    }
+    .pro-line {
+        width: 112rpx;
+        height: 4rpx;
+        border-radius: 2rpx;
+        background-color: #1E4B3A;
+        margin-top: 28rpx;
+    }
+    .chapter {
+        background-color: #1B231E;
+        border-radius: 32rpx;
+        padding: 32rpx;
+        margin-top: 40rpx;
+    }
+    .ch-no {
+        font-size: 24rpx;
+        font-weight: 700;
+        color: #B9E7CF;
+    }
+    .ch-title {
+        font-size: 36rpx;
+        font-weight: 600;
+        color: #E1E3DC;
+        margin-top: 8rpx;
+    }
+    .ch-text {
+        font-size: 28rpx;
+        color: #C0C9C2;
+        line-height: 48rpx;
+        margin-top: 16rpx;
+    }
+    .epilogue {
+        align-items: center;
+        margin-top: 56rpx;
+    }
+    .seal-end {
+        width: 108rpx;
+        height: 108rpx;
+        border-radius: 24rpx;
+        background-color: #A63E2C;
+        align-items: center;
+        justify-content: center;
+    }
+    .seal-end-text {
+        font-size: 44rpx;
+        font-weight: 700;
+        color: #FFFFFF;
+    }
+    .ep-note {
+        font-size: 24rpx;
+        color: #C0C9C2;
+        margin-top: 16rpx;
+    }
+</style>

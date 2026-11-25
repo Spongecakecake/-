@@ -1,0 +1,101 @@
+// 「做到」主题 token（Material Design 3 · seed 深松绿 #1E4B3A）
+export const C_PRIMARY = '#1E4B3A'
+export const C_PRIMARY_CONTAINER = '#B9E7CF'
+export const C_ON_PRIMARY_CONTAINER = '#0E2A1F'
+export const C_SECONDARY = '#8A6B32'
+export const C_SECONDARY_CONTAINER = '#F3EAD6'
+export const C_ON_SECONDARY_CONTAINER = '#5C4A1F'
+export const C_TERTIARY = '#A63E2C'
+export const C_TERTIARY_CONTAINER = '#F7E9E3'
+export const C_ON_TERTIARY_CONTAINER = '#4A120A'
+export const C_ERROR = '#BA1A1A'
+export const C_SURFACE = '#F9FAF5'
+export const C_ON_SURFACE = '#191C19'
+export const C_SURFACE_HIGH = '#EFF2EA'
+export const C_SURFACE_HIGHEST = '#E3E7DE'
+export const C_ON_SURFACE_VARIANT = '#404943'
+export const C_OUTLINE = '#717971'
+export const C_OUTLINE_VARIANT = '#C1C9C0'
+// 回忆录深色
+export const C_DARK_SURFACE = '#101613'
+export const C_DARK_CONTAINER = '#1B231E'
+export const C_DARK_ON_SURFACE = '#E1E3DC'
+export const C_DARK_ON_VARIANT = '#C0C9C2'
+export const C_DARK_PRIMARY_CONTAINER = '#2C4A3B'
+
+export type Tpl = {
+    id: string
+    name: string
+    color: string
+}
+
+// 内置契约模板（5 类场景 + 其他立志兜底）
+export const TEMPLATES: Array<Tpl> = [
+    { id: 'study', name: '学业精进', color: '#1E4B3A' },
+    { id: 'fitness', name: '强身健体', color: '#2F4D6E' },
+    { id: 'habit', name: '习惯养成', color: '#A06B2A' },
+    { id: 'create', name: '创作输出', color: '#5D4270' },
+    { id: 'health', name: '身心调养', color: '#9C4048' },
+    { id: 'other', name: '其他立志', color: '#8A6B32' },
+]
+
+export function tplName(id: string): string {
+    for (let i = 0; i < TEMPLATES.length; i++) {
+        if (TEMPLATES[i].id == id) return TEMPLATES[i].name
+    }
+    return '其他立志'
+}
+
+export function tplColor(id: string): string {
+    for (let i = 0; i < TEMPLATES.length; i++) {
+        if (TEMPLATES[i].id == id) return TEMPLATES[i].color
+    }
+    return '#8A6B32'
+}
+
+export function statusText(s: string): string {
+    if (s == 'awaiting') return '待接受'
+    if (s == 'active') return '进行中'
+    if (s == 'achieved') return '已达成'
+    if (s == 'failed') return '未达成'
+    return s
+}
+
+export function roleText(r: string): string {
+    if (r == 'owner') return '立约人'
+    if (r == 'supervisor') return '监督人'
+    if (r == 'witness') return '见证人'
+    return r
+}
+
+export function two(n: number): string {
+    return n < 10 ? '0' + n.toString() : n.toString()
+}
+
+export function todayStr(): string {
+    const d = new Date()
+    return d.getFullYear().toString() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate())
+}
+
+export function dateAfter(days: number): string {
+    const d = new Date()
+    d.setDate(d.getDate() + days)
+    return d.getFullYear().toString() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate())
+}
+
+export function daysBetween(a: string, b: string): number {
+    if (a.length < 10 || b.length < 10) return 0
+    const ay = parseInt(a.substring(0, 4))
+    const am = parseInt(a.substring(5, 7))
+    const ad = parseInt(a.substring(8, 10))
+    const by = parseInt(b.substring(0, 4))
+    const bm = parseInt(b.substring(5, 7))
+    const bd = parseInt(b.substring(8, 10))
+    const da = new Date(ay, am - 1, ad)
+    const db = new Date(by, bm - 1, bd)
+    return Math.round((db.getTime() - da.getTime()) / 86400000.0)
+}
+
+export function shortDate(iso: string): string {
+    return iso.length >= 10 ? iso.substring(0, 10) : iso
+}

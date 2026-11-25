@@ -1,0 +1,198 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <view class="row head">
+                <view class="seal-avatar">
+                    <text class="seal-avatar-text">{{ avatarChar() }}</text>
+                </view>
+                <view class="col head-info">
+                    <text class="nick">{{ nick }}</text>
+                    <text class="dim">@{{ username }}</text>
+                </view>
+            </view>
+
+            <view class="card row trust-card" @click="goPoints">
+                <view class="col">
+                    <text class="sec-label">信任分 · 积分权益</text>
+                    <text class="h2 gap-8">{{ score }}</text>
+                    <text class="small gap-8">{{ canPlant ? '可插旗' : '禁插旗期内' }}</text>
+                </view>
+                <view class="spacer"></view>
+                <text class="dim">积分 / 账本 / 商店 ›</text>
+            </view>
+
+            <view class="card">
+                <text class="sec-label">连接设置</text>
+                <input class="input gap-12" v-model="apiBase" placeholder="后端地址，留空恢复线上" />
+                <view class="btn-sm btn-tonal gap-12" @click="saveBase">
+                    <text class="btn-text-gold-sm">保存后端地址</text>
+                </view>
+                <text class="small gap-8">线上默认 http://139.224.56.248:3001；本地联调填 http://电脑IP:3001</text>
+            </view>
+
+            <view class="card link-row" @click="goOps">
+                <text class="body-text">运营后台（需权限）</text>
+                <text class="dim">›</text>
+            </view>
+
+            <text class="sec-label sec">回忆录</text>
+            <view v-if="memoirs.length == 0" class="card">
+                <text class="muted-lh t-center">暂无回忆录</text>
+                <text class="muted-lh t-center">完成一份契约后自动生成</text>
+            </view>
+            <view v-else>
+                <view v-for="(m, i) in memoirs" :key="m.id" class="memoir-card" @click="openMemoir(m.id)">
+                    <text class="memoir-label">回忆录</text>
+                    <text class="memoir-title">{{ m.title }}</text>
+                    <text class="memoir-date">{{ memoirDate(m) }}</text>
+                </view>
+            </view>
+
+            <text class="sec-label sec">平台说明</text>
+            <view class="card">
+                <text class="rule-line">· 心愿礼物仅线下兑现，平台不经手任何资金与物品</text>
+                <text class="rule-line">· 目标结果以双方确认为准，平台不代判</text>
+                <text class="rule-line">· 投诉与争议由管理员人工终裁</text>
+                <text class="rule-line">· 打卡 48 小时未审核，按约自动通过</text>
+                <text class="rule-line">· 不限制未成年人使用，请量力而诺</text>
+            </view>
+
+            <view class="btn btn-outlined logout" @click="logout">
+                <text class="btn-text-green">退出登录</text>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { api, myNick, myUsername, clearSession, apiBaseUrl, setApiBaseUrl } from '@/utils/api.uts'
+    import { trustMe } from '@/utils/points-api.uts'
+    import { memoirItems, memoirDate as memoirDateOf, MemoirItem } from '@/utils/models.uts'
+
+    export default {
+        data() {
+            return {
+                memoirs: [] as Array<MemoirItem>,
+                nick: myNick() as string,
+                username: myUsername() as string,
+                score: 100,
+                canPlant: true,
+                apiBase: apiBaseUrl() as string
+            }
+        },
+        onShow() {
+            this.nick = myNick()
+            this.username = myUsername()
+            this.apiBase = apiBaseUrl()
+            this.load()
+            trustMe()
+                .then((res: UTSJSONObject) => {
+                    const t = res.getJSON('trust')
+                    if (t != null) {
+                        this.score = (t as UTSJSONObject).getNumber('score', 100)
+                        this.canPlant = (t as UTSJSONObject).getBoolean('canPlant', true)
+                    }
+                })
+                .catch(() => {})
+        },
+        methods: {
+            memoirDate(m: MemoirItem): string { return memoirDateOf(m) },
+            avatarChar(): string {
+                return this.nick.length > 0 ? this.nick.charAt(0) : '客'
+            },
+            load() {
+                api('/api/me/memoirs')
+                    .then((res: UTSJSONObject) => {
+                        this.memoirs = memoirItems(res)
+                    })
+                    .catch((_e: any | null) => {})
+            },
+            openMemoir(id: string) {
+                uni.navigateTo({ url: '/pages/memoir/memoir?id=' + id })
+            },
+            goPoints() {
+                uni.switchTab({ url: '/pages/points-home/points-home' })
+            },
+            goOps() {
+                uni.navigateTo({ url: '/pagesAdmin/ops/ops' })
+            },
+            saveBase() {
+                setApiBaseUrl(this.apiBase)
+                this.apiBase = apiBaseUrl()
+                uni.showToast({ title: '已保存', icon: 'success' })
+            },
+            logout() {
+                clearSession()
+                uni.reLaunch({ url: '/pages/login/login' })
+            }
+        }
+    }
+</script>
+
+<style>
+    .head {
+        padding-top: 16rpx;
+    }
+    .seal-avatar {
+        width: 104rpx;
+        height: 104rpx;
+        border-radius: 23rpx;
+        background-color: #B9E7CF;
+        align-items: center;
+        justify-content: center;
+    }
+    .seal-avatar-text {
+        font-size: 56rpx;
+        font-weight: 700;
+        color: #0E2A1F;
+    }
+    .head-info {
+        margin-left: 28rpx;
+    }
+    .nick {
+        font-size: 40rpx;
+        font-weight: 600;
+        color: #191C19;
+    }
+    .head-info .dim {
+        margin-top: 8rpx;
+    }
+    .sec {
+        font-size: 26rpx;
+        margin-top: 32rpx;
+        margin-bottom: 20rpx;
+    }
+    .memoir-card {
+        background-color: #101613;
+        border-radius: 32rpx;
+        padding: 32rpx;
+        margin-bottom: 24rpx;
+    }
+    .memoir-label {
+        font-size: 22rpx;
+        font-weight: 600;
+        color: #B9E7CF;
+    }
+    .memoir-title {
+        font-size: 36rpx;
+        font-weight: 600;
+        color: #E1E3DC;
+        margin-top: 12rpx;
+    }
+    .memoir-date {
+        font-size: 22rpx;
+        color: #C0C9C2;
+        margin-top: 12rpx;
+    }
+    .rule-line {
+        font-size: 26rpx;
+        color: #404943;
+        line-height: 48rpx;
+    }
+    .logout {
+        margin-top: 40rpx;
+        margin-bottom: 40rpx;
+    }
+    .trust-card { background-color: #F3EAD6; }
+    .link-row { flex-direction: row; align-items: center; justify-content: space-between; }
+</style>

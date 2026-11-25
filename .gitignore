@@ -1,0 +1,47 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# build outputs
+dist/
+dist-*/
+**/dist/
+**/dist-*/
+web-build/
+.expo/
+.unpackage/
+**/unpackage/
+*.dex
+*.apk
+
+# logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# runtime data / credentials
+zuodao-server/data/
+zuodao-server/storage/proofs/*
+!zuodao-server/storage/proofs/.gitkeep
+.env
+.env*.local
+*.pem
+
+# local git history backup
+.git-backups/
+
+# IDE / local tool data
+.codebuddy/
+.trae-html-share-packages/
+.claude/
+.hbuilderx/
+.DS_Store
+*.tsbuildinfo
+
+# native signing
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision

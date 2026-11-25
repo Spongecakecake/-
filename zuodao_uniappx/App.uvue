@@ -1,0 +1,166 @@
+<script lang="uts">
+    export default {
+        onLaunch: function () {},
+        onShow: function () {},
+        onHide: function () {}
+    }
+</script>
+
+<style>
+    /* 全局公共样式（uni-app x：App.uvue 样式为全局样式，优先级最低） */
+
+    /* 页面骨架 */
+    .page { flex: 1; background-color: #F9FAF5; }
+    .scroll { flex: 1; padding: 24rpx 36rpx 200rpx; }
+    .row { flex-direction: row; align-items: center; }
+    .col { flex-direction: column; }
+    .spacer { flex: 1; }
+
+    /* 卡片 */
+    .card {
+        background-color: #FFFFFF;
+        border-radius: 32rpx;
+        padding: 32rpx;
+        margin-bottom: 24rpx;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 文本 */
+    .t-center { text-align: center; }
+    .h1 { font-size: 64rpx; font-weight: 700; color: #191C19; }
+    .h2 { font-size: 48rpx; font-weight: 600; color: #191C19; }
+    .h3 { font-size: 32rpx; font-weight: 600; color: #191C19; }
+    .sec-label { font-size: 22rpx; font-weight: 600; color: #1E4B3A; }
+    .sub { font-size: 30rpx; color: #191C19; }
+    .body-text { font-size: 30rpx; color: #191C19; line-height: 54rpx; }
+    .muted { font-size: 26rpx; color: #404943; }
+    .muted-lh { font-size: 26rpx; color: #404943; line-height: 46rpx; }
+    .dim { font-size: 24rpx; color: #717971; }
+    .small { font-size: 22rpx; color: #717971; }
+    .gold-note { font-size: 24rpx; color: #8A6B32; }
+    .err { font-size: 26rpx; color: #BA1A1A; }
+
+    /* 按钮（view 实现） */
+    .btn {
+        align-items: center; justify-content: center;
+        border-radius: 999rpx; padding: 26rpx 40rpx;
+    }
+    .btn-sm {
+        align-items: center; justify-content: center;
+        border-radius: 999rpx; padding: 16rpx 32rpx;
+    }
+    .btn-filled { background-color: #1E4B3A; }
+    .btn-tonal { background-color: #F3EAD6; }
+    .btn-danger { background-color: #BA1A1A; }
+    .btn-outlined { background-color: #F9FAF5; border-width: 1px; border-style: solid; border-color: #717971; }
+    .btn-disabled { background-color: #E3E7DE; }
+    .btn-text { font-size: 30rpx; font-weight: 600; color: #FFFFFF; }
+    .btn-text-sm { font-size: 26rpx; font-weight: 600; color: #FFFFFF; }
+    .btn-text-green { font-size: 30rpx; font-weight: 600; color: #1E4B3A; }
+    .btn-text-green-sm { font-size: 26rpx; font-weight: 600; color: #1E4B3A; }
+    .btn-text-gold-sm { font-size: 26rpx; font-weight: 600; color: #5C4A1F; }
+    .btn-text-gray { font-size: 30rpx; font-weight: 600; color: #9BA29A; }
+    .btn-text-gray-sm { font-size: 26rpx; font-weight: 600; color: #9BA29A; }
+    .btn-text-red-sm { font-size: 26rpx; font-weight: 600; color: #FFFFFF; }
+    .btn-wide { flex: 1; }
+
+    /* 状态签 */
+    .chip-badge {
+        padding: 8rpx 20rpx; border-radius: 16rpx;
+        background-color: #404943;
+    }
+    .chip-badge-text { font-size: 24rpx; font-weight: 500; color: #FFFFFF; }
+    .chip-badge-gold { background-color: #8A6B32; }
+    .chip-badge-green { background-color: #1E4B3A; }
+    .chip-badge-red { background-color: #BA1A1A; }
+    .chip-line { padding: 8rpx 20rpx; border-radius: 16rpx; border-width: 1px; border-style: solid; border-color: #C1C9C0; }
+    .chip-line-red { border-color: #BA1A1A; }
+    .chip-line-green { border-color: #1E4B3A; }
+    .chip-line-gold { border-color: #8A6B32; }
+    .chip-line-text { font-size: 24rpx; font-weight: 500; color: #404943; }
+    .chip-line-text-red { font-size: 24rpx; font-weight: 500; color: #BA1A1A; }
+    .chip-line-text-green { font-size: 24rpx; font-weight: 500; color: #1E4B3A; }
+    .chip-line-text-gold { font-size: 24rpx; font-weight: 500; color: #8A6B32; }
+
+    /* 选择 chips */
+    .chip-sel {
+        padding: 16rpx 28rpx; border-radius: 16rpx;
+        background-color: #B9E7CF;
+    }
+    .chip-plain {
+        padding: 16rpx 28rpx; border-radius: 16rpx;
+        background-color: #F9FAF5; border-width: 1px; border-style: solid; border-color: #C1C9C0;
+    }
+    .chip-sel-text { font-size: 26rpx; font-weight: 500; color: #0E2A1F; }
+    .chip-plain-text { font-size: 26rpx; font-weight: 500; color: #404943; }
+
+    /* 输入 */
+    .input {
+        background-color: #EFF2EA; border-radius: 16rpx;
+        padding: 24rpx 28rpx; font-size: 30rpx; color: #191C19;
+    }
+    .textarea {
+        background-color: #EFF2EA; border-radius: 16rpx;
+        padding: 24rpx 28rpx; font-size: 30rpx; color: #191C19;
+        height: 180rpx;
+    }
+
+    /* 杂项 */
+    .dot { width: 16rpx; height: 16rpx; border-radius: 8rpx; }
+    .bar { height: 16rpx; border-radius: 8rpx; background-color: #E3E7DE; overflow: hidden; }
+    .bar-fill { height: 16rpx; background-color: #1E4B3A; }
+    .divider { height: 1px; background-color: #C1C9C0; margin-top: 24rpx; margin-bottom: 24rpx; }
+    .avatar {
+        width: 80rpx; height: 80rpx; border-radius: 40rpx;
+        background-color: #1E4B3A; align-items: center; justify-content: center;
+    }
+    .avatar-text { color: #FFFFFF; font-size: 32rpx; font-weight: 600; }
+    .avatar-sm {
+        width: 48rpx; height: 48rpx; border-radius: 24rpx;
+        background-color: #B9E7CF; align-items: center; justify-content: center;
+    }
+    .avatar-sm-text { color: #0E2A1F; font-size: 24rpx; font-weight: 700; }
+    .box { background-color: #EFF2EA; border-radius: 24rpx; padding: 24rpx; }
+    .gap-8 { margin-top: 8rpx; }
+    .gap-12 { margin-top: 12rpx; }
+    .gap-16 { margin-top: 16rpx; }
+    .gap-20 { margin-top: 20rpx; }
+    .gap-24 { margin-top: 24rpx; }
+    .gap-32 { margin-top: 32rpx; }
+    .code-big { font-size: 60rpx; font-weight: 700; color: #A63E2C; }
+
+    /* 插旗体系 · 契约卷宗 + 社区战况 */
+    .flag-title { font-size: 40rpx; font-weight: 700; color: #191C19; }
+    .flag-ring { width: 120rpx; height: 120rpx; border-radius: 60rpx; background-color: #B9E7CF; align-items: center; justify-content: center; border-width: 8rpx; border-style: solid; border-color: #1E4B3A; }
+    .flag-ring-text { font-size: 30rpx; font-weight: 700; color: #0E2A1F; }
+    .flag-featured { border-width: 2rpx; border-style: solid; border-color: #8A6B32; }
+    .flag-featured-tag { background-color: #F3EAD6; padding: 6rpx 16rpx; border-radius: 12rpx; }
+    .flag-featured-text { font-size: 20rpx; font-weight: 600; color: #5C4A1F; }
+    .badge-self { background-color: #E3E7DE; }
+    .badge-witness { background-color: #B9E7CF; }
+    .badge-auto { background-color: #8A6B32; }
+    .badge-fallen { background-color: #A63E2C; }
+    .badge-void { background-color: #404943; }
+    .badge-text-dark { font-size: 22rpx; font-weight: 600; color: #0E2A1F; }
+    .badge-text-light { font-size: 22rpx; font-weight: 600; color: #FFFFFF; }
+    .side-tabs { flex-direction: row; border-bottom-width: 1px; border-bottom-color: #C1C9C0; }
+    .side-tab { flex: 1; align-items: center; padding: 24rpx 0; }
+    .side-tab-active { border-bottom-width: 6rpx; border-bottom-color: #1E4B3A; }
+    .side-tab-red { border-bottom-color: #BA1A1A; }
+    .side-tab-text { font-size: 28rpx; font-weight: 600; color: #404943; }
+    .side-tab-text-active { color: #1E4B3A; }
+    .side-tab-text-red { color: #BA1A1A; }
+    .standing-card { background-color: #FFFFFF; border-radius: 24rpx; padding: 24rpx; margin-bottom: 16rpx; border-width: 1px; border-color: #E3E7DE; }
+    .standing-featured { border-color: #8A6B32; background-color: #FFFDF6; }
+    .standing-pending { background-color: #F3EAD6; }
+    .standing-quote { font-size: 30rpx; color: #191C19; line-height: 48rpx; }
+    .threat-text { font-size: 26rpx; font-weight: 600; color: #A63E2C; }
+    .points-balance { font-size: 72rpx; font-weight: 700; color: #1E4B3A; }
+    .points-pending { font-size: 26rpx; color: #8A6B32; }
+    .proof-mark { padding: 8rpx 18rpx; border-radius: 14rpx; background-color: #EFF2EA; }
+    .proof-mark-text { font-size: 22rpx; color: #404943; }
+    .dark-card { background-color: #101613; border-radius: 28rpx; padding: 32rpx; margin-bottom: 24rpx; }
+    .dark-title { font-size: 40rpx; font-weight: 700; color: #E1E3DC; }
+    .dark-text { font-size: 28rpx; color: #C0C9C2; line-height: 48rpx; }
+    .dim-row { flex-direction: row; align-items: center; justify-content: space-between; }
+</style>

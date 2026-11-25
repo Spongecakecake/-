@@ -1,0 +1,259 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <!-- 完成 / 婉拒后 -->
+            <view v-if="done.length > 0" class="center-box">
+                <view :class="isDeclined() ? 'seal-result seal-gray' : 'seal-result'">
+                    <text :class="isDeclined() ? 'seal-result-text seal-gray-text' : 'seal-result-text'">{{ isDeclined() ? '辞' : '诺' }}</text>
+                </view>
+                <text class="h2 t-center gap-24">{{ done }}</text>
+                <text class="muted t-center gap-8">{{ isDeclined() ? '愿立约人另觅良监督' : '此后每一笔打卡，都将由你审核' }}</text>
+                <view class="btn btn-filled gap-32 result-btn" @click="backHome">
+                    <text class="btn-text">回到首页</text>
+                </view>
+            </view>
+
+            <view v-else>
+                <!-- 查邀请码 -->
+                <view v-if="!hasInv">
+                    <view class="card">
+                        <text class="sec-label">邀请码</text>
+                        <text class="h2 gap-16">{{ code.length > 0 ? code : '— — — — — —' }}</text>
+                        <input class="input gap-24" v-model="code" type="number" maxlength="6"
+                            placeholder="输入六位数字邀请码" />
+                        <view :class="code.trim().length != 6 ? 'btn btn-disabled gap-20' : 'btn btn-filled gap-20'" @click="look">
+                            <text :class="code.trim().length != 6 ? 'btn-text-gray' : 'btn-text'">查看邀请</text>
+                        </view>
+                        <text v-if="err.length > 0" class="err gap-16">{{ err }}</text>
+                    </view>
+                </view>
+
+                <!-- 邀请详情 + 接印 -->
+                <view v-else-if="hasInv">
+                    <view class="card center-col">
+                        <view class="seal-invite">
+                            <text class="seal-invite-text">邀</text>
+                        </view>
+                        <text class="sec-label t-center gap-8">邀请详情</text>
+                        <text class="h2 t-center gap-8">{{ invTitle }}</text>
+                        <text class="dim t-center gap-8">{{ invMeta }}</text>
+                        <view class="box gap-24 box-full">
+                            <text class="sec-label">每日规则</text>
+                            <text class="body-text gap-8">{{ inv.rule }}</text>
+                        </view>
+                        <view v-if="inv.giftName.length > 0" class="box gap-16 box-full">
+                            <text class="sec-label">心愿奖励（线下兑现）</text>
+                            <text class="body-text gap-8">{{ inv.giftName }}</text>
+                        </view>
+                    </view>
+
+                    <view class="card">
+                        <text class="sec-label">选择身份</text>
+                        <view class="row gap-16">
+                            <view class="col role-col">
+                                <view :class="roleBtnClass('supervisor')" @click="setRole('supervisor')">
+                                    <text :class="roleBtnTextClass('supervisor')">作监督人</text>
+                                </view>
+                                <text v-if="inv.supTaken" class="small t-center gap-8">已有人加入</text>
+                            </view>
+                            <view class="role-gap"></view>
+                            <view class="col role-col">
+                                <view :class="roleBtnClass('witness')" @click="setRole('witness')">
+                                    <text :class="roleBtnTextClass('witness')">作见证人</text>
+                                </view>
+                                <text v-if="inv.witTaken" class="small t-center gap-8">已有人加入</text>
+                            </view>
+                        </view>
+                        <text class="sec-label gap-24">首句鼓励（随邀请附上）</text>
+                        <input class="input gap-16" v-model="msg" placeholder="如：跑不动的时候，想想跑鞋" />
+                        <text v-if="err.length > 0" class="err gap-16">{{ err }}</text>
+                        <view class="row gap-24">
+                            <view class="btn btn-filled btn-wide role-accept" @click="accept">
+                                <text class="btn-text">{{ busy ? '提交中…' : '接受邀请' }}</text>
+                            </view>
+                            <view class="btn btn-outlined decline-btn gap-left" @click="decline">
+                                <text class="btn-text-green">婉拒</text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { api, errText } from '@/utils/api.uts'
+    import { tplName as tplNameOf } from '@/utils/theme.uts'
+    import { inviteFrom, emptyInvite, Invite } from '@/utils/models.uts'
+
+    export default {
+        data() {
+            return {
+                code: '',
+                inv: emptyInvite() as Invite,
+                hasInv: false,
+                role: 'supervisor',
+                msg: '',
+                busy: false,
+                err: '',
+                done: ''
+            }
+        },
+        computed: {
+            invTitle(): string {
+                return this.inv.title
+            },
+            invMeta(): string {
+                return this.inv.ownerName + ' 发起 · ' + tplNameOf(this.inv.template) + ' · ' + this.inv.startDate + ' ～ ' + this.inv.endDate
+            }
+        },
+        onLoad(options: OnLoadOptions) {
+            const c = options['code'] ?? ''
+            if (c.length > 0) {
+                this.code = c
+                this.look()
+            }
+        },
+        methods: {
+            isDeclined(): boolean {
+                return this.done == '已婉拒'
+            },
+            roleBtnClass(r: string): string {
+                const selected = this.role == r
+                const taken = r == 'supervisor' ? this.inv.supTaken : this.inv.witTaken
+                if (taken) return 'btn-sm btn-disabled role-btn'
+                return selected ? 'btn-sm btn-filled role-btn' : 'btn-sm btn-outlined role-btn'
+            },
+            roleBtnTextClass(r: string): string {
+                const taken = r == 'supervisor' ? this.inv.supTaken : this.inv.witTaken
+                if (taken) return 'btn-text-gray-sm'
+                return this.role == r ? 'btn-text-sm' : 'btn-text-green-sm'
+            },
+            setRole(r: string) {
+                const taken = r == 'supervisor' ? this.inv.supTaken : this.inv.witTaken
+                if (!taken) this.role = r
+            },
+            look() {
+                this.err = ''
+                const c = this.code.trim()
+                if (c.length != 6) {
+                    this.err = '请输入六位邀请码'
+                    return
+                }
+                api('/api/invites/' + c)
+                    .then((res: UTSJSONObject) => {
+                        const ij = res.getJSON('invite')
+                        if (ij != null) {
+                            this.inv = inviteFrom(ij as UTSJSONObject)
+                            this.hasInv = true
+                            this.role = this.inv.supTaken ? 'witness' : 'supervisor'
+                        }
+                    })
+                    .catch((e: any | null) => {
+                        this.err = errText(e)
+                        this.hasInv = false
+                    })
+            },
+            accept() {
+                if (!this.hasInv || this.busy) return
+                this.busy = true
+                this.err = ''
+                api('/api/invites/' + this.inv.code + '/accept', 'POST', {
+                    'role': this.role,
+                    'message': this.msg.trim()
+                })
+                    .then((res: UTSJSONObject) => {
+                        this.done = this.role == 'supervisor' ? '已以监督人身份加入' : '已以见证人身份加入'
+                        this.hasInv = false
+                        this.busy = false
+                    })
+                    .catch((e: any | null) => {
+                        this.busy = false
+                        this.err = errText(e)
+                    })
+            },
+            decline() {
+                if (!this.hasInv || this.busy) return
+                this.busy = true
+                this.err = ''
+                api('/api/invites/' + this.inv.code + '/accept', 'POST', { 'role': 'decline' })
+                    .then((res: UTSJSONObject) => {
+                        this.done = '已婉拒'
+                        this.hasInv = false
+                        this.busy = false
+                    })
+                    .catch((e: any | null) => {
+                        this.busy = false
+                        this.err = errText(e)
+                    })
+            },
+            backHome() {
+                uni.reLaunch({ url: '/pages/index/index' })
+            }
+        }
+    }
+</script>
+
+<style>
+    .center-box {
+        padding-top: 200rpx;
+        padding-bottom: 200rpx;
+        align-items: center;
+    }
+    .seal-result {
+        width: 120rpx;
+        height: 120rpx;
+        border-radius: 26rpx;
+        background-color: #B9E7CF;
+        align-items: center;
+        justify-content: center;
+    }
+    .seal-result-text {
+        font-size: 64rpx;
+        font-weight: 700;
+        color: #0E2A1F;
+    }
+    .seal-gray { background-color: #E3E7DE; }
+    .seal-gray-text { color: #404943; }
+    .result-btn {
+        align-self: stretch;
+        margin-left: 40rpx;
+        margin-right: 40rpx;
+    }
+    .seal-invite {
+        width: 92rpx;
+        height: 92rpx;
+        border-radius: 20rpx;
+        background-color: #B9E7CF;
+        align-items: center;
+        justify-content: center;
+    }
+    .seal-invite-text {
+        font-size: 50rpx;
+        font-weight: 700;
+        color: #0E2A1F;
+    }
+    .center-col {
+        align-items: center;
+    }
+    .box-full {
+        align-self: stretch;
+    }
+    .role-col {
+        flex: 1;
+    }
+    .role-gap { width: 20rpx; }
+    .role-btn {
+        align-self: stretch;
+    }
+    .role-accept {
+        flex: 2;
+    }
+    .decline-btn {
+        flex: 1;
+    }
+    .gap-left {
+        margin-left: 20rpx;
+    }
+</style>

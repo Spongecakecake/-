@@ -1,0 +1,132 @@
+<template>
+    <view class="page-dark">
+        <scroll-view class="scroll" scroll-y>
+            <view class="dark-card gap-24">
+                <text class="sec-label">旗落 · 旅程收束</text>
+                <text class="dark-title">{{ flag.title }}</text>
+                <text class="dark-text">旗缓缓降下。没有胜负，只有一段真实走过的路。</text>
+                <view class="divider"></view>
+                <view class="dim-row">
+                    <text class="dark-text">通过 {{ flag.progressApproved }} / {{ flag.progressTotal }} 天</text>
+                    <text class="dark-text">威胁 {{ flag.threatValue }}</text>
+                </view>
+            </view>
+
+            <view class="dark-card">
+                <text class="sec-label">护旗留言合集</text>
+                <view v-for="(s, i) in defendList" :key="s.id" :class="s.featured ? 'dark-standing dark-featured' : 'dark-standing'">
+                    <text class="dark-text">「{{ s.content }}」</text>
+                    <text v-if="s.featured" class="gold-note gap-8">已收进旗帜</text>
+                </view>
+                <text v-if="defendList.length == 0" class="dark-text gap-12">还没有护旗留言。</text>
+            </view>
+
+            <view v-if="flag.canManage" class="dark-card">
+                <text class="sec-label">复活窗 · 7 天</text>
+                <text class="dark-text gap-12">{{ reviveLeftText }}</text>
+                <view :class="canRevive ? 'btn btn-tonal gap-20' : 'btn btn-disabled gap-20'" @click="revive">
+                    <text :class="canRevive ? 'btn-text-gold-sm' : 'btn-text-gray-sm'">使用重启券 · 换新旗重来</text>
+                </view>
+                <text class="dark-text gap-12">复活后进度重置，原留言归档保留；结算分按规则重算。</text>
+            </view>
+
+            <view class="card">
+                <text class="sec-label">战况卡</text>
+                <text class="small gap-8">主角端只呈现降旗与鼓励，不显示红营庆祝元素。</text>
+                <view class="btn btn-outlined gap-16" @click="share">
+                    <text class="btn-text-green">复制战况文案</text>
+                </view>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { flagDetail, reviveFlag, flagCard } from '@/utils/flag-api.uts'
+    import { flagFrom, Flag, Standing } from '@/utils/flag-models.uts'
+    import { errText } from '@/utils/api.uts'
+
+    function emptyFlag(): Flag {
+        return {
+            id: '', goalId: '', ownerId: '', state: 'fallen', privacy: 'public', proofLevel: 'L2', color: 'witness',
+            multiplier: 0.8, pullEnabled: false, pullEnabledEffective: false, highRisk: false, threatValue: 0,
+            featured: false, reviveUntil: '', revivedBy: '', createdAt: '', fallenAt: '', finalizedAt: '',
+            voidReason: '', canManage: false, title: '', template: '', rule: '', startDate: '', endDate: '',
+            progressApproved: 0, progressTotal: 0, progressRatio: 0, defendCount: 0, temptCount: 0,
+            hasProof: false, standings: [] as Array<Standing>
+        } as Flag
+    }
+
+    export default {
+        data() {
+            return {
+                flagId: '',
+                flag: emptyFlag(),
+                err: ''
+            }
+        },
+        onLoad(q: any) {
+            this.flagId = q == null ? '' : (q.id as string)
+            this.load()
+        },
+        computed: {
+            defendList(): Array<Standing> {
+                const out: Array<Standing> = []
+                for (let i = 0; i < this.flag.standings.length; i++) {
+                    const s = this.flag.standings[i]
+                    if (s.side == 'defend' && s.status == 'published') out.push(s)
+                }
+                return out
+            },
+            reviveLeftText(): string {
+                if (this.flag.reviveUntil.length == 0) return '复活窗未开启'
+                const ms = new Date(this.flag.reviveUntil).getTime() - Date.now()
+                if (ms <= 0) return '复活窗已关闭'
+                return '剩余 ' + Math.ceil(ms / 86400000).toString() + ' 天'
+            },
+            canRevive(): boolean {
+                if (this.flag.reviveUntil.length == 0 || this.flag.revivedBy.length > 0) return false
+                return new Date(this.flag.reviveUntil).getTime() > Date.now()
+            }
+        },
+        methods: {
+            load() {
+                flagDetail(this.flagId)
+                    .then((res: UTSJSONObject) => {
+                        const j = res.getJSON('flag')
+                        if (j != null) this.flag = flagFrom(j as UTSJSONObject)
+                    })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            revive() {
+                if (!this.canRevive) return
+                reviveFlag(this.flagId)
+                    .then((res: UTSJSONObject) => {
+                        const f = res.getJSON('flag')
+                        const id = f == null ? '' : (f as UTSJSONObject).getString('id', '')
+                        uni.showModal({
+                            title: '已重启', content: id.length > 0 ? '新旗已生成，进度重置。' : '重启成功。',
+                            success: () => {
+                                if (id.length > 0) uni.redirectTo({ url: '/pagesFlag/flag-detail/flag-detail?id=' + id })
+                                else uni.navigateBack()
+                            }
+                        } as any)
+                    })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            share() {
+                flagCard(this.flagId).then((res: UTSJSONObject) => {
+                    const c = res.getJSON('card')
+                    const text = c == null ? '做到 · 旗落' : '【做到 · 旗落】' + c.getString('title', '') + ' · 每一步都算数'
+                    uni.setClipboardData({ data: text, success: () => uni.showToast({ title: '已复制', icon: 'success' }) } as any)
+                }).catch((e: any | null) => { this.err = errText(e) })
+            }
+        }
+    }
+</script>
+
+<style>
+    .page-dark { flex: 1; background-color: #101613; }
+    .dark-standing { padding: 16rpx 20rpx; border-left-width: 6rpx; border-left-color: #2C4A3B; border-left-style: solid; margin-bottom: 12rpx; }
+    .dark-featured { border-left-color: #8A6B32; }
+</style>

@@ -1,0 +1,118 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <view class="hero">
+                <view class="seal-login">
+                    <text class="seal-login-text">做</text>
+                </view>
+                <text class="h1 t-center hero-title">做到</text>
+                <text class="muted t-center">一诺千金 · 白纸黑字</text>
+            </view>
+            <view class="card">
+                <text class="h3">登录</text>
+                <text class="dim gap-8">首次输入即自动注册账号</text>
+                <input class="input gap-20" v-model="username" placeholder="用户名" />
+                <input class="input gap-16" v-model="password" placeholder="密码" :password="true" />
+                <text v-if="err.length > 0" class="err gap-16">{{ err }}</text>
+                <view :class="btnClass" @click="go">
+                    <text :class="btnTextClass">{{ busy ? '登录中…' : '登录' }}</text>
+                </view>
+            </view>
+            <view class="box agree">
+                <text class="small t-center agree-line">每日一分钟，读一遍约定：目标由自己立，打卡由自己写；</text>
+                <text class="small t-center agree-line">监督只过目，成败双方确认。</text>
+                <text class="small t-center agree-line">心愿礼物仅线下兑现，平台不经手任何资金与物品；</text>
+                <text class="small t-center agree-line">争议由管理员人工终裁。本应用不设年龄门槛，请量力而诺。</text>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { api, saveSession, errText } from '@/utils/api.uts'
+
+    export default {
+        data() {
+            return {
+                username: '',
+                password: '',
+                busy: false,
+                err: ''
+            }
+        },
+        computed: {
+            btnClass(): string {
+                return this.busy ? 'btn btn-disabled gap-24' : 'btn btn-filled gap-24'
+            },
+            btnTextClass(): string {
+                return this.busy ? 'btn-text-gray' : 'btn-text'
+            }
+        },
+        methods: {
+            go() {
+                if (this.busy) return
+                const u = this.username.trim()
+                if (u.length == 0 || this.password.length == 0) {
+                    this.err = '请填写用户名与密码'
+                    return
+                }
+                this.busy = true
+                this.err = ''
+                api('/api/auth/login', 'POST', {
+                    'username': u,
+                    'password': this.password
+                })
+                    .then((res: UTSJSONObject) => {
+                        const token = res.getString('token', '')
+                        const user = res.getJSON('user')
+                        if (token.length > 0 && user != null) {
+                            saveSession(token, user as UTSJSONObject)
+                            uni.reLaunch({ url: '/pages/index/index' })
+                        } else {
+                            this.busy = false
+                            this.err = '登录响应异常'
+                        }
+                    })
+                    .catch((e: any | null) => {
+                        this.busy = false
+                        this.err = errText(e)
+                    })
+            }
+        }
+    }
+</script>
+
+<style>
+    .hero {
+        align-items: center;
+        padding-top: 120rpx;
+        padding-bottom: 24rpx;
+    }
+    .seal-login {
+        width: 128rpx;
+        height: 128rpx;
+        border-radius: 28rpx;
+        background-color: #B9E7CF;
+        align-items: center;
+        justify-content: center;
+    }
+    .seal-login-text {
+        font-size: 70rpx;
+        font-weight: 700;
+        color: #0E2A1F;
+    }
+    .hero-title {
+        letter-spacing: 4rpx;
+        margin-top: 32rpx;
+    }
+    .hero .muted {
+        margin-top: 12rpx;
+    }
+    .agree {
+        margin-top: 48rpx;
+        margin-bottom: 60rpx;
+    }
+    .agree-line {
+        line-height: 40rpx;
+    }
+</style>

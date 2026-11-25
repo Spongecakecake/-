@@ -1,0 +1,263 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <view v-if="err.length > 0" class="card">
+                <text class="err">{{ err }}</text>
+                <view class="btn btn-outlined gap-16" @click="load">
+                    <text class="btn-text-green">重试</text>
+                </view>
+            </view>
+
+            <view v-else-if="flag.id.length > 0">
+                <view class="card">
+                    <view class="row">
+                        <view class="flag-ring">
+                            <text class="flag-ring-text">{{ pct }}%</text>
+                        </view>
+                        <view class="col gap-left">
+                            <text class="flag-title">{{ flag.title }}</text>
+                            <view class="row gap-8">
+                                <text class="dim">{{ flag.startDate }} ～ {{ flag.endDate }}</text>
+                            </view>
+                            <text class="small gap-8">通过 {{ flag.progressApproved }} / {{ flag.progressTotal }} 天</text>
+                        </view>
+                    </view>
+                    <view class="row gap-16">
+                        <view class="chip-badge badge-auto" v-if="flag.color == 'auto'"><text class="badge-text-light">自动核验 ×1.2</text></view>
+                        <view class="chip-badge badge-witness" v-else-if="flag.color == 'witness'"><text class="badge-text-dark">点验中 ×0.8</text></view>
+                        <view class="chip-badge badge-self" v-else><text class="badge-text-dark">仅自证 ×0.5</text></view>
+                        <view class="chip-line" v-if="flag.state == 'active'"><text class="chip-line-text-green">生效中</text></view>
+                        <view class="chip-badge badge-fallen" v-else-if="flag.state == 'fallen'"><text class="badge-text-light">已掉落</text></view>
+                        <view class="chip-badge badge-auto" v-else-if="flag.state == 'achieved'"><text class="badge-text-light">已达成</text></view>
+                        <view class="spacer"></view>
+                        <text class="threat-text">威胁 {{ flag.threatValue }}</text>
+                    </view>
+                    <text class="body-text gap-16">{{ flag.rule }}</text>
+                    <view class="divider"></view>
+                    <view class="row">
+                        <text class="small">护旗 {{ flag.defendCount }} · {{ flag.pullEnabledEffective ? '拔旗 ' + flag.temptCount : '拔旗已关' }}</text>
+                        <view class="spacer"></view>
+                        <view class="proof-mark" @click="requestPoint">
+                            <text class="proof-mark-text">{{ flag.hasProof ? '已举证 · 点验' : '待举证 · 点验' }}</text>
+                        </view>
+                    </view>
+
+                    <view v-if="flag.canManage" class="col gap-16">
+                        <view class="divider"></view>
+                        <text class="sec-label">旗主管理</text>
+                        <view class="row wrap">
+                            <view class="btn-sm btn-outlined mgr" @click="togglePrivacy">
+                                <text class="btn-text-green-sm">{{ flag.privacy == 'public' ? '转私密' : '转公开' }}</text>
+                            </view>
+                            <view class="btn-sm btn-outlined mgr" @click="togglePull">
+                                <text class="btn-text-green-sm">{{ flag.pullEnabled ? '关拔旗' : '开拔旗' }}</text>
+                            </view>
+                            <view class="btn-sm btn-tonal mgr" @click="shareCard">
+                                <text class="btn-text-gold-sm">战况卡</text>
+                            </view>
+                        </view>
+                        <view v-if="flag.state == 'fallen'" class="btn btn-tonal" @click="openFall">
+                            <text class="btn-text-gold-sm">查看旗落结果与复活入口</text>
+                        </view>
+                        <view v-if="flag.state == 'active'" class="row gap-8">
+                            <view class="btn btn-outlined btn-wide" @click="propose('achieved')">
+                                <text class="btn-text-green-sm">判定：做到了</text>
+                            </view>
+                            <view class="btn btn-outlined btn-wide" @click="propose('failed')">
+                                <text class="btn-text-green-sm">判定：未做到</text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+
+                <view class="side-tabs">
+                    <view :class="side == 'defend' ? 'side-tab side-tab-active' : 'side-tab'" @click="setSide('defend')">
+                        <text :class="side == 'defend' ? 'side-tab-text side-tab-text-active' : 'side-tab-text'">护旗 · {{ flag.defendCount }}</text>
+                    </view>
+                    <view v-if="flag.pullEnabledEffective" :class="side == 'tempt' ? 'side-tab side-tab-active side-tab-red' : 'side-tab'" @click="setSide('tempt')">
+                        <text :class="side == 'tempt' ? 'side-tab-text side-tab-text-red' : 'side-tab-text'">拔旗 · {{ flag.temptCount }}</text>
+                    </view>
+                </view>
+
+                <view class="card gap-16">
+                    <text class="sec-label">{{ side == 'defend' ? '护旗留言（≤100 字）' : '拔旗留言' }}</text>
+                    <textarea v-if="side == 'defend'" class="textarea" v-model="content" placeholder="说点什么，陪他把旗守住" />
+                    <view v-else class="btn btn-tonal" @click="openTemplate">
+                        <text class="btn-text-gold-sm">{{ templateText.length > 0 ? templateText : '选一句官方模板（即选即发）' }}</text>
+                    </view>
+                    <text v-if="side == 'tempt'" class="small gap-8">自定义文案需审核；涉及金额、转账的内容一律拦截</text>
+                    <view :class="busy ? 'btn btn-disabled gap-16' : 'btn btn-filled gap-16'" @click="send">
+                        <text :class="busy ? 'btn-text-gray' : 'btn-text'">{{ busy ? '提交中…' : '站队留言' }}</text>
+                    </view>
+                </view>
+
+                <view v-for="(s, i) in currentStandings" :key="s.id" :class="s.featured ? 'standing-card standing-featured' : s.status == 'pending' ? 'standing-card standing-pending' : 'standing-card'">
+                    <view class="row">
+                        <text class="dim">{{ s.userId.substring(0, 6) }} · {{ s.createdAt.substring(0, 10) }}</text>
+                        <view class="spacer"></view>
+                        <text v-if="s.official" class="gold-note">官方</text>
+                        <text v-if="s.featured" class="gold-note">已收进旗帜</text>
+                        <text v-if="s.status == 'pending'" class="dim">审核中</text>
+                    </view>
+                    <text class="standing-quote gap-12">{{ s.content }}</text>
+                    <view class="row gap-8" v-if="flag.canManage && s.status == 'published'">
+                        <view class="btn-sm btn-tonal" @click="feature(s.id)"><text class="btn-text-gold-sm">收进旗帜</text></view>
+                        <view class="btn-sm btn-outlined" @click="poke(s.id)"><text class="btn-text-green-sm">戳到我 {{ s.pokedCount > 0 ? '×' + s.pokedCount : '' }}</text></view>
+                    </view>
+                    <view class="row gap-8" v-if="!flag.canManage">
+                        <view class="btn-sm btn-outlined" @click="report(s.id)"><text class="btn-text-green-sm">举报</text></view>
+                    </view>
+                </view>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { api, errText } from '@/utils/api.uts'
+    import { flagDetail, sendStanding, featureStanding, pokeStanding, reportStanding, setFlagPrivacy, setFlagPull, flagCard, requestProof } from '@/utils/flag-api.uts'
+    import { flagFrom, Flag, Standing, flagStateText as flagStateTextOf } from '@/utils/flag-models.uts'
+
+    function emptyFlag(): Flag {
+        return {
+            id: '', goalId: '', ownerId: '', state: '', privacy: 'public', proofLevel: 'L2', color: 'witness',
+            multiplier: 0.8, pullEnabled: false, pullEnabledEffective: false, highRisk: false, threatValue: 0,
+            featured: false, reviveUntil: '', revivedBy: '', createdAt: '', fallenAt: '', finalizedAt: '',
+            voidReason: '', canManage: false, title: '', template: '', rule: '', startDate: '', endDate: '',
+            progressApproved: 0, progressTotal: 0, progressRatio: 0, defendCount: 0, temptCount: 0,
+            hasProof: false, standings: [] as Array<Standing>
+        } as Flag
+    }
+
+    export default {
+        data() {
+            return {
+                flagId: '',
+                flag: emptyFlag(),
+                side: 'defend',
+                content: '',
+                templateText: '',
+                templateId: '',
+                err: '',
+                busy: false
+            }
+        },
+        onLoad(q: any) {
+            this.flagId = q == null ? '' : (q.id as string)
+        },
+        onShow() {
+            const tpl = uni.getStorageSync('zd_selected_template')
+            if (tpl != null && (tpl as string).length > 0) {
+                this.templateText = tpl as string
+                this.templateId = uni.getStorageSync('zd_selected_template_id') as string
+                uni.removeStorageSync('zd_selected_template')
+                uni.removeStorageSync('zd_selected_template_id')
+            }
+            this.load()
+        },
+        computed: {
+            pct(): number {
+                if (this.flag.progressTotal <= 0) return 0
+                return Math.round(this.flag.progressRatio * 100)
+            },
+            currentStandings(): Array<Standing> {
+                const out: Array<Standing> = []
+                for (let i = 0; i < this.flag.standings.length; i++) {
+                    const s = this.flag.standings[i]
+                    if (s.side == this.side) out.push(s)
+                }
+                return out
+            }
+        },
+        methods: {
+            flagStateText(s: string): string { return flagStateTextOf(s) },
+            load() {
+                if (this.flagId.length == 0) { this.err = '缺少旗编号'; return }
+                flagDetail(this.flagId)
+                    .then((res: UTSJSONObject) => {
+                        const j = res.getJSON('flag')
+                        if (j != null) this.flag = flagFrom(j as UTSJSONObject)
+                        this.err = ''
+                    })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            setSide(s: string) {
+                this.side = s
+            },
+            openTemplate() {
+                uni.navigateTo({ url: '/pagesFlag/tempt-picker/tempt-picker?flagId=' + this.flagId })
+            },
+            send() {
+                if (this.busy) return
+                this.busy = true
+                const text = this.side == 'defend' ? this.content.trim() : this.templateText
+                if (text.length == 0) {
+                    this.busy = false
+                    this.err = this.side == 'defend' ? '请先写下护旗留言' : '请先选择一句官方模板'
+                    return
+                }
+                const ctype = this.side == 'tempt' && this.templateId != 'CUSTOM' ? 'template' : 'custom'
+                sendStanding(this.flagId, this.side, ctype, text, this.templateId)
+                    .then(() => {
+                        this.busy = false
+                        this.content = ''
+                        this.templateText = ''
+                        this.templateId = ''
+                        this.err = ''
+                        this.load()
+                    })
+                    .catch((e: any | null) => { this.busy = false; this.err = errText(e) })
+            },
+            feature(id: string) {
+                featureStanding(id).then(() => this.load()).catch((e: any | null) => { this.err = errText(e) })
+            },
+            poke(id: string) {
+                pokeStanding(id).then(() => this.load()).catch((e: any | null) => { this.err = errText(e) })
+            },
+            report(id: string) {
+                uni.showModal({
+                    title: '举报理由', editable: true, placeholderText: '请说明举报原因',
+                    success: (res: any) => {
+                        if (!res.confirm) return
+                        reportStanding(id, res.content == null ? '' : res.content as string)
+                            .then(() => uni.showToast({ title: '已提交举报', icon: 'success' }))
+                            .catch((e: any | null) => { this.err = errText(e) })
+                    }
+                } as any)
+            },
+            togglePrivacy() {
+                const next = this.flag.privacy == 'public' ? 'private' : 'public'
+                setFlagPrivacy(this.flagId, next).then(() => this.load()).catch((e: any | null) => { this.err = errText(e) })
+            },
+            togglePull() {
+                setFlagPull(this.flagId, !this.flag.pullEnabled).then(() => this.load()).catch((e: any | null) => { this.err = errText(e) })
+            },
+            requestPoint() {
+                requestProof(this.flagId)
+                    .then(() => uni.showToast({ title: '点验请求已发出', icon: 'success' }))
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            shareCard() {
+                flagCard(this.flagId).then((res: UTSJSONObject) => {
+                    const c = res.getJSON('card')
+                    const text = c == null ? '做到 · 战况卡' : '【做到战况卡】' + c.getString('title', '') + ' · 威胁值 ' + c.getNumber('threatValue', 0).toString()
+                    uni.setClipboardData({ data: text, success: () => uni.showToast({ title: '文案已复制', icon: 'success' }) } as any)
+                }).catch((e: any | null) => { this.err = errText(e) })
+            },
+            openFall() {
+                uni.navigateTo({ url: '/pagesFlag/flag-fall/flag-fall?id=' + this.flagId })
+            },
+            propose(result: string) {
+                api('/api/goals/' + this.flag.goalId + '/result', 'POST', { 'result': result } as UTSJSONObject)
+                    .then(() => { this.load(); uni.showToast({ title: '已发起判定', icon: 'success' }) })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            }
+        }
+    }
+</script>
+
+<style>
+    .gap-left { margin-left: 20rpx; }
+    .wrap { flex-wrap: wrap; }
+    .mgr { margin-right: 12rpx; margin-bottom: 12rpx; }
+</style>

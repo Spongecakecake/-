@@ -1,0 +1,242 @@
+// 插旗体系数据模型（与后端 modules/flags.js、standings.js 对齐）
+export type Flag = {
+    id: string
+    goalId: string
+    ownerId: string
+    state: string
+    privacy: string
+    proofLevel: string
+    color: string
+    multiplier: number
+    pullEnabled: boolean
+    pullEnabledEffective: boolean
+    highRisk: boolean
+    threatValue: number
+    featured: boolean
+    reviveUntil: string
+    revivedBy: string
+    createdAt: string
+    fallenAt: string
+    finalizedAt: string
+    voidReason: string
+    canManage: boolean
+    title: string
+    template: string
+    rule: string
+    startDate: string
+    endDate: string
+    progressApproved: number
+    progressTotal: number
+    progressRatio: number
+    defendCount: number
+    temptCount: number
+    hasProof: boolean
+    standings: Array<Standing>
+}
+
+export type Standing = {
+    id: string
+    flagId: string
+    userId: string
+    side: string
+    contentType: string
+    content: string
+    status: string
+    featured: boolean
+    pokedCount: number
+    countable: boolean
+    official: boolean
+    createdAt: string
+    reason: string
+}
+
+export type FlagCard = {
+    id: string
+    flagId: string
+    type: string
+    title: string
+    progress: string
+    threatValue: number
+    defendCount: number
+    temptCount: number
+    quote: string
+}
+
+export type StandingTemplate = {
+    id: string
+    category: string
+    text: string
+    disclaimer: string
+}
+
+export type ProofRequest = {
+    id: string
+    flagId: string
+    type: string
+    status: string
+    dueAt: string
+    createdAt: string
+}
+
+function getStr(o: UTSJSONObject, k: string): string {
+    const v = o.getString(k)
+    return v == null ? '' : v as string
+}
+
+export function standingFrom(o: UTSJSONObject): Standing {
+    return {
+        id: getStr(o, 'id'),
+        flagId: getStr(o, 'flagId'),
+        userId: getStr(o, 'userId'),
+        side: getStr(o, 'side'),
+        contentType: getStr(o, 'contentType'),
+        content: getStr(o, 'content'),
+        status: getStr(o, 'status'),
+        featured: o.getBoolean('featured', false),
+        pokedCount: o.getNumber('pokedCount', 0),
+        countable: o.getBoolean('countable', false),
+        official: o.getBoolean('official', false),
+        createdAt: getStr(o, 'createdAt'),
+        reason: getStr(o, 'reason')
+    } as Standing
+}
+
+export function flagFrom(o: UTSJSONObject): Flag {
+    const goal = o.getJSON('goal')
+    const progress = o.getJSON('progress')
+    const counts = o.getJSON('counts')
+    const proof = o.getJSON('proofMark')
+    const arr = o.getArray('standings')
+    const list: Array<Standing> = []
+    if (arr != null) {
+        arr.forEach((e: any | null) => {
+            if (e instanceof UTSJSONObject) list.push(standingFrom(e as UTSJSONObject))
+        })
+    }
+    return {
+        id: getStr(o, 'id'),
+        goalId: getStr(o, 'goalId'),
+        ownerId: getStr(o, 'ownerId'),
+        state: getStr(o, 'state'),
+        privacy: getStr(o, 'privacy'),
+        proofLevel: getStr(o, 'proofLevel'),
+        color: getStr(o, 'color'),
+        multiplier: o.getNumber('multiplier', 0.5),
+        pullEnabled: o.getBoolean('pullEnabled', false),
+        pullEnabledEffective: o.getBoolean('pullEnabledEffective', false),
+        highRisk: o.getBoolean('highRisk', false),
+        threatValue: o.getNumber('threatValue', 0),
+        featured: o.getBoolean('featured', false),
+        reviveUntil: getStr(o, 'reviveUntil'),
+        revivedBy: getStr(o, 'revivedBy'),
+        createdAt: getStr(o, 'createdAt'),
+        fallenAt: getStr(o, 'fallenAt'),
+        finalizedAt: getStr(o, 'finalizedAt'),
+        voidReason: getStr(o, 'voidReason'),
+        canManage: o.getBoolean('canManage', false),
+        title: goal == null ? '' : getStr(goal as UTSJSONObject, 'title'),
+        template: goal == null ? '' : getStr(goal as UTSJSONObject, 'template'),
+        rule: goal == null ? '' : getStr(goal as UTSJSONObject, 'rule'),
+        startDate: goal == null ? '' : getStr(goal as UTSJSONObject, 'startDate'),
+        endDate: goal == null ? '' : getStr(goal as UTSJSONObject, 'endDate'),
+        progressApproved: progress == null ? 0 : (progress as UTSJSONObject).getNumber('approved', 0),
+        progressTotal: progress == null ? 0 : (progress as UTSJSONObject).getNumber('total', 0),
+        progressRatio: progress == null ? 0 : (progress as UTSJSONObject).getNumber('ratio', 0),
+        defendCount: counts == null ? 0 : (counts as UTSJSONObject).getNumber('defend', 0),
+        temptCount: counts == null ? 0 : (counts as UTSJSONObject).getNumber('tempt', 0),
+        hasProof: proof == null ? false : (proof as UTSJSONObject).getBoolean('hasProof', false),
+        standings: list
+    } as Flag
+}
+
+export function flagFromField(o: UTSJSONObject): Flag {
+    const progress = o.getJSON('progress')
+    const counts = o.getJSON('counts')
+    return {
+        id: getStr(o, 'id'),
+        goalId: getStr(o, 'goalId'),
+        ownerId: '',
+        state: getStr(o, 'state'),
+        privacy: 'public',
+        proofLevel: '',
+        color: getStr(o, 'color'),
+        multiplier: o.getNumber('multiplier', 0.5),
+        pullEnabled: o.getBoolean('pullEnabled', false),
+        pullEnabledEffective: o.getBoolean('pullEnabled', false),
+        highRisk: false,
+        threatValue: o.getNumber('threatValue', 0),
+        featured: o.getBoolean('featured', false),
+        reviveUntil: '',
+        revivedBy: '',
+        createdAt: '',
+        fallenAt: '',
+        finalizedAt: '',
+        voidReason: '',
+        canManage: false,
+        title: getStr(o, 'title'),
+        template: '',
+        rule: '',
+        startDate: '',
+        endDate: getStr(o, 'endDate'),
+        progressApproved: progress == null ? 0 : (progress as UTSJSONObject).getNumber('approved', 0),
+        progressTotal: progress == null ? 0 : (progress as UTSJSONObject).getNumber('total', 0),
+        progressRatio: progress == null ? 0 : (progress as UTSJSONObject).getNumber('ratio', 0),
+        defendCount: counts == null ? 0 : (counts as UTSJSONObject).getNumber('defend', 0),
+        temptCount: counts == null ? 0 : (counts as UTSJSONObject).getNumber('tempt', 0),
+        hasProof: false,
+        standings: []
+    } as Flag
+}
+
+export function cardFrom(o: UTSJSONObject): FlagCard {
+    const c = o.getJSON('card')
+    const j = c == null ? o : c as UTSJSONObject
+    const counts = j.getJSON('counts')
+    return {
+        id: '',
+        flagId: getStr(j, 'flagId'),
+        type: getStr(j, 'type'),
+        title: getStr(j, 'title'),
+        progress: getStr(j, 'progress'),
+        threatValue: j.getNumber('threatValue', 0),
+        defendCount: counts == null ? 0 : (counts as UTSJSONObject).getNumber('defend', 0),
+        temptCount: counts == null ? 0 : (counts as UTSJSONObject).getNumber('tempt', 0),
+        quote: getStr(j, 'quote')
+    } as FlagCard
+}
+
+export function templateFrom(o: UTSJSONObject): StandingTemplate {
+    return {
+        id: getStr(o, 'id'),
+        category: getStr(o, 'category'),
+        text: getStr(o, 'text'),
+        disclaimer: getStr(o, 'disclaimer')
+    } as StandingTemplate
+}
+
+export function proofRequestFrom(o: UTSJSONObject): ProofRequest {
+    return {
+        id: getStr(o, 'id'),
+        flagId: getStr(o, 'flagId'),
+        type: getStr(o, 'type'),
+        status: getStr(o, 'status'),
+        dueAt: getStr(o, 'dueAt'),
+        createdAt: getStr(o, 'createdAt')
+    } as ProofRequest
+}
+
+export function flagStateText(s: string): string {
+    if (s == 'pending') return '待生效'
+    if (s == 'active') return '生效中'
+    if (s == 'fallen') return '已掉落'
+    if (s == 'achieved') return '已达成'
+    if (s == 'closed') return '已落幕'
+    if (s == 'void') return '已作废'
+    return s
+}
+
+export function colorText(c: string): string {
+    if (c == 'auto') return '自动核验 ×1.2'
+    if (c == 'witness') return '点验中 ×0.8'
+    return '仅自证 ×0.5'
+}

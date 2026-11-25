@@ -1,0 +1,89 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <view class="card">
+                <text class="sec-label">可用积分</text>
+                <text class="points-balance">{{ balance }}</text>
+                <text class="small gap-8">商品限购按季度 / 年度重置；购买后进入账本流水</text>
+            </view>
+
+            <view v-for="(it, i) in items" :key="it.id" class="card">
+                <view class="row">
+                    <text class="h3">{{ it.name }}</text>
+                    <view class="spacer"></view>
+                    <text class="h3 amount-plus">{{ it.price }}</text>
+                </view>
+                <text class="small gap-8">{{ limitText(it) }}</text>
+                <view :class="it.price > balance ? 'btn btn-disabled gap-16' : 'btn btn-tonal gap-16'" @click="buy(it.id)">
+                    <text :class="it.price > balance ? 'btn-text-gray' : 'btn-text-gold-sm'">{{ it.price > balance ? '积分不足' : '兑换' }}</text>
+                </view>
+            </view>
+            <text v-if="err.length > 0" class="err t-center gap-24">{{ err }}</text>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { pointsShop, pointsSummary, buyPointsItem } from '@/utils/points-api.uts'
+    import { errText } from '@/utils/api.uts'
+
+    type ShopItem = { id: string, name: string, price: number, period: string, limit: number }
+
+    export default {
+        data() {
+            return {
+                items: [] as Array<ShopItem>,
+                balance: 0,
+                err: ''
+            }
+        },
+        onShow() { this.load() },
+        methods: {
+            limitText(it: ShopItem): string {
+                if (it.period == 'quarter') return '每季度限购 ' + it.limit.toString() + ' 次'
+                if (it.period == 'year') return '每年限购 ' + it.limit.toString() + ' 次'
+                return '不限购'
+            },
+            load() {
+                pointsSummary()
+                    .then((res: UTSJSONObject) => {
+                        const p = res.getJSON('points')
+                        if (p != null) this.balance = (p as UTSJSONObject).getNumber('balance', 0)
+                    })
+                    .catch(() => {})
+                pointsShop()
+                    .then((res: UTSJSONObject) => {
+                        const list: Array<ShopItem> = []
+                        const arr = res.getArray('items')
+                        if (arr != null) {
+                            arr.forEach((e: any | null) => {
+                                if (e instanceof UTSJSONObject) {
+                                    const j = e as UTSJSONObject
+                                    list.push({
+                                        id: j.getString('id', ''), name: j.getString('name', ''),
+                                        price: j.getNumber('price', 0), period: j.getString('period', ''),
+                                        limit: j.getNumber('limit', 0)
+                                    } as ShopItem)
+                                }
+                            })
+                        }
+                        this.items = list
+                    })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            buy(id: string) {
+                this.err = ''
+                buyPointsItem(id)
+                    .then(() => {
+                        uni.showToast({ title: '兑换成功', icon: 'success' })
+                        this.load()
+                    })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            }
+        }
+    }
+</script>
+
+<style>
+    .amount-plus { color: #8A6B32; }
+</style>

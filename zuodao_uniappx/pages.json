@@ -1,0 +1,82 @@
+{
+    "pages": [
+        {
+            "path": "pages/login/login",
+            "style": { "navigationBarTitleText": "做到" }
+        },
+        {
+            "path": "pages/index/index",
+            "style": { "navigationBarTitleText": "我的契约" }
+        },
+        {
+            "path": "pages/flag-field/flag-field",
+            "style": { "navigationBarTitleText": "旗场" }
+        },
+        {
+            "path": "pages/points-home/points-home",
+            "style": { "navigationBarTitleText": "积分" }
+        },
+        {
+            "path": "pages/profile/profile",
+            "style": { "navigationBarTitleText": "我的" }
+        },
+        {
+            "path": "pages/create/create",
+            "style": { "navigationBarTitleText": "新建契约" }
+        },
+        {
+            "path": "pages/detail/detail",
+            "style": { "navigationBarTitleText": "契约详情" }
+        },
+        {
+            "path": "pages/invite/invite",
+            "style": { "navigationBarTitleText": "接受邀请" }
+        },
+        {
+            "path": "pages/memoir/memoir",
+            "style": { "navigationBarTitleText": "回忆录" }
+        }
+    ],
+    "subPackages": [
+        {
+            "root": "pagesFlag",
+            "pages": [
+                { "path": "flag-detail/flag-detail", "style": { "navigationBarTitleText": "旗面" } },
+                { "path": "flag-fall/flag-fall", "style": { "navigationBarTitleText": "旗落结果" } },
+                { "path": "tempt-picker/tempt-picker", "style": { "navigationBarTitleText": "选一句拔旗" } },
+                { "path": "proof-request/proof-request", "style": { "navigationBarTitleText": "点验请求" } }
+            ]
+        },
+        {
+            "root": "pagesPoints",
+            "pages": [
+                { "path": "points-ledger/points-ledger", "style": { "navigationBarTitleText": "积分账本" } },
+                { "path": "points-shop/points-shop", "style": { "navigationBarTitleText": "积分商店" } }
+            ]
+        },
+        {
+            "root": "pagesAdmin",
+            "pages": [
+                { "path": "ops/ops", "style": { "navigationBarTitleText": "运营后台" } }
+            ]
+        }
+    ],
+    "tabBar": {
+        "color": "#717971",
+        "selectedColor": "#1E4B3A",
+        "backgroundColor": "#FFFFFF",
+        "borderStyle": "white",
+        "list": [
+            { "pagePath": "pages/index/index", "text": "契约" },
+            { "pagePath": "pages/flag-field/flag-field", "text": "旗场" },
+            { "pagePath": "pages/points-home/points-home", "text": "积分" },
+            { "pagePath": "pages/profile/profile", "text": "我的" }
+        ]
+    },
+    "globalStyle": {
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "做到",
+        "navigationBarBackgroundColor": "#F9FAF5",
+        "backgroundColor": "#F9FAF5"
+    }
+}

@@ -1,0 +1,267 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <!-- 创建成功 -->
+            <view v-if="createdOk">
+                <text class="muted">契约已创建 · 等待对方加入</text>
+                <view class="card gap-16">
+                    <view class="seal-created">
+                        <text class="seal-created-text">立</text>
+                    </view>
+                    <text class="sec-label t-center gap-8">契约书</text>
+                    <text class="h2 t-center gap-8">{{ createdGoal.title }}</text>
+                    <text class="dim t-center gap-8">{{ tplName(createdGoal.template) }} · {{ createdGoal.startDate }} 起 · 为期 {{ days }} 天</text>
+                    <view class="box gap-24">
+                        <text class="sec-label">每日规则</text>
+                        <text class="body-text gap-8">{{ createdGoal.rule }}</text>
+                    </view>
+                    <view class="box gap-16">
+                        <text class="sec-label">心愿奖励（线下兑现）</text>
+                        <text class="body-text gap-8">{{ createdGoal.giftName.length > 0 ? createdGoal.giftName : '—' }}</text>
+                    </view>
+                    <view class="divider"></view>
+                    <text class="sec-label t-center">邀请码</text>
+                    <text class="code-big t-center gap-8">{{ code }}</text>
+                    <text class="small t-center gap-8">把邀请码发给监督人 / 见证人，即可加入</text>
+                </view>
+                <view class="btn btn-filled gap-16" @click="backHome">
+                    <text class="btn-text">回到首页</text>
+                </view>
+                <view class="btn btn-outlined gap-16" @click="resetForm">
+                    <text class="btn-text-green">再建一份</text>
+                </view>
+            </view>
+
+            <!-- 立约表单 -->
+            <view v-else>
+                <text class="h3">选择类型</text>
+                <view class="row wrap gap-16">
+                    <view v-for="(t, i) in templates" :key="t.id"
+                        :class="tpl == t.id ? 'chip-sel tpl-chip' : 'chip-plain tpl-chip'"
+                        @click="setTpl(t.id)">
+                        <text :class="tpl == t.id ? 'chip-sel-text' : 'chip-plain-text'">{{ t.name }}</text>
+                    </view>
+                </view>
+
+                <text class="h3 sec-gap">立下目标</text>
+                <input class="input gap-16" v-model="title" placeholder="目标名称，如：连续晨跑 21 天" />
+                <textarea class="textarea gap-16" v-model="desc" placeholder="缘由与细则（可空）" />
+
+                <text class="h3 sec-gap">设定周期</text>
+                <view class="row wrap gap-16">
+                    <view v-for="(d, i) in durations" :key="d"
+                        :class="days == d ? 'chip-sel tpl-chip' : 'chip-plain tpl-chip'"
+                        @click="setDays(d)">
+                        <text :class="days == d ? 'chip-sel-text' : 'chip-plain-text'">{{ d }} 天</text>
+                    </view>
+                </view>
+                <text class="dim gap-16">{{ todayText }} ～ {{ endDateText }}</text>
+
+                <text class="h3 sec-gap">每日规则</text>
+                <textarea class="textarea gap-16" v-model="rule" placeholder="每天做到什么算过一天？如：晨跑 3 公里并记录" />
+
+                <text class="h3 sec-gap">插旗设置</text>
+                <text class="small">选定后可在旗场被围观；私密与仅见证人不生成旗。</text>
+                <view class="row wrap gap-16">
+                    <view v-for="(p, i) in privacyOptions" :key="p.id"
+                        :class="privacy == p.id ? 'chip-sel tpl-chip' : 'chip-plain tpl-chip'" @click="setPrivacy(p.id)">
+                        <text :class="privacy == p.id ? 'chip-sel-text' : 'chip-plain-text'">{{ p.name }}</text>
+                    </view>
+                </view>
+                <view v-if="privacy == 'public'">
+                    <text class="h3 gap-16">举证等级</text>
+                    <view class="row wrap gap-8">
+                        <view v-for="(p, i) in proofOptions" :key="p.id"
+                            :class="proofLevel == p.id ? 'chip-sel tpl-chip' : 'chip-plain tpl-chip'" @click="setProof(p.id)">
+                            <text :class="proofLevel == p.id ? 'chip-sel-text' : 'chip-plain-text'">{{ p.name }}</text>
+                        </view>
+                    </view>
+                    <view class="box gap-16">
+                        <view class="row">
+                            <text class="body-text">允许围观者拔旗</text>
+                            <view class="spacer"></view>
+                            <text :class="highRisk ? 'small' : pullEnabled ? 'chip-line-text-green' : 'dim'">{{ highRisk ? '此类目标只护不拔' : pullEnabled ? '已开启' : '默认关闭' }}</text>
+                        </view>
+                        <view v-if="!highRisk" class="btn-sm gap-12" :class="pullEnabled ? 'btn-tonal' : 'btn-outlined'" @click="togglePull">
+                            <text :class="pullEnabled ? 'btn-text-gold-sm' : 'btn-text-green-sm'">{{ pullEnabled ? '关闭拔旗' : '开启拔旗' }}</text>
+                        </view>
+                    </view>
+                </view>
+
+                <text class="h3 sec-gap">达成奖励</text>
+                <text class="dim gap-8">如愿达成，以此自赏 · 仅线下兑现，平台不经手资金</text>
+                <input class="input gap-16" v-model="giftName" placeholder="心愿礼物，如：一双跑鞋" />
+                <input class="input gap-16" v-model="giftNote" placeholder="补充说明（可空）" />
+
+                <text v-if="err.length > 0" class="err t-center gap-24">{{ err }}</text>
+                <view :class="busy ? 'btn btn-disabled gap-32' : 'btn btn-filled gap-32'" @click="submit">
+                    <text :class="busy ? 'btn-text-gray' : 'btn-text'">{{ busy ? '创建中…' : '创建契约' }}</text>
+                </view>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { api, errText } from '@/utils/api.uts'
+    import { plantFlag } from '@/utils/flag-api.uts'
+    import { TEMPLATES, tplName as tplNameOf, todayStr, dateAfter, Tpl } from '@/utils/theme.uts'
+    import { goalFrom, Goal } from '@/utils/models.uts'
+
+    export default {
+        data() {
+            return {
+                templates: TEMPLATES as Array<Tpl>,
+                durations: [7, 21, 30, 100] as Array<number>,
+                tpl: 'habit',
+                days: 21,
+                busy: false,
+                err: '',
+                createdOk: false,
+                createdGoal: {
+                    id: '', title: '', template: 'other', description: '', startDate: '', endDate: '',
+                    rule: '', status: 'awaiting', myRole: 'owner', inviteCode: '',
+                    giftName: '', giftNote: '', encouragement: '',
+                    participants: [], checkins: [], events: [],
+                    stats: { total: 0, approved: 0, rejected: 0, pending: 0, bestStreak: 0 },
+                    pendingToReview: 0, proposal: null
+                } as Goal,
+                code: '',
+                title: '',
+                desc: '',
+                rule: '',
+                giftName: '',
+                giftNote: '',
+                privacy: 'witness',
+                proofLevel: 'L2',
+                pullEnabled: false,
+                privacyOptions: [
+                    { id: 'private', name: '仅自己' },
+                    { id: 'witness', name: '仅见证人' },
+                    { id: 'public', name: '全部公开' }
+                ] as Array<{ id: string, name: string }>,
+                proofOptions: [
+                    { id: 'L1', name: 'L1 自证 ×0.5' },
+                    { id: 'L2', name: 'L2 点验 ×0.8' }
+                ] as Array<{ id: string, name: string }>
+            }
+        },
+        computed: {
+            highRisk(): boolean {
+                return this.tpl == 'fitness' || this.tpl == 'health'
+            },
+            todayText(): string {
+                return todayStr()
+            },
+            endDateText(): string {
+                return dateAfter(this.days)
+            }
+        },
+        methods: {
+            tplName(s: string): string { return tplNameOf(s) },
+            setTpl(id: string) { this.tpl = id },
+            setDays(d: number) { this.days = d },
+            setPrivacy(id: string) { this.privacy = id },
+            setProof(id: string) { this.proofLevel = id },
+            togglePull() { this.pullEnabled = !this.pullEnabled },
+            backHome() {
+                uni.reLaunch({ url: '/pages/index/index' })
+            },
+            resetForm() {
+                this.createdOk = false
+                this.code = ''
+                this.title = ''
+                this.desc = ''
+                this.rule = ''
+                this.giftName = ''
+                this.giftNote = ''
+                this.privacy = 'witness'
+                this.proofLevel = 'L2'
+                this.pullEnabled = false
+                this.err = ''
+            },
+            submit() {
+                if (this.busy) return
+                if (this.title.trim().length == 0 || this.rule.trim().length == 0) {
+                    this.err = '目标名称与每日规则不可为空'
+                    return
+                }
+                this.busy = true
+                this.err = ''
+                const gift = { 'name': this.giftName.trim(), 'note': this.giftNote.trim() } as UTSJSONObject
+                const body = {
+                    'title': this.title.trim(),
+                    'template': this.tpl,
+                    'goalType': 'habit',
+                    'checkinType': 'text',
+                    'description': this.desc.trim(),
+                    'startDate': todayStr(),
+                    'endDate': dateAfter(this.days),
+                    'rule': this.rule.trim(),
+                    'privacy': this.privacy == 'witness' ? 'followers' : this.privacy,
+                    'gift': gift,
+                    'gifts': [gift]
+                } as UTSJSONObject
+                api('/api/goals', 'POST', body)
+                    .then((res: UTSJSONObject): Promise<UTSJSONObject> => {
+                        const gj = res.getJSON('goal')
+                        if (gj == null) {
+                            throw new Error('创建响应异常')
+                        }
+                        this.createdGoal = goalFrom(gj as UTSJSONObject)
+                        return api('/api/goals/' + this.createdGoal.id, 'POST', null)
+                    })
+                    .then((res2: UTSJSONObject) => {
+                        this.code = res2.getString('code', '')
+                        if (this.privacy != 'public') {
+                            this.createdOk = true
+                            this.busy = false
+                            return
+                        }
+                        const pull = this.highRisk ? false : this.pullEnabled
+                        plantFlag(this.createdGoal.id, 'public', this.proofLevel, pull)
+                            .then(() => {
+                                this.createdOk = true
+                                this.busy = false
+                            })
+                            .catch((e: any | null) => {
+                                this.createdOk = true
+                                this.busy = false
+                                this.err = '契约已创建，但插旗失败：' + errText(e)
+                            })
+                    })
+                    .catch((e: any | null) => {
+                        this.busy = false
+                        this.err = errText(e)
+                    })
+            }
+        }
+    }
+</script>
+
+<style>
+    .tpl-chip {
+        margin-right: 16rpx;
+        margin-bottom: 16rpx;
+    }
+    .wrap {
+        flex-wrap: wrap;
+    }
+    .sec-gap {
+        margin-top: 44rpx;
+    }
+    .seal-created {
+        width: 92rpx;
+        height: 92rpx;
+        border-radius: 20rpx;
+        background-color: #B9E7CF;
+        align-items: center;
+        justify-content: center;
+        align-self: center;
+    }
+    .seal-created-text {
+        font-size: 50rpx;
+        font-weight: 700;
+        color: #0E2A1F;
+    }
+</style>

@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>「做到」App UI 设计稿 V2.0 · 契约文书版</title>
+<style>
+:root{
+  --pine:#1e4b3a; --pine-d:#123226; --pine-dd:#0e2a1f; --pine-l:#e6efe7;
+  --gold:#b08d45; --gold-d:#8a6b32; --gold-l:#f3ead6;
+  --cinnabar:#a63e2c; --cinnabar-l:#f7e9e3;
+  --indigo:#2f4d6e; --indigo-l:#e7edf4;
+  --violet:#5d4270; --violet-l:#efe9f3;
+  --rouge:#9c4048; --rouge-l:#f6e9e8;
+  --ink:#2b2924; --ink2:#5c5749; --ink3:#9a937f;
+  --line:#e3dbc8; --bg:#e9e3d3; --paper:#f3eee1; --card:#fffdf6;
+  --memoir:#12211a;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--ink);
+ font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;}
+.f-serif{font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;}
+.wrap{max-width:1440px;margin:0 auto;padding:36px 28px 80px;}
+/* ===== cover ===== */
+.cover{background:linear-gradient(150deg,var(--pine-dd),var(--pine) 62%,#275845);color:#fff;
+ border-radius:18px;padding:40px 44px;margin-bottom:26px;position:relative;overflow:hidden;}
+.cover::before{content:"";position:absolute;inset:10px;border:1px solid rgba(217,189,122,.45);
+ border-radius:12px;pointer-events:none;}
+.cover .deco{position:absolute;right:-70px;top:-70px;width:280px;height:280px;
+ border:1px solid rgba(217,189,122,.3);border-radius:50%;}
+.cover .deco2{position:absolute;right:-30px;top:-30px;width:200px;height:200px;
+ border:1px solid rgba(217,189,122,.22);border-radius:50%;}
+.cover-seal{position:absolute;right:40px;top:44px;width:72px;height:72px;
+ border:2px solid rgba(217,189,122,.6);border-radius:10px;display:flex;align-items:center;
+ justify-content:center;color:rgba(233,215,168,.9);writing-mode:vertical-rl;
+ letter-spacing:6px;font-size:21px;font-weight:700;transform:rotate(6deg);}
+.cover h1{font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+ font-size:34px;margin-bottom:10px;letter-spacing:3px;font-weight:700;}
+.cover .sub{opacity:.9;font-size:14.5px;margin-bottom:22px;letter-spacing:.5px;}
+.cover .vk{font-size:12.5px;letter-spacing:3px;color:#d9bd7a;margin-bottom:8px;font-weight:700;}
+.decision{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px;max-width:900px;}
+.decision span{background:rgba(217,189,122,.1);border:1px solid rgba(217,189,122,.4);
+ border-radius:4px;padding:5px 13px;font-size:12px;color:#ecdfbd;}
+.cover .note{background:rgba(0,0,0,.18);border:1px solid rgba(217,189,122,.28);border-radius:8px;
+ padding:13px 18px;font-size:12.5px;max-width:860px;line-height:1.9;color:#e9e2cf;}
+/* ===== spec ===== */
+.spec{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;}
+.spec .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 22px;
+ flex:1;min-width:260px;box-shadow:0 3px 10px rgba(43,41,36,.05);}
+.spec h3{font-size:13px;margin-bottom:12px;color:var(--gold-d);letter-spacing:2px;font-weight:700;}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;}
+.sw{display:flex;flex-direction:column;font-size:11px;color:var(--ink3);gap:5px;align-items:center;}
+.sw i{width:42px;height:42px;border-radius:8px;display:block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);}
+.type span{display:block;margin-bottom:6px;color:var(--ink);}
+.type .t1{font-size:22px;font-weight:700;font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.type .t2{font-size:16px;font-weight:700;font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.type .t3{font-size:13px;font-weight:600;}
+.type .t4{font-size:11.5px;color:var(--ink3);}
+.comp{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+/* ===== groups ===== */
+.group-title{display:flex;align-items:center;gap:12px;margin:40px 0 10px;}
+.group-title .bar{width:6px;height:26px;border-radius:2px;background:linear-gradient(180deg,var(--gold),var(--gold-d));}
+.group-title h2{font-family:"Noto Serif SC","Songti SC","SimSun",serif;font-size:21px;letter-spacing:1px;}
+.group-title small{color:var(--ink3);font-size:12.5px;}
+.boards{display:flex;flex-wrap:wrap;gap:30px;align-items:flex-start;}
+.figure{width:320px;}
+.figure .cap{display:flex;align-items:center;gap:9px;margin:0 4px 12px;}
+.figure .cap .no{background:var(--pine);color:#e9d9ac;font-weight:700;font-size:12px;
+ width:23px;height:23px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+ flex:0 0 23px;font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.figure .cap b{font-size:14.5px;}
+.figure .cap small{display:block;color:var(--ink3);font-size:11px;font-weight:400;margin-top:1px;}
+/* ===== phone ===== */
+.phone{width:320px;height:660px;background:#fff;border-radius:40px;
+ box-shadow:0 18px 44px rgba(43,41,36,.2),0 0 0 9px #26221a,0 0 0 11px #453d2c;
+ overflow:hidden;position:relative;display:flex;flex-direction:column;}
+.statusbar{height:38px;flex:0 0 38px;display:flex;align-items:center;justify-content:space-between;
+ padding:0 22px;font-size:12px;font-weight:700;position:relative;z-index:5;}
+.statusbar .sb-icons{display:flex;gap:5px;align-items:center;}
+.homebar{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:120px;height:4px;
+ border-radius:2px;background:var(--ink);opacity:.5;z-index:9;}
+.scr{flex:1;overflow:hidden;position:relative;background:var(--paper);display:flex;flex-direction:column;}
+.scr-body{flex:1;overflow:hidden;padding:0 14px;}
+.navbar{display:flex;align-items:center;gap:10px;padding:4px 4px 12px;}
+.navbar .ttl{font-size:17px;font-weight:700;flex:1;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;letter-spacing:.5px;}
+.navbar .ic{width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--line);
+ display:flex;align-items:center;justify-content:center;color:var(--ink2);}
+/* tabbar */
+.tabbar{flex:0 0 62px;background:var(--card);border-top:1px solid var(--line);
+ display:flex;padding:6px 8px 12px;}
+.tabbar .tb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+ font-size:10.5px;color:var(--ink3);}
+.tabbar .tb.on{color:var(--pine);font-weight:700;}
+.tabbar .tb .dot{position:relative;}
+.tabbar .tb .dot::after{content:"";position:absolute;right:-7px;top:-2px;width:7px;height:7px;
+ background:var(--cinnabar);border-radius:50%;border:1.5px solid var(--card);}
+/* generic widgets */
+.card{background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--line);}
+/* 证书双线框：外细线 + 内鎏金线 */
+.cert{position:relative;background:var(--card);border:1px solid #d9cfb4;border-radius:10px;
+ box-shadow:0 6px 18px rgba(43,41,36,.07);}
+.cert::before{content:"";position:absolute;inset:5px;border:1px solid rgba(176,141,69,.65);
+ border-radius:6px;pointer-events:none;}
+.btn{border:none;border-radius:10px;height:46px;width:100%;font-size:15px;font-weight:700;
+ display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;cursor:pointer;}
+.btn-p{background:var(--pine);color:#f2ecd9;box-shadow:0 6px 16px rgba(30,75,58,.28);}
+.btn-o{background:var(--gold-d);color:#fdf8ea;box-shadow:0 6px 16px rgba(138,107,50,.28);}
+.btn-g{background:transparent;color:var(--pine);border:1.5px solid var(--pine);}
+.btn-d{background:#ece6d6;color:var(--ink2);}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:8px;padding:6px 13px;
+ font-size:12px;font-weight:600;background:#f0eadb;color:var(--ink2);border:1px solid var(--line);}
+.chip.on{background:var(--pine-l);color:var(--pine);border-color:#b9cfc0;}
+.chip.o{background:var(--gold-l);color:var(--gold-d);border-color:#e2d3a9;}
+.chip.p{background:var(--violet-l);color:var(--violet);border-color:#ddd2e6;}
+.av{width:34px;height:34px;border-radius:50%;color:#f6f1e2;font-size:12px;font-weight:700;
+ display:inline-flex;align-items:center;justify-content:center;flex:0 0 34px;}
+.av.sm{width:26px;height:26px;flex:0 0 26px;font-size:10px;}
+.av.lg{width:54px;height:54px;flex:0 0 54px;font-size:18px;}
+.tag{font-size:10px;font-weight:700;border-radius:5px;padding:2px 7px;letter-spacing:.5px;}
+.tag.sup{background:var(--gold-l);color:var(--gold-d);border:1px solid #e2d3a9;}
+.tag.wit{background:var(--violet-l);color:var(--violet);}
+.tag.live{background:var(--gold-l);color:var(--gold-d);}
+.tag.win{background:var(--indigo-l);color:var(--indigo);}
+.ico{display:inline-flex;}
+.progress{height:7px;border-radius:4px;background:#e6dfcb;overflow:hidden;}
+.progress i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#c9ab62,#a98738);}
+.photo{border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fdfaf2;
+ font-size:10px;font-weight:700;text-align:center;line-height:1.4;}
+.ph1{background:linear-gradient(135deg,#9db8a5,#62836f);}
+.ph2{background:linear-gradient(135deg,#d9bd8a,#b3854a);}
+.ph3{background:linear-gradient(135deg,#a3b4cc,#64799c);}
+.ph4{background:linear-gradient(135deg,#cfa0ad,#a06878);}
+.ph5{background:linear-gradient(135deg,#b3a3c9,#75648f);}
+.tl{position:relative;padding-left:20px;}
+.tl::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:#d8cfb6;}
+.tli{position:relative;padding-bottom:14px;}
+.tli::before{content:"";position:absolute;left:-18px;top:5px;width:9px;height:9px;border-radius:50%;
+ background:var(--pine);border:2px solid var(--paper);box-shadow:0 0 0 1.5px var(--gold);}
+.tli.gray::before{background:#c6bfa8;box-shadow:0 0 0 1.5px #e6dfcb;}
+.hair{height:1px;background:var(--line);margin:10px 0;}
+.muted{color:var(--ink3);font-size:11.5px;}
+.kvline{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;margin:9px 0;}
+.kvline b{font-weight:700;}
+.label{font-size:11px;color:var(--gold-d);font-weight:700;margin:14px 0 8px;letter-spacing:2px;}
+.section-hd{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 10px;}
+.section-hd b{font-size:14px;font-family:"Noto Serif SC","Songti SC","SimSun",serif;letter-spacing:.5px;}
+.section-hd span{font-size:11px;color:var(--ink3);}
+.footnote{margin:10px 4px 0;font-size:11px;color:var(--ink3);line-height:1.7;}
+/* ===== 屏幕级 ===== */
+/* S1 启动 */
+.s-start{background:linear-gradient(172deg,var(--pine-dd) 0%,var(--pine) 58%,#275845 100%);
+ color:#fff;align-items:center;justify-content:flex-start;text-align:center;padding:0 26px;}
+.s-start::before{content:"";position:absolute;inset:10px;border:1px solid rgba(217,189,122,.5);
+ border-radius:20px;pointer-events:none;}
+.s-start .logo{width:88px;height:88px;background:var(--cinnabar);border-radius:12px;
+ display:flex;align-items:center;justify-content:center;margin-top:88px;position:relative;
+ box-shadow:0 10px 24px rgba(0,0,0,.35);transform:rotate(-4deg);}
+.s-start .logo::before{content:"";position:absolute;inset:5px;border:1px solid rgba(255,255,255,.55);
+ border-radius:8px;}
+.s-start .logo span{writing-mode:vertical-rl;color:#fdf6ea;font-size:30px;font-weight:700;
+ letter-spacing:8px;font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.s-start h1{font-family:"Noto Serif SC","Songti SC","SimSun",serif;font-size:36px;
+ letter-spacing:14px;text-indent:14px;margin:24px 0 4px;}
+.s-start .orn{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:12px;}
+.s-start .orn i{display:block;width:52px;height:1px;background:linear-gradient(90deg,transparent,rgba(217,189,122,.8));}
+.s-start .orn i:last-child{background:linear-gradient(270deg,transparent,rgba(217,189,122,.8));}
+.s-start .orn b{color:#d9bd7a;font-size:10px;font-weight:400;}
+.s-start .slogan{font-size:13.5px;color:#e5ddc6;line-height:2.1;margin-bottom:78px;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;letter-spacing:2px;}
+.s-start .wx{background:var(--card);color:var(--ink);}
+.s-start .phone-n{background:rgba(255,255,255,.1);color:#ecdfbd;border:1px solid rgba(217,189,122,.5);}
+.s-start .agree{font-size:10px;color:rgba(255,255,255,.6);margin-top:14px;line-height:1.8;}
+/* S2 模板 */
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.tpl{border-radius:12px;padding:13px 12px;height:100px;background:var(--card);
+ border:1px solid var(--line);border-top:3px solid var(--tc);position:relative;
+ box-shadow:0 3px 8px rgba(43,41,36,.05);}
+.tpl .ti{width:34px;height:34px;border-radius:10px;background:var(--tl);color:var(--tc);
+ display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
+.tpl b{font-size:14px;display:block;font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.tpl small{font-size:10px;color:var(--ink3);}
+.tpl.t1{--tc:#1e4b3a;--tl:#e6efe7;}
+.tpl.t2{--tc:#2f4d6e;--tl:#e7edf4;}
+.tpl.t3{--tc:#a06b2a;--tl:#f5ead7;}
+.tpl.t4{--tc:#5d4270;--tl:#efe9f3;}
+.tpl.t5{--tc:#9c4048;--tl:#f6e9e8;}
+.tpl.t6{border:1.5px dashed #cfc5aa;border-top:1.5px dashed #cfc5aa;background:transparent;--tc:transparent;--tl:#f0eadb;}
+.tpl.t6 .ti{color:var(--gold-d);}
+.tpl.on{border-color:var(--pine);box-shadow:0 6px 14px rgba(30,75,58,.14);}
+.tpl .pick{position:absolute;top:9px;right:9px;width:18px;height:18px;border-radius:50%;
+ background:var(--pine);color:#fff;display:none;align-items:center;justify-content:center;}
+.tpl.on .pick{display:flex;}
+.search{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+ border-radius:9px;padding:9px 14px;font-size:12px;color:var(--ink3);margin-bottom:14px;}
+/* S3 定参 */
+.weight-box{display:flex;align-items:center;justify-content:center;gap:13px;margin:6px 0 4px;}
+.weight-box .w{font-size:30px;font-weight:700;color:var(--pine);
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.weight-box .unit{font-size:12px;color:var(--ink3);}
+.weight-box .arrow{color:var(--ink3);}
+.gift-mini{display:flex;align-items:center;gap:11px;background:var(--card);
+ border:1px solid #e2d3a9;border-left:3px solid var(--gold);border-radius:9px;
+ padding:11px 12px;margin-bottom:9px;}
+.gift-mini .gi{width:38px;height:38px;border-radius:9px;background:var(--gold-l);flex:0 0 38px;
+ display:flex;align-items:center;justify-content:center;}
+.gift-mini b{font-size:13px;display:block;}
+.gift-mini small{font-size:10.5px;color:var(--gold-d);}
+.gift-mini.mys{border-left-color:var(--violet);border-color:#ddd2e6;}
+.gift-mini.mys .gi{background:var(--violet-l);}
+.gift-mini.mys small{color:var(--violet);}
+.addline{border:1.5px dashed #cfc5aa;border-radius:9px;padding:12px;text-align:center;
+ font-size:12px;color:var(--ink3);font-weight:600;}
+/* S5 契约书 */
+.contract{color:var(--ink);padding:18px 18px 16px;margin-top:8px;}
+.contract .ct-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.contract .ct-kicker{font-size:11px;letter-spacing:6px;color:var(--gold-d);font-weight:700;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.contract .ct-no{font-size:10px;color:var(--ink3);letter-spacing:1px;}
+.contract h3{font-family:"Noto Serif SC","Songti SC","SimSun",serif;font-size:21px;
+ margin:2px 0 4px;letter-spacing:.5px;}
+.contract .ct-sub{font-size:11px;color:var(--ink3);margin-bottom:6px;}
+.contract .ct-orn{display:flex;align-items:center;gap:8px;margin:8px 0 4px;}
+.contract .ct-orn i{flex:1;height:1px;background:linear-gradient(90deg,transparent,#d9c793);}
+.contract .ct-orn i:last-child{background:linear-gradient(270deg,transparent,#d9c793);}
+.contract .ct-orn b{color:var(--gold);font-size:9px;}
+.contract .crow{display:flex;justify-content:space-between;font-size:11.5px;
+ padding:7.5px 0;border-bottom:1px dashed #ddd2b4;}
+.contract .crow:last-of-type{border-bottom:none;}
+.contract .crow span:first-child{color:var(--ink3);}
+.contract .crow span:last-child{font-weight:700;color:var(--ink);}
+.contract .ct-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:10px;}
+.contract .ct-sign{font-size:10px;color:var(--ink3);line-height:1.9;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.seal-z{width:46px;height:46px;background:var(--cinnabar);color:#fdf3e7;border-radius:7px;
+ display:flex;align-items:center;justify-content:center;font-size:13.5px;line-height:1.3;
+ letter-spacing:2px;text-align:center;font-weight:700;transform:rotate(6deg);
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;
+ box-shadow:0 3px 8px rgba(166,62,44,.4),inset 0 0 0 1.5px rgba(255,255,255,.35);}
+.choice{display:flex;gap:9px;margin-top:12px;}
+.choice .c{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:11px 8px;text-align:center;
+ font-size:11.5px;font-weight:700;color:var(--ink2);background:var(--card);}
+.choice .c.on{border-color:var(--pine);background:var(--pine-l);color:var(--pine);}
+.choice .c .ci{display:flex;justify-content:center;margin-bottom:6px;}
+/* S8 目标头 */
+.goal-top{background:linear-gradient(155deg,var(--pine-dd),var(--pine) 70%);color:#fff;margin:0 -14px;
+ padding:16px 18px 18px;border-radius:0 0 18px 18px;}
+.goal-top .gname{font-size:18px;font-weight:700;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;letter-spacing:1px;}
+.goal-top .gdays{font-size:11.5px;color:rgba(240,234,214,.85);margin:4px 0 12px;}
+.goal-top .gp{display:flex;justify-content:space-between;font-size:11px;color:rgba(240,234,214,.9);margin-bottom:6px;}
+.gift-slot{display:flex;gap:9px;margin:12px 0 2px;overflow:hidden;}
+.gift-slot .g{flex:0 0 104px;background:rgba(217,189,122,.14);border:1px solid rgba(217,189,122,.4);
+ border-radius:10px;padding:10px 8px;text-align:center;}
+.gift-slot .g.mystery{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28);}
+.gift-slot .g .gi{display:flex;justify-content:center;margin-bottom:5px;}
+.gift-slot .g b{font-size:10.5px;display:block;color:#ecd9a6;}
+.gift-slot .g.mystery b{color:#e9e2cf;}
+.gift-slot .g small{font-size:9.5px;color:rgba(255,255,255,.62);}
+.wall{display:flex;align-items:center;gap:8px;margin:12px 0 2px;}
+.wall .av{border:2px solid rgba(255,255,255,.85);}
+.wall .add{width:34px;height:34px;border-radius:50%;border:1.5px dashed rgba(217,189,122,.7);
+ display:flex;align-items:center;justify-content:center;color:#d9bd7a;background:rgba(255,255,255,.06);}
+.approve{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;
+ color:var(--pine);background:var(--pine-l);padding:2px 8px;border-radius:6px;}
+.reject{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;
+ color:var(--rouge);background:var(--rouge-l);padding:2px 8px;border-radius:6px;}
+/* S9 打卡项 */
+.ci{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);
+ border-radius:12px;padding:12px;margin-bottom:10px;}
+.ci .ci-ic{width:38px;height:38px;border-radius:10px;flex:0 0 38px;display:flex;
+ align-items:center;justify-content:center;}
+.ci b{font-size:13px;display:block;}
+.ci small{font-size:10.5px;color:var(--ink3);}
+.ci .go{margin-left:auto;width:24px;height:24px;border-radius:50%;border:1.5px solid #cfc5aa;}
+.ci.done .go{background:var(--pine);border-color:var(--pine);display:flex;align-items:center;
+ justify-content:center;}
+.mini-chart{display:flex;align-items:flex-end;gap:5px;height:46px;margin:8px 0 2px;}
+.mini-chart i{flex:1;border-radius:3px 3px 1px 1px;background:#ddcda2;}
+.mini-chart i.h{background:var(--pine);}
+/* S10 监督 */
+.sup-flag{background:var(--cinnabar-l);border:1px solid #ecd0c4;color:var(--cinnabar);
+ border-radius:9px;padding:9px 12px;font-size:11.5px;font-weight:700;text-align:center;margin-bottom:12px;}
+.review-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;}
+.rc-top{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+.rc-top b{font-size:13.5px;}
+.rc-photos{display:flex;gap:8px;margin-bottom:11px;}
+.rc-photos .photo{width:62px;height:62px;flex:0 0 62px;}
+.rc-actions{display:flex;gap:10px;margin-top:6px;}
+.rc-actions .btn{height:40px;font-size:13.5px;}
+.sticker{display:flex;gap:7px;margin:10px 0 2px;flex-wrap:wrap;}
+/* S11 广场 */
+.sq-tabs{display:flex;gap:16px;padding:4px 2px 12px;font-size:13px;color:var(--ink3);font-weight:700;}
+.sq-tabs .on{color:var(--ink);position:relative;}
+.sq-tabs .on::after{content:"";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);
+ width:18px;height:2.5px;border-radius:2px;background:var(--gold);}
+.feed{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;}
+.feed .fh{display:flex;align-items:center;gap:9px;padding:12px 13px 8px;}
+.feed .fh b{font-size:12.5px;}
+.feed .fh .right{margin-left:auto;}
+.feed .fb{padding:0 13px 10px;font-size:12.5px;}
+.feed .fp{display:flex;gap:6px;padding:0 13px 10px;}
+.feed .fp .photo{width:60px;height:60px;flex:0 0 60px;font-size:9px;}
+.feed .ff{display:flex;gap:20px;padding:10px 13px;border-top:1px solid var(--line);
+ font-size:11.5px;color:var(--ink2);}
+.feed .ff span{display:flex;align-items:center;gap:5px;}
+.mini-progress-card{background:#faf6ea;border:1px solid #e3d7b8;
+ border-radius:10px;padding:12px;margin-bottom:12px;}
+/* S12 拆礼 */
+.s-result{background:linear-gradient(180deg,#efe5cd 0%,var(--paper) 36%);padding:0 16px;}
+.confetti{font-size:12px;letter-spacing:6px;text-align:center;padding:10px 0 0;color:var(--gold);}
+.res-hd{display:flex;align-items:center;gap:12px;justify-content:center;margin:4px 0 3px;}
+.res-hd i{display:block;width:46px;height:1px;background:linear-gradient(90deg,transparent,var(--gold));}
+.res-hd i:last-child{background:linear-gradient(270deg,transparent,var(--gold));}
+.res-hd b{font-family:"Noto Serif SC","Songti SC","SimSun",serif;font-size:21px;letter-spacing:2px;}
+.gift-open{padding:16px;text-align:center;margin-bottom:12px;}
+.gift-open .box{width:96px;height:96px;margin:4px auto 10px;}
+.gift-open b{font-size:17px;display:block;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;letter-spacing:1px;}
+.gift-open .from{font-size:11.5px;color:var(--ink3);margin:4px 0 10px;}
+.gift-open .words{background:var(--gold-l);border:1px solid #e6d7ae;border-radius:9px;
+ padding:11px 13px;font-size:12.5px;color:#6b5636;text-align:left;line-height:1.9;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.gift-pending{display:flex;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;
+ padding:11px 12px;margin-bottom:9px;align-items:center;}
+.gift-pending b{font-size:12.5px;}
+.gift-pending small{font-size:10.5px;color:var(--ink3);}
+/* S13 回忆录 */
+.s-memoir{background:var(--memoir);padding:0;}
+.mem-status{color:#fdfaf2;background:var(--memoir);}
+.mem-book{margin:10px;border-radius:16px;overflow:hidden;flex:1;position:relative;
+ background:linear-gradient(172deg,#1d3328,var(--memoir) 78%);color:#fff;display:flex;flex-direction:column;
+ border:1px solid rgba(217,189,122,.35);}
+.mem-book::before{content:"";position:absolute;inset:6px;border:1px solid rgba(217,189,122,.4);
+ border-radius:11px;pointer-events:none;}
+.mem-page{padding:24px 20px;}
+.mem-page .kicker{font-size:10px;letter-spacing:5px;color:#d9bd7a;font-weight:700;}
+.mem-page h3{font-family:"Noto Serif SC","Songti SC","SimSun",serif;font-size:22px;
+ margin:10px 0 6px;line-height:1.6;font-weight:700;letter-spacing:1px;}
+.mem-page .who{font-size:11px;color:rgba(255,255,255,.62);letter-spacing:1px;}
+.mem-nums{display:flex;gap:9px;margin:16px 0;}
+.mem-nums .n{flex:1;background:rgba(217,189,122,.1);border:1px solid rgba(217,189,122,.3);
+ border-radius:9px;padding:12px 8px;text-align:center;}
+.mem-nums .n b{font-size:21px;color:#e3c887;display:block;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.mem-nums .n small{font-size:9.5px;color:rgba(255,255,255,.72);}
+.mem-photos{display:flex;gap:7px;margin:14px 0;}
+.mem-photos .photo{flex:1;height:88px;border-radius:8px;}
+.mem-quote{border-left:2px solid var(--gold);padding:4px 0 4px 12px;font-size:12.5px;
+ line-height:1.9;color:rgba(255,255,255,.94);margin:10px 0;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;}
+.mem-quote .by{display:block;margin-top:6px;font-size:10.5px;color:rgba(255,255,255,.55);}
+.mem-dots{display:flex;gap:6px;justify-content:center;padding:10px 0 14px;}
+.mem-dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);}
+.mem-dots i.on{background:var(--gold);width:18px;border-radius:3px;}
+/* S14 我的 */
+.me-top{background:linear-gradient(155deg,var(--pine-dd),var(--pine) 75%);color:#fff;margin:0 -14px;
+ padding:18px 18px 54px;border-radius:0 0 18px 18px;display:flex;align-items:center;gap:13px;}
+.me-top b{font-size:17px;display:block;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;letter-spacing:1px;}
+.me-top small{font-size:11px;color:rgba(240,234,214,.8);}
+.me-stats{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:-38px 0 12px;
+ padding:16px 6px;display:flex;position:relative;box-shadow:0 6px 16px rgba(43,41,36,.08);}
+.me-stats .s{flex:1;text-align:center;}
+.me-stats .s b{font-size:19px;display:block;font-family:"Noto Serif SC","Songti SC","SimSun",serif;
+ color:var(--pine);}
+.me-stats .s small{font-size:10.5px;color:var(--ink3);}
+.me-stats .s + .s{border-left:1px solid var(--line);}
+.badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
+.badge{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 4px;text-align:center;}
+.badge .bi{width:38px;height:38px;border-radius:50%;margin:0 auto 6px;display:flex;
+ align-items:center;justify-content:center;}
+.badge small{font-size:9.5px;color:var(--ink2);font-weight:700;}
+.book-shelf{display:flex;gap:10px;}
+.book{flex:0 0 84px;height:112px;border-radius:4px 9px 9px 4px;padding:10px 9px;color:#efe6cf;
+ display:flex;flex-direction:column;justify-content:flex-end;font-size:10px;line-height:1.7;
+ font-family:"Noto Serif SC","Songti SC","SimSun",serif;
+ border-left:3px solid rgba(217,189,122,.85);
+ box-shadow:inset 4px 0 6px -4px rgba(0,0,0,.6),0 8px 16px rgba(43,41,36,.2);}
+.book span{color:rgba(233,215,168,.75);font-size:9px;}
+.list-row{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);
+ border-radius:10px;padding:12px 14px;margin-bottom:9px;}
+.list-row b{font-size:12.5px;flex:1;}
+/* 表单件 */
+.input-fake{background:#f0eadb;border-radius:9px;padding:12px 14px;font-size:12.5px;
+ color:var(--ink2);margin-bottom:10px;display:flex;align-items:center;gap:9px;}
+.input-fake.ph{color:var(--ink3);}
+.radio-line{display:flex;align-items:center;gap:9px;font-size:12.5px;margin:8px 0;}
+.radio{width:18px;height:18px;border-radius:50%;border:1.8px solid #c6bfa8;flex:0 0 18px;}
+.radio.on{border:5px solid var(--pine);}
+.check{width:18px;height:18px;border-radius:5px;border:1.8px solid #c6bfa8;flex:0 0 18px;}
+.check.on{background:var(--pine);border-color:var(--pine);display:flex;align-items:center;justify-content:center;}
+.scale-num{display:flex;gap:7px;align-items:center;justify-content:center;margin:4px 0 8px;}
+.scale-num input{width:84px;border:none;border-bottom:2px solid var(--gold);font-size:28px;
+ font-weight:700;text-align:center;color:var(--pine);font-family:inherit;background:transparent;}
+.scale-num span{font-size:13px;color:var(--ink3);font-weight:700;}
+.flow-hint{background:#faf6ea;border:1px dashed #cfc0a0;border-radius:8px;padding:9px 12px;
+ font-size:11.5px;color:var(--gold-d);margin-top:14px;line-height:1.8;}
+footer{text-align:center;color:var(--ink2);font-size:12px;margin-top:40px;line-height:2;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- SVG icon library -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7M6 10v9h12v-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 8.5l-2 5-5 2 2-5z" fill="currentColor"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1112 0v5l1.5 2h-15L6 16z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 20a2 2 0 004 0" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4.5 20a7.5 7.5 0 0115 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 7l1.2-2h3.6L15 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.6-9.2-9C1.3 8 2.8 5 5.8 5c2 0 3.2 1.2 4.2 2.6C11 6.2 12.2 5 14.2 5c3 0 4.5 3 3 6-2.2 4.4-9.2 9-9.2 9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5h14a2 2 0 012 2v8a2 2 0 01-2 2H9l-4 3v-3H5a2 2 0 01-2-2V7a2 2 0 012-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><path d="M4 10h16v9a1 1 0 01-1 1H5a1 1 0 01-1-1v-9zM3 7h18v3H3zM12 7v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7S10.8 4 8.8 4 6 5.4 7.2 7h4.8zm0 0s1.2-3 3.2-3S18 5.4 16.8 7H12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 3c1 3-2 4-2 7a2 2 0 104 0c0-1-.5-1.5-.5-1.5C15 10 17 12 17 15a5 5 0 11-10 0c0-5 5-6 5-12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 15l1.6-3.4h2.8L15 15M10.4 13.2h3.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 5.5C7 4.5 9.5 4.5 12 6v13c-2.5-1.5-5-1.5-7-.5v-13zM19 5.5C17 4.5 14.5 4.5 12 6v13c2.5-1.5 5-1.5 7-.5v-13z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 119.5 4 6.5 6.5 0 0020 14.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-run" viewBox="0 0 24 24"><circle cx="15" cy="5" r="2.2" fill="currentColor"/><path d="M13.5 9l-3 2.5 1.5 3M10.5 11.5L7 13M12 14.5l-3 4.5M14 12l3 2.5-2 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-cup" viewBox="0 0 24 24"><path d="M6 8h11v5a5.5 5.5 0 01-11 0V8zM17 9h2.5a2.5 2.5 0 010 5H17M8 4.5c-.6.8-.4 1.6 0 2.4M11.5 4.5c-.6.8-.4 1.6 0 2.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 4l1.8 5.2L19 11l-5.2 1.8L12 18l-1.8-5.2L5 11l5.2-1.8L12 4z" fill="currentColor"/></symbol>
+  <symbol id="i-wx" viewBox="0 0 24 24"><path d="M9 4C5.7 4 3 6.3 3 9.2c0 1.7.9 3.2 2.3 4.2L4.5 15.5l2.3-1.2c.7.2 1.4.3 2.2.3h.5A5.6 5.6 0 019 13.5c0-3.3 3.1-6 7-6h.5C16.2 5.3 12.9 4 9 4z" fill="currentColor"/><path d="M21 13.6c0-2.6-2.5-4.7-5.5-4.7s-5.5 2.1-5.5 4.7 2.5 4.7 5.5 4.7c.7 0 1.3-.1 1.9-.3l1.9 1-.5-1.6c1.4-.9 2.2-2.2 2.2-3.8z" fill="currentColor"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="6" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="18" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.2 10.8l6.6-3.6M8.2 13.2l6.6 3.6" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-medal" viewBox="0 0 24 24"><circle cx="12" cy="14" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 9L7 3h10l-2 6M12 11.5l1 1.8 2 .2-1.5 1.3.4 2-1.9-1-1.9 1 .4-2L9 13.5l2-.2z" fill="currentColor"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M16 5l3 3L8 19l-4 1 1-4L16 5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path d="M5 17l4.5-4 3.5 3 2.5-2L19 17" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 13h5l-1 8 8-10h-5l1-8z" fill="currentColor"/></symbol>
+</svg>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="deco"></div>
+  <div class="deco2"></div>
+  <div class="cover-seal">做到</div>
+  <div class="vk">UI DESIGN REVIEW · V2.0 契约文书版</div>
+  <h1>「做到」App 界面设计稿</h1>
+  <div class="sub">立下目标 · 搭子监督也送礼 · 每天互相打气 · 达成拆礼，再收到一本大结局回忆录</div>
+  <div class="decision">
+    <span>视觉语言：契约文书 · 深松绿 × 鎏金 × 宣纸 × 朱砂印</span>
+    <span>技术方向：混合开发框架，先出 App</span>
+    <span>目标模板：5 大类 + 「其他」自定义入口</span>
+    <span>礼物：仅线下心意，无支付/电商闭环</span>
+    <span>争议规则：双方确认为准，投诉后管理员人工终裁</span>
+    <span>不限制未成年人使用</span>
+    <span>运营/商业模式：本期不涉及</span>
+  </div>
+  <div class="note">
+    本稿为高保真静态视觉稿 V2.0，共 14 个关键屏幕，按「立约 → 履约 → 大结局」三段排列。整体调性从"轻快社交"转为"庄重承诺"：立约如立契，契约卡、邀请函、回忆录均以文书质感呈现，让每一次承诺都有证书般的分量。请重点审核：庄重感是否到位、仪式节点（契约书 / 火漆拆礼 / 回忆录）是否动人、日常履约界面是否保持了克制的精致。
+  </div>
+</div>
+
+<!-- SPEC -->
+<div class="spec">
+  <div class="box">
+    <h3>品牌色板</h3>
+    <div class="swatches">
+      <div class="sw"><i style="background:#1e4b3a"></i>深松绿</div>
+      <div class="sw"><i style="background:#b08d45"></i>鎏金</div>
+      <div class="sw"><i style="background:#a63e2c"></i>朱砂</div>
+      <div class="sw"><i style="background:#f3eee1;border:1px solid #d9cfb4"></i>宣纸</div>
+      <div class="sw"><i style="background:#2f4d6e"></i>黛蓝</div>
+      <div class="sw"><i style="background:#12211a"></i>回忆墨</div>
+    </div>
+  </div>
+  <div class="box">
+    <h3>字体层级</h3>
+    <div class="type">
+      <span class="t1">大标题 22 / 宋体 700</span>
+      <span class="t2">卡片标题 16 / 宋体 700</span>
+      <span class="t3">正文 13 / 600</span>
+      <span class="t4">辅助说明 11 / 常规</span>
+    </div>
+  </div>
+  <div class="box">
+    <h3>核心组件</h3>
+    <div class="comp">
+      <button class="btn btn-p" style="width:auto;padding:0 22px;height:40px;">主按钮</button>
+      <button class="btn btn-g" style="width:auto;padding:0 22px;height:40px;">次按钮</button>
+      <span class="chip on">已选项</span>
+      <span class="chip">普通项</span>
+      <span class="tag sup">监督人</span>
+      <span class="tag wit">见证人</span>
+      <div class="progress" style="width:120px;"><i style="width:66%"></i></div>
+    </div>
+    <div class="comp" style="margin-top:12px;">
+      <div class="cert" style="padding:10px 16px;font-size:12px;color:var(--ink2);">证书双线框 · 契约卡 / 邀请函 / 拆礼凭证通用</div>
+      <div class="seal-z" style="flex:0 0 46px;">说到<br>做到</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ GROUP 1 立约 ============ -->
+<div class="group-title"><div class="bar"></div><h2>第一幕 · 立约</h2><small>从打开 App 到邀请搭子、礼物被认下——像签一份庄重的契约</small></div>
+<div class="boards">
+
+<!-- S1 -->
+<div class="figure">
+  <div class="cap"><div class="no">1</div><div><b>启动 / 登录页</b><small>朱砂印 logo + 鎏金边框，一诺千金的开场</small></div></div>
+  <div class="phone">
+    <div class="scr s-start">
+      <div class="statusbar" style="color:#fff;"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+      <div class="logo"><span>做到</span></div>
+      <h1>做到</h1>
+      <div class="orn"><i></i><b>❖</b><i></i></div>
+      <div class="slogan">和重要的人立约<br>把每个目标走完</div>
+      <button class="btn wx"><svg width="20" height="20" style="color:#07c160"><use href="#i-wx"/></svg>微信一键登录</button>
+      <div style="height:11px"></div>
+      <button class="btn phone-n">手机号登录</button>
+      <div class="agree">登录即代表同意《用户协议》与《隐私政策》<br>青少年用户请在家长陪伴下使用礼物约定功能</div>
+    </div>
+    <div class="homebar" style="background:#fff;opacity:.5;"></div>
+  </div>
+</div>
+
+<!-- S2 模板 -->
+<div class="figure">
+  <div class="cap"><div class="no">2</div><div><b>创建目标 · 选模板</b><small>5 大类固定卡片 + 「其他目标」自定义入口</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr">
+      <div class="scr-body">
+        <div class="navbar"><div class="ic"><svg width="15" height="15"><use href="#i-close"/></svg></div><div class="ttl">选一件你想做到的事</div></div>
+        <div class="search"><svg width="14" height="14" style="color:#9a937f"><use href="#i-search"/></svg>搜索：减脂 / 早起 / 备考 / 戒糖…</div>
+        <div class="tpl-grid">
+          <div class="tpl t1 on"><span class="pick"><svg width="10" height="10"><use href="#i-check"/></svg></span><div class="ti"><svg width="19" height="19"><use href="#i-scale"/></svg></div><b>减脂塑形</b><small>减重 · 体脂 · 健康餐</small></div>
+          <div class="tpl t2"><div class="ti"><svg width="19" height="19"><use href="#i-moon"/></svg></div><b>早睡早起</b><small>作息 · 不赖床挑战</small></div>
+          <div class="tpl t3"><div class="ti"><svg width="19" height="19"><use href="#i-run"/></svg></div><b>运动健身</b><small>跑步 · 健身 · 步数</small></div>
+          <div class="tpl t4"><div class="ti"><svg width="19" height="19"><use href="#i-book"/></svg></div><b>学习阅读</b><small>备考 · 读书 · 技能</small></div>
+          <div class="tpl t5"><div class="ti"><svg width="19" height="19"><use href="#i-cup"/></svg></div><b>戒断挑战</b><small>戒糖 · 戒酒 · 戒熬夜</small></div>
+          <div class="tpl t6"><div class="ti"><svg width="19" height="19"><use href="#i-plus"/></svg></div><b style="color:var(--ink2)">其他目标</b><small style="color:var(--ink3)">自定义任何想坚持的事</small></div>
+        </div>
+        <div class="footnote">选择模板后可自由修改全部参数；「其他目标」支持手填名称并选择判定方式（数值 / 打卡频次 / 里程碑）。</div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S3 目标设置 -->
+<div class="figure">
+  <div class="cap"><div class="no">3</div><div><b>创建目标 · 设参数</b><small>以「减脂塑形」为例，规则开始前锁定</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr">
+      <div class="scr-body">
+        <div class="navbar"><div class="ic"><svg width="15" height="15"><use href="#i-close"/></svg></div><div class="ttl">减脂塑形 · 30 天</div><div class="ic"><svg width="14" height="14"><use href="#i-edit"/></svg></div></div>
+
+        <div class="label">目标体重</div>
+        <div class="card" style="text-align:center;">
+          <div class="weight-box">
+            <span class="w">65.0</span><span class="unit">kg 现在</span>
+            <span class="arrow"><svg width="18" height="18"><use href="#i-chev"/></svg></span>
+            <span class="w" style="color:var(--gold-d)">58.0</span><span class="unit">kg 目标</span>
+          </div>
+          <div class="muted">每周约减 1.6kg → 建议放缓到 45 天更健康哦</div>
+        </div>
+
+        <div class="label">周期</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+          <span class="chip">21 天</span><span class="chip on">30 天</span><span class="chip">60 天</span><span class="chip">90 天</span><span class="chip">自定义</span>
+        </div>
+
+        <div class="label">每日打卡内容（监督审核依据）</div>
+        <div class="radio-line"><span class="check on"><svg width="11" height="11" style="color:#fff"><use href="#i-check"/></svg></span>体重 + 秤面照片</div>
+        <div class="radio-line"><span class="check on"><svg width="11" height="11" style="color:#fff"><use href="#i-check"/></svg></span>三餐拍照</div>
+        <div class="radio-line"><span class="check on"><svg width="11" height="11" style="color:#fff"><use href="#i-check"/></svg></span>运动记录</div>
+        <div class="radio-line"><span class="check"></span>一句话心情（选填）</div>
+
+        <div class="kvline"><span>每周休息天</span><span><b>1 天</b> <span class="muted">可调</span></span></div>
+        <div class="kvline"><span>谁可以看</span><span><b>仅受邀的人</b> <svg width="12" height="12" style="display:inline;color:#9a937f"><use href="#i-chev"/></svg></span></div>
+      </div>
+      <div style="padding:10px 14px 16px;background:var(--paper);">
+        <button class="btn btn-p">下一步：想要什么奖励？<svg width="16" height="16"><use href="#i-chev"/></svg></button>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S4 心愿礼物 -->
+<div class="figure">
+  <div class="cap"><div class="no">4</div><div><b>心愿礼物清单</b><small>明约/惊喜可选，平台不参与购买支付</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr">
+      <div class="scr-body">
+        <div class="navbar"><div class="ic"><svg width="15" height="15"><use href="#i-close"/></svg></div><div class="ttl">做到了，想要什么？</div></div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;">
+          <span class="chip o">一杯奶茶</span><span class="chip o">请吃火锅</span><span class="chip o">一双跑鞋</span>
+          <span class="chip o">一次旅行</span><span class="chip o">看场电影</span><span class="chip o">+ 自定义</span>
+        </div>
+
+        <div class="gift-mini">
+          <div class="gi"><svg width="21" height="21" style="color:var(--gold)"><use href="#i-gift"/></svg></div>
+          <div style="flex:1"><b>一双新跑鞋</b><small>预算备忘 ¥500 · 仅双方可见</small></div>
+          <span class="tag live">明约</span>
+        </div>
+        <div class="gift-mini mys">
+          <div class="gi"><svg width="21" height="21" style="color:var(--violet)"><use href="#i-gift"/></svg></div>
+          <div style="flex:1"><b>神秘礼物 ×1</b><small>达成当天才揭晓内容</small></div>
+          <span class="tag wit">惊喜</span>
+        </div>
+        <div class="addline"><svg width="14" height="14" style="color:#9a937f"><use href="#i-plus"/></svg> &nbsp;再添一个心愿（至多 5 件）</div>
+
+        <div class="label">希望谁送？（可选）</div>
+        <div class="input-fake ph"><div class="av sm" style="background:#a06b2a">柠</div>指定 @阿柠 —— 仅作邀请建议，不强制</div>
+
+        <div class="flow-hint">礼物是朋友间的心意约定，由双方线下自行兑现。平台不参与购买、支付与配送，也不强制履行。</div>
+      </div>
+      <div style="padding:10px 14px 16px;background:var(--paper);">
+        <button class="btn btn-p">下一步：邀请搭子</button>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S5 契约卡 -->
+<div class="figure">
+  <div class="cap"><div class="no">5</div><div><b>邀请搭子 · 契约书</b><small>证书双线框 + 朱砂钤印，目标与心愿一并发出</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr">
+      <div class="scr-body">
+        <div class="navbar"><div class="ic"><svg width="15" height="15"><use href="#i-close"/></svg></div><div class="ttl">邀请我的搭子监督人</div></div>
+
+        <div class="contract cert">
+          <div class="ct-top"><span class="ct-kicker">立 约 书</span><span class="ct-no">№ 2026-1024</span></div>
+          <h3>从 65kg 减到 58kg</h3>
+          <div class="ct-sub">小鹿 的 30 天契约</div>
+          <div class="ct-orn"><i></i><b>❖</b><i></i></div>
+          <div class="crow"><span>立约人</span><span>小鹿</span></div>
+          <div class="crow"><span>周期</span><span>10.24 – 11.22（30 天）</span></div>
+          <div class="crow"><span>每日交作业</span><span>体重 · 三餐 · 运动</span></div>
+          <div class="crow"><span>心愿礼物</span><span>一双新跑鞋 / 神秘礼物</span></div>
+          <div class="crow"><span>需要你做</span><span>每天约 1 分钟：审核 + 加油</span></div>
+          <div class="ct-foot">
+            <div class="ct-sign">立约人签名：小鹿<br>监督人签名：待你接受</div>
+            <div class="seal-z">说到<br>做到</div>
+          </div>
+        </div>
+
+        <div class="label">发给 TA 的话</div>
+        <div class="input-fake" style="line-height:1.8;">这次我是认真的！来当我的搭子监督人好不好？我做到的话，你答应我的礼物可就要兑现啦～</div>
+
+        <div class="label">发给谁</div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px;">
+          <div class="av" style="background:#a06b2a">柠</div>
+          <div style="flex:1;font-size:12.5px"><b style="display:block">阿柠</b><span class="muted">微信好友 · 未注册也能邀请</span></div>
+          <span class="chip on">已选</span>
+        </div>
+      </div>
+      <div style="padding:10px 14px 16px;background:var(--paper);display:flex;gap:10px;">
+        <button class="btn btn-g" style="flex:0 0 118px;"><svg width="17" height="17" style="color:#07c160"><use href="#i-wx"/></svg>微信邀请</button>
+        <button class="btn btn-p" style="flex:1;">发出契约</button>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S6 接受邀请 -->
+<div class="figure">
+  <div class="cap"><div class="no">6</div><div><b>受邀方 · 接受邀请</b><small>权责告知 + 礼物三选一 + 首句鼓励落笔为证</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr">
+      <div class="scr-body">
+        <div style="display:flex;gap:11px;align-items:center;margin:6px 0 14px;">
+          <div class="av lg" style="background:var(--pine)">鹿</div>
+          <div style="flex:1">
+            <b style="font-size:15px;font-family:'Noto Serif SC','Songti SC','SimSun',serif;">小鹿 邀请你做搭子监督人</b>
+            <div class="muted" style="margin-top:3px;">30 天 · 从 65kg 减到 58kg</div>
+          </div>
+        </div>
+
+        <div class="label">你需要做什么</div>
+        <div class="card" style="font-size:12px;line-height:2;color:var(--ink2)">
+          <div>① 每天看 TA 的打卡，通过或驳回（约 1 分钟）</div>
+          <div>② 到期一起确认目标结果</div>
+          <div>③ 留下一句鼓励——这才是重点</div>
+        </div>
+
+        <div class="label">TA 的心愿礼物，你的回应</div>
+        <div class="choice">
+          <div class="c on"><div class="ci"><svg width="19" height="19" style="color:var(--pine)"><use href="#i-gift"/></svg></div>认下跑鞋</div>
+          <div class="c"><div class="ci"><svg width="19" height="19" style="color:var(--gold-d)"><use href="#i-spark"/></svg></div>换个礼物</div>
+          <div class="c"><div class="ci"><svg width="19" height="19" style="color:#9a937f"><use href="#i-heart"/></svg></div>只监督</div>
+        </div>
+
+        <div class="label">第一句鼓励（将写进回忆录）</div>
+        <div class="input-fake ph" style="font-family:'Noto Serif SC','Songti SC','SimSun',serif;">“别怕，我每天都在。”</div>
+
+        <div class="flow-hint">结果以双方确认为准；如对结果有争议可发起投诉，由平台管理员人工审核后终裁。</div>
+      </div>
+      <div style="padding:10px 14px 16px;background:var(--paper);display:flex;gap:10px;">
+        <button class="btn btn-d" style="flex:0 0 96px;">婉拒</button>
+        <button class="btn btn-p" style="flex:1;">接受，陪 TA 走完</button>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /group1 -->
+
+<!-- ============ GROUP 2 履约 ============ -->
+<div class="group-title"><div class="bar"></div><h2>第二幕 · 履约陪伴</h2><small>每天交作业、被审核、互相打气——克制而精致的日常</small></div>
+<div class="boards">
+
+<!-- S7 首页 -->
+<div class="figure">
+  <div class="cap"><div class="no">7</div><div><b>首页 · 今天</b><small>待办式打卡入口 + 搭子实时反馈</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr">
+      <div class="scr-body">
+        <div style="display:flex;align-items:center;padding:6px 2px 14px;">
+          <div style="flex:1"><div class="muted">10 月 24 日 · 周五</div><b style="font-size:19px;font-family:'Noto Serif SC','Songti SC','SimSun',serif;">早安，小鹿</b></div>
+          <div class="ic" style="position:relative;"><svg width="17" height="17"><use href="#i-bell"/></svg><span style="position:absolute;right:-2px;top:-2px;width:8px;height:8px;background:var(--cinnabar);border-radius:50%;border:2px solid var(--paper);"></span></div>
+          <div class="av" style="background:var(--pine);margin-left:10px;">鹿</div>
+        </div>
+
+        <div class="card" style="background:linear-gradient(150deg,var(--pine-dd),var(--pine) 75%);color:#fff;border:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><b style="font-size:14.5px;font-family:'Noto Serif SC','Songti SC','SimSun',serif;letter-spacing:.5px;">减脂冲刺 30 天</b><span class="tag" style="background:rgba(217,189,122,.18);color:#ecd9a6;border:1px solid rgba(217,189,122,.4);">第 18 天</span></div>
+          <div style="margin:10px 0 5px;display:flex;justify-content:space-between;font-size:11px;color:rgba(240,234,214,.9);"><span>59.2kg → 58.0kg</span><span>还剩 12 天</span></div>
+          <div class="progress" style="background:rgba(255,255,255,.2);"><i style="width:72%;background:linear-gradient(90deg,#d9bd7a,#b08d45);"></i></div>
+          <div style="display:flex;align-items:center;margin-top:11px;gap:8px;">
+            <svg width="15" height="15" style="color:#e3c887"><use href="#i-fire"/></svg>
+            <span style="font-size:11.5px;color:#e9e2cf;">已连续打卡 16 天</span>
+          </div>
+        </div>
+
+        <button class="btn btn-o" style="margin:11px 0 14px;"><svg width="17" height="17"><use href="#i-bolt"/></svg>今日打卡 · 还差 2 项</button>
+
+        <div class="card" style="display:flex;gap:11px;align-items:center;margin-bottom:11px;background:#faf6ea;border-color:#e3d7b8;">
+          <div class="av" style="background:#a06b2a">柠</div>
+          <div style="flex:1;font-size:12px;line-height:1.7;color:#6b5636;"><b>阿柠</b> 刚刚通过了你的早餐打卡：“今天也很稳！晚上别忘了跑步～”</div>
+        </div>
+
+        <div class="card" style="display:flex;gap:11px;align-items:center;">
+          <div style="width:42px;height:42px;border-radius:11px;background:var(--indigo-l);display:flex;align-items:center;justify-content:center;flex:0 0 42px;"><svg width="20" height="20" style="color:var(--indigo)"><use href="#i-moon"/></svg></div>
+          <div style="flex:1"><b style="font-size:13px;display:block;">6:30 早起挑战</b><span class="muted">连续 12 天 · 本周完成 4/5</span></div>
+          <span class="tag win">进行中</span>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tb on"><svg width="21" height="21"><use href="#i-home"/></svg>今天</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-target"/></svg>目标</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-compass"/></svg>广场</div>
+        <div class="tb"><span class="dot"><svg width="21" height="21"><use href="#i-bell"/></svg></span>消息</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-user"/></svg>我的</div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S8 目标主页 -->
+<div class="figure">
+  <div class="cap"><div class="no">8</div><div><b>目标主页</b><small>进度 + 礼物位 + 见证墙 + 时间线</small></div></div>
+  <div class="phone">
+    <div class="statusbar" style="color:#fff;background:var(--pine-dd);"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr" style="background:var(--paper);">
+      <div style="overflow:hidden;flex:1;">
+        <div class="goal-top" style="border-radius:0 0 18px 18px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <b class="gname">减脂冲刺 30 天</b><span class="tag" style="background:rgba(217,189,122,.18);color:#ecd9a6;border:1px solid rgba(217,189,122,.4);">仅受邀可见</span>
+          </div>
+          <div class="gdays">第 18 / 30 天 · 59.2 → 58.0kg · 已减 5.8kg</div>
+          <div class="progress" style="background:rgba(255,255,255,.2);"><i style="width:60%;background:linear-gradient(90deg,#d9bd7a,#b08d45);"></i></div>
+          <div class="gift-slot">
+            <div class="g"><div class="gi"><svg width="22" height="22" style="color:#ecd9a6"><use href="#i-gift"/></svg></div><b>新跑鞋</b><small>阿柠 承诺</small></div>
+            <div class="g mystery"><div class="gi"><svg width="22" height="22" style="color:#e9e2cf"><use href="#i-gift"/></svg></div><b>神秘礼物</b><small>达成揭晓</small></div>
+            <div class="g" style="background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.24);"><b style="color:rgba(255,255,255,.85);">加码？</b><small style="color:rgba(255,255,255,.6)">见证人也可送</small></div>
+          </div>
+          <div class="wall">
+            <div class="av sm" style="background:#a06b2a">柠</div>
+            <div class="av sm" style="background:#5d4270">妈</div>
+            <div class="av sm" style="background:#2f4d6e">凯</div>
+            <div class="av sm" style="background:#8b8371">3</div>
+            <div class="add sm"><svg width="13" height="13"><use href="#i-plus"/></svg></div>
+            <span class="muted" style="color:rgba(255,255,255,.72);margin-left:2px;">1 位监督 · 4 位见证</span>
+          </div>
+        </div>
+
+        <div style="padding:14px 14px 0;">
+          <div class="mini-progress-card" style="display:flex;align-items:center;gap:12px;">
+            <div style="flex:1"><b style="font-size:12.5px;display:block;margin-bottom:7px;">体重趋势（kg）</b><div class="mini-chart"><i style="height:70%"></i><i style="height:64%"></i><i style="height:66%"></i><i style="height:55%"></i><i style="height:58%"></i><i style="height:46%"></i><i class="h" style="height:42%"></i></div></div>
+            <div style="text-align:right"><b style="font-size:20px;color:var(--pine);display:block;font-family:'Noto Serif SC','Songti SC','SimSun',serif;">59.2</b><span class="muted">7 日均值</span></div>
+          </div>
+
+          <div class="section-hd"><b>时间线</b><span>全部 · 打卡 · 里程碑</span></div>
+          <div class="tl">
+            <div class="tli">
+              <div style="display:flex;justify-content:space-between;"><b style="font-size:12.5px;">今天 · 早餐打卡</b><span class="approve"><svg width="10" height="10"><use href="#i-check"/></svg>已通过</span></div>
+              <div class="muted" style="margin:3px 0 6px;">阿柠：今天也很稳！晚上别忘了跑步～</div>
+              <div style="display:flex;gap:7px;"><div class="photo ph2" style="width:56px;height:56px;">早餐<br>照片</div><div class="photo ph1" style="width:56px;height:56px;">牛奶<br>鸡蛋</div></div>
+            </div>
+            <div class="tli gray">
+              <b style="font-size:12.5px;">昨天 · 里程碑</b>
+              <div class="card" style="margin-top:6px;background:#faf6ea;border-color:#e3d7b8;display:flex;gap:10px;align-items:center;">
+                <svg width="22" height="22" style="color:var(--gold-d)"><use href="#i-medal"/></svg>
+                <div style="font-size:11.5px;color:#6b5636;"><b style="display:block">达成第 2 个里程碑：已减 5kg</b>阿柠加码：再满 21 天加一杯奶茶</div>
+              </div>
+            </div>
+            <div class="tli gray">
+              <b style="font-size:12.5px;">10.21 · 补卡</b>
+              <div class="muted" style="margin-top:2px;">加班漏卡，用补卡券补交了运动记录</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tb"><svg width="21" height="21"><use href="#i-home"/></svg>今天</div>
+        <div class="tb on"><svg width="21" height="21"><use href="#i-target"/></svg>目标</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-compass"/></svg>广场</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-bell"/></svg>消息</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-user"/></svg>我的</div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S9 打卡 -->
+<div class="figure">
+  <div class="cap"><div class="no">9</div><div><b>每日打卡 · 交作业</b><small>30 秒录完，自动生成动态同步时间线</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr">
+      <div class="scr-body">
+        <div class="navbar"><div class="ic"><svg width="15" height="15"><use href="#i-close"/></svg></div><div class="ttl">今日打卡 · 第 18 天</div><span class="chip on">补卡券 ×1</span></div>
+
+        <div class="ci done">
+          <div class="ci-ic" style="background:var(--pine-l)"><svg width="19" height="19" style="color:var(--pine)"><use href="#i-scale"/></svg></div>
+          <div><b>体重</b><small>59.2kg + 秤面照片</small></div>
+          <div class="go"><svg width="13" height="13" style="color:#fff"><use href="#i-check"/></svg></div>
+        </div>
+
+        <div class="ci done">
+          <div class="ci-ic" style="background:var(--gold-l)"><svg width="19" height="19" style="color:var(--gold-d)"><use href="#i-image"/></svg></div>
+          <div><b>三餐拍照</b><small>早 ✓ 午 ✓ · 还差晚餐</small></div>
+          <div class="go"><svg width="13" height="13" style="color:#fff"><use href="#i-check"/></svg></div>
+        </div>
+
+        <div class="ci">
+          <div class="ci-ic" style="background:var(--indigo-l)"><svg width="19" height="19" style="color:var(--indigo)"><use href="#i-clock"/></svg></div>
+          <div style="flex:1"><b>运动</b><small>跑步 · 40 分钟</small></div>
+          <div style="display:flex;gap:6px;">
+            <span class="photo ph3" style="width:34px;height:34px;flex:0 0 34px;"><svg width="16" height="16"><use href="#i-camera"/></svg></span>
+            <div class="go"></div>
+          </div>
+        </div>
+
+        <div class="label">今天一句话</div>
+        <div class="input-fake ph">超饿，但忍住了没点炸鸡！</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+          <span class="chip">今天超饿但忍住了</span><span class="chip">状态很好</span><span class="chip">破戒了，明天继续</span>
+        </div>
+
+        <div class="label">同步到</div>
+        <div class="radio-line"><span class="radio on"></span>目标时间线（监督与见证人可见）</div>
+        <div class="radio-line"><span class="radio"></span>广场公开（体重数字自动隐藏）</div>
+      </div>
+      <div style="padding:10px 14px 16px;background:var(--paper);">
+        <button class="btn btn-p">交作业啦</button>
+        <div class="footnote" style="text-align:center;">提交后等待搭子审核，48h 未处理将自动通过</div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S10 监督工作台 -->
+<div class="figure">
+  <div class="cap"><div class="no">10</div><div><b>监督工作台</b><small>搭子视角：审核 + 鼓励 + 催打卡</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr">
+      <div class="scr-body">
+        <div class="navbar"><div class="ttl">监督工作台</div></div>
+        <div class="sup-flag">你是 @小鹿 的搭子监督人 · 第 18 天</div>
+
+        <div class="review-card">
+          <div class="rc-top">
+            <div class="av" style="background:var(--pine)">鹿</div>
+            <div style="flex:1"><b>小鹿 提交了今日打卡</b><div class="muted" style="margin-top:2px;">12 分钟前 · 待你审核</div></div>
+            <span class="chip on" style="flex:0 0 auto;">3 项全交</span>
+          </div>
+          <div class="kvline"><span>体重</span><b>59.2kg <span class="muted">（较昨日 -0.3）</span></b></div>
+          <div class="kvline"><span>运动</span><b>跑步 40 分钟</b></div>
+          <div class="rc-photos">
+            <div class="photo ph2" style="height:64px;">午餐</div>
+            <div class="photo ph1" style="height:64px;">秤面</div>
+            <div class="photo ph3" style="height:64px;">跑步<br>记录</div>
+          </div>
+          <div class="muted">TA 说：“超饿，但忍住了没点炸鸡！”</div>
+          <div class="sticker">
+            <span class="chip">今天也很稳！</span><span class="chip">为你骄傲</span><span class="chip">继续冲</span><span class="chip">写一句…</span>
+          </div>
+          <div class="rc-actions">
+            <button class="btn btn-d" style="flex:0 0 104px;color:var(--rouge);">驳回</button>
+            <button class="btn btn-p" style="flex:1;"><svg width="15" height="15"><use href="#i-check"/></svg>通过并鼓励</button>
+          </div>
+        </div>
+
+        <div class="section-hd"><b>已处理</b><span>本周及时率 100%</span></div>
+        <div class="list-row">
+          <div class="av sm" style="background:var(--pine)">鹿</div>
+          <div style="flex:1"><b style="font-size:12px;">昨天早餐打卡</b><div class="muted">你：今天也很稳！</div></div>
+          <span class="approve">已通过</span>
+        </div>
+        <button class="btn btn-g"><svg width="16" height="16" style="color:var(--pine)"><use href="#i-bell"/></svg>催 TA 今天别忘了晚餐打卡</button>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S11 广场 -->
+<div class="figure">
+  <div class="cap"><div class="no">11</div><div><b>广场</b><small>目标卡片为主，点赞 / 加油 / 评论</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr">
+      <div class="scr-body">
+        <div class="sq-tabs"><span class="on">推荐</span><span>减脂</span><span>早起</span><span>学习</span><span>戒断</span><span>运动</span></div>
+
+        <div class="mini-progress-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <div class="av sm" style="background:#5d4270">米</div><b style="font-size:12.5px;flex:1">米粒儿 的目标</b>
+            <span class="tag sup">1 搭子监督</span>
+          </div>
+          <b style="font-size:13.5px;">30 天读完 4 本书</b>
+          <div class="progress" style="margin:8px 0 5px;"><i style="width:75%"></i></div>
+          <div class="muted">第 23 天 · 已读 3.1 本 · 🎁 明约礼物：一本新书</div>
+        </div>
+
+        <div class="feed">
+          <div class="fh"><div class="av sm" style="background:#9c4048">桃</div><div><b>小桃</b><div class="muted">戒糖第 15 天</div></div><div class="right tag win">进行中</div></div>
+          <div class="fb">今天同事请奶茶，我点了无糖乌龙，感觉自己赢了全世界！</div>
+          <div class="fp"><div class="photo ph4">奶茶</div><div class="photo ph1">乌龙</div></div>
+          <div class="ff">
+            <span><svg width="14" height="14" style="color:var(--rouge)"><use href="#i-heart"/></svg>128</span>
+            <span><svg width="14" height="14" style="color:var(--gold-d)"><use href="#i-spark"/></svg>加油 46</span>
+            <span><svg width="14" height="14"><use href="#i-chat"/></svg>23</span>
+          </div>
+        </div>
+
+        <div class="feed">
+          <div class="fh"><div class="av sm" style="background:#2f4d6e">凯</div><div><b>阿凯</b><div class="muted">晨跑打卡</div></div></div>
+          <div class="fb">5km 打卡，配速 6'10"，监督人已经在等我的截图了 🏃</div>
+          <div class="ff">
+            <span><svg width="14" height="14"><use href="#i-heart"/></svg>89</span>
+            <span><svg width="14" height="14" style="color:var(--gold-d)"><use href="#i-spark"/></svg>加油 31</span>
+            <span><svg width="14" height="14"><use href="#i-chat"/></svg>12</span>
+          </div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tb"><svg width="21" height="21"><use href="#i-home"/></svg>今天</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-target"/></svg>目标</div>
+        <div class="tb on"><svg width="21" height="21"><use href="#i-compass"/></svg>广场</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-bell"/></svg>消息</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-user"/></svg>我的</div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /group2 -->
+
+<!-- ============ GROUP 3 结局 ============ -->
+<div class="group-title"><div class="bar"></div><h2>第三幕 · 大结局</h2><small>火漆封印的拆礼仪式，与一本鎏金装帧的回忆录</small></div>
+<div class="boards">
+
+<!-- S12 拆礼 -->
+<div class="figure">
+  <div class="cap"><div class="no">12</div><div><b>成功 · 火漆拆礼仪式</b><small>朱砂火漆印启封，明约/惊喜逐个揭晓</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr s-result">
+      <div class="scr-body" style="padding-top:0;">
+        <div class="confetti">✦ ✧ ✦ ✧ ✦</div>
+        <div class="res-hd"><i></i><b>恭喜，你做到了</b><i></i></div>
+        <div style="text-align:center;margin-bottom:14px;">
+          <span class="muted">30 天 · 65.0 → 57.8kg · 打卡率 96%</span>
+        </div>
+
+        <div class="gift-open cert">
+          <div class="box">
+            <svg viewBox="0 0 100 104" width="96" height="96">
+              <path d="M28 72 L34 96 L46 82 Z" fill="#8a6b32"/>
+              <path d="M72 72 L66 96 L54 82 Z" fill="#a98738"/>
+              <circle cx="50" cy="46" r="34" fill="#9c3a28"/>
+              <circle cx="50" cy="46" r="34" fill="none" stroke="#7e2c1d" stroke-width="2.5" opacity=".7"/>
+              <circle cx="50" cy="46" r="25.5" fill="none" stroke="#c4593f" stroke-width="1.5"/>
+              <ellipse cx="34" cy="30" rx="7" ry="4" fill="#c4593f" opacity=".5" transform="rotate(-32 34 30)"/>
+              <text x="50" y="56" text-anchor="middle" font-size="25" fill="#f6e7d8" font-family="Noto Serif SC, Songti SC, SimSun, serif" font-weight="700">诺</text>
+            </svg>
+          </div>
+          <b>一双新跑鞋</b>
+          <div class="from">来自搭子监督人 · 阿柠</div>
+          <div class="words">“答应你的，说到做到。这双鞋陪你跑下一个 30 天。”</div>
+        </div>
+
+        <div class="gift-pending">
+          <div style="width:38px;height:38px;border-radius:10px;background:var(--violet-l);display:flex;align-items:center;justify-content:center;flex:0 0 38px;"><svg width="19" height="19" style="color:var(--violet)"><use href="#i-gift"/></svg></div>
+          <div style="flex:1"><b>神秘礼物揭晓：周末火锅局</b><small>见证人：妈妈 +3 人的加码奶茶</small></div>
+        </div>
+
+        <div class="kvline" style="background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 13px;"><span>线下兑现</span><span><b>等阿柠标记「已送出」</b></span></div>
+      </div>
+      <div style="padding:10px 14px 16px;background:var(--paper);">
+        <button class="btn btn-p"><svg width="16" height="16"><use href="#i-book"/></svg>查看大结局回忆录</button>
+        <div class="footnote" style="text-align:center;">礼物为朋友间心意约定，双方线下自行完成</div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S13 回忆录 -->
+<div class="figure">
+  <div class="cap"><div class="no">13</div><div><b>大结局回忆录</b><small>鎏金装帧成册：数据 / 日常 / 搭子金句 / 寄语</small></div></div>
+  <div class="phone">
+    <div class="statusbar mem-status"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="#fff"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="#fff" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="#fff"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="#fff" opacity=".5"/></svg></span></div>
+    <div class="scr s-memoir">
+      <div class="mem-book">
+        <div class="mem-page">
+          <div class="kicker">MEMOIR · 大结局</div>
+          <h3>我们一起<br>走过的 30 天</h3>
+          <div class="who">小鹿 × 搭子阿柠 · 2026.10.24 – 11.22</div>
+          <div class="mem-photos">
+            <div class="photo ph1" style="height:96px;">第一天<br>的秤</div>
+            <div class="photo ph2" style="height:96px;">三餐<br>记录</div>
+            <div class="photo ph3" style="height:96px;">雨夜<br>跑步</div>
+          </div>
+          <div class="mem-nums">
+            <div class="n"><b>7.2</b><small>减掉 kg</small></div>
+            <div class="n"><b>29</b><small>打卡天数</small></div>
+            <div class="n"><b>16</b><small>连击最长</small></div>
+            <div class="n"><b>87</b><small>互动鼓励</small></div>
+          </div>
+          <div class="mem-quote">
+            “别怕，我每天都在。”
+            <span class="by">—— 第 1 天，阿柠接受邀请时写的</span>
+          </div>
+          <div class="mem-quote">
+            “超饿，但忍住了没点炸鸡！”<br>那天你收到了 23 个加油。
+            <span class="by">—— 第 18 天 · 闪光日常</span>
+          </div>
+          <div class="card" style="background:rgba(217,189,122,.1);border-color:rgba(217,189,122,.32);color:#fff;font-size:11.5px;line-height:1.9;">
+            <b style="color:#e3c887;font-family:'Noto Serif SC','Songti SC','SimSun',serif;">大结局</b><br>你拆开了阿柠送的跑鞋；妈妈说：“我女儿说话算话。”
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 14px 10px;background:var(--memoir);">
+        <div class="mem-dots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn" style="background:rgba(255,255,255,.12);color:#fff;flex:0 0 104px;height:42px;font-size:13px;"><svg width="15" height="15"><use href="#i-edit"/></svg>编辑</button>
+          <button class="btn" style="background:var(--gold);color:#2b2109;flex:1;height:42px;font-size:13px;font-weight:700;"><svg width="15" height="15"><use href="#i-share"/></svg>导出长图 / 分享给 TA</button>
+        </div>
+      </div>
+      <div class="homebar" style="background:var(--memoir);opacity:1;"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /group3 -->
+
+<!-- ============ GROUP 4 沉淀 ============ -->
+<div class="group-title"><div class="bar"></div><h2>沉淀 · 我的</h2><small>成就、人情档案与回忆书架</small></div>
+<div class="boards">
+
+<!-- S14 我的 -->
+<div class="figure">
+  <div class="cap"><div class="no">14</div><div><b>个人中心</b><small>勋章墙 + 送出/收到礼物 + 回忆书架</small></div></div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span class="sb-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg><svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="19.5" y="3.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+    <div class="scr">
+      <div style="overflow:hidden;flex:1;">
+        <div class="me-top">
+          <div class="av lg" style="background:rgba(217,189,122,.2);border:2px solid rgba(217,189,122,.65)">鹿</div>
+          <div style="flex:1"><b>小鹿</b><small>ID: luoluolu · 已认真生活 86 天</small></div>
+          <svg width="18" height="18" style="opacity:.8"><use href="#i-share"/></svg>
+        </div>
+        <div style="padding:0 14px;">
+          <div class="me-stats">
+            <div class="s"><b>2</b><small>进行中</small></div>
+            <div class="s"><b>5</b><small>已做到</small></div>
+            <div class="s"><b>83%</b><small>完成率</small></div>
+            <div class="s"><b>6</b><small>搭子数</small></div>
+          </div>
+
+          <div class="section-hd"><b>勋章墙</b><span>共 9 枚</span></div>
+          <div class="badge-grid">
+            <div class="badge"><div class="bi" style="background:var(--gold-l)"><svg width="19" height="19" style="color:var(--gold-d)"><use href="#i-fire"/></svg></div><small>连击 21 天</small></div>
+            <div class="badge"><div class="bi" style="background:var(--pine-l)"><svg width="19" height="19" style="color:var(--pine)"><use href="#i-medal"/></svg></div><small>首次成功</small></div>
+            <div class="badge"><div class="bi" style="background:var(--rouge-l)"><svg width="19" height="19" style="color:var(--rouge)"><use href="#i-heart"/></svg></div><small>最佳搭子</small></div>
+            <div class="badge"><div class="bi" style="background:var(--violet-l)"><svg width="19" height="19" style="color:var(--violet)"><use href="#i-gift"/></svg></div><small>礼物 ×2</small></div>
+          </div>
+
+          <div class="section-hd"><b>人情档案</b><span>仅自己可见明细</span></div>
+          <div class="list-row">
+            <div style="width:34px;height:34px;border-radius:9px;background:var(--gold-l);display:flex;align-items:center;justify-content:center;flex:0 0 34px;"><svg width="17" height="17" style="color:var(--gold-d)"><use href="#i-gift"/></svg></div>
+            <b>收到 2 份 · 送出 3 份礼物</b>
+            <svg width="14" height="14" style="color:#9a937f"><use href="#i-chev"/></svg>
+          </div>
+
+          <div class="section-hd"><b>我的回忆书架</b></div>
+          <div class="book-shelf">
+            <div class="book" style="background:linear-gradient(168deg,#24483a,#12261d);">我们一起<br>走过的 30 天<br><span>减脂 · 2026</span></div>
+            <div class="book" style="background:linear-gradient(168deg,#8a6b32,#54400f);">21 天<br>早起之旅<br><span>作息 · 2026</span></div>
+            <div class="book" style="background:linear-gradient(168deg,#5d4270,#38284a);">旅程纪念册<br><span>戒糖 · 未完待续</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tb"><svg width="21" height="21"><use href="#i-home"/></svg>今天</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-target"/></svg>目标</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-compass"/></svg>广场</div>
+        <div class="tb"><svg width="21" height="21"><use href="#i-bell"/></svg>消息</div>
+        <div class="tb on"><svg width="21" height="21"><use href="#i-user"/></svg>我的</div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /group4 -->
+
+<footer>
+「做到」App UI 设计稿 V2.0 · 契约文书版 · 2026-10-23 · 供视觉与信息架构评审<br>
+本稿为静态高保真，审核通过后可输出：可点击交互原型、组件标注与切图、按混合开发框架（uni-app / React Native）组织的页面结构
+</footer>
+
+</div>
+</body>
+</html>

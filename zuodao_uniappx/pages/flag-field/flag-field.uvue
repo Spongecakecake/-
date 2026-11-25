@@ -1,0 +1,128 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <view class="row head">
+                <view class="col">
+                    <text class="dim">社区战况 · 本周热闹程度</text>
+                    <text class="h2 gap-8">旗场</text>
+                </view>
+                <view class="spacer"></view>
+                <view class="btn-sm btn-tonal" @click="goMine">
+                    <text class="btn-text-green-sm">我的旗</text>
+                </view>
+            </view>
+
+            <view class="side-tabs gap-16">
+                <view v-for="(t, i) in tabs" :key="t.id" :class="tab == t.id ? 'side-tab side-tab-active' : 'side-tab'" @click="setTab(t.id)">
+                    <text :class="tab == t.id ? 'side-tab-text side-tab-text-active' : 'side-tab-text'">{{ t.name }}</text>
+                </view>
+            </view>
+
+            <text v-if="err.length > 0" class="err t-center gap-24">{{ err }}</text>
+
+            <view v-if="flags.length == 0 && !loading" class="empty">
+                <text class="h3 t-center">还没有人插旗</text>
+                <text class="dim t-center gap-12">做第一个，把目标亮出来</text>
+                <view class="btn btn-filled gap-24" @click="goCreate">
+                    <text class="btn-text">去建约</text>
+                </view>
+            </view>
+
+            <view v-for="(f, i) in flags" :key="f.id" :class="f.featured ? 'card flag-featured' : 'card'" @click="openFlag(f.id)">
+                <view class="row">
+                    <view v-if="f.featured" class="flag-featured-tag">
+                        <text class="flag-featured-text">编辑推荐</text>
+                    </view>
+                    <text class="dim gap-left">{{ f.color == 'auto' ? '自动核验' : f.color == 'witness' ? '点验中' : '仅自证' }}</text>
+                    <view class="spacer"></view>
+                    <view :class="f.color == 'auto' ? 'chip-badge badge-auto' : f.color == 'witness' ? 'chip-badge badge-witness' : 'chip-badge badge-self'">
+                        <text :class="f.color == 'auto' ? 'badge-text-light' : 'badge-text-dark'">×{{ f.multiplier }}</text>
+                    </view>
+                </view>
+                <text class="flag-title gap-12">{{ f.title }}</text>
+                <view class="row gap-16">
+                    <view class="flag-ring">
+                        <text class="flag-ring-text">{{ pct(f) }}%</text>
+                    </view>
+                    <view class="col gap-left">
+                        <text class="dim">护旗 {{ f.defendCount }} · 拔旗 {{ f.pullEnabled ? f.temptCount : '关' }}</text>
+                        <text class="threat-text gap-8">威胁值 {{ f.threatValue }} · {{ f.endDate }} 到期</text>
+                        <text class="small gap-8">{{ f.featured ? '编辑推荐 · 只展示摘要' : '围观不显示精确数值' }}</text>
+                    </view>
+                </view>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { api, errText } from '@/utils/api.uts'
+    import { flagField } from '@/utils/flag-api.uts'
+    import { flagFromField, Flag, colorText as colorTextOf } from '@/utils/flag-models.uts'
+
+    export default {
+        data() {
+            return {
+                tabs: [
+                    { id: 'hot', name: '热门' },
+                    { id: 'latest', name: '最新' },
+                    { id: 'ending', name: '即将到期' }
+                ] as Array<{ id: string, name: string }>,
+                tab: 'hot',
+                flags: [] as Array<Flag>,
+                loading: false,
+                err: ''
+            }
+        },
+        onShow() {
+            this.load()
+        },
+        methods: {
+            setTab(id: string) {
+                this.tab = id
+                this.load()
+            },
+            colorText(c: string): string { return colorTextOf(c) },
+            pct(f: Flag): number {
+                if (f.progressTotal <= 0) return 0
+                return Math.round(f.progressRatio * 100)
+            },
+            load() {
+                this.loading = true
+                this.err = ''
+                api('/api/events/collect', 'POST', { 'type': 'flag_view', 'from': this.tab } as UTSJSONObject).catch(() => {})
+                flagField(this.tab, 50)
+                    .then((res: UTSJSONObject) => {
+                        const list: Array<Flag> = []
+                        const arr = res.getArray('flags')
+                        if (arr != null) {
+                            arr.forEach((e: any | null) => {
+                                if (e instanceof UTSJSONObject) list.push(flagFromField(e as UTSJSONObject))
+                            })
+                        }
+                        this.flags = list
+                        this.loading = false
+                    })
+                    .catch((e: any | null) => {
+                        this.loading = false
+                        this.err = errText(e)
+                    })
+            },
+            openFlag(id: string) {
+                uni.navigateTo({ url: '/pagesFlag/flag-detail/flag-detail?id=' + id })
+            },
+            goMine() {
+                uni.switchTab({ url: '/pages/index/index' })
+            },
+            goCreate() {
+                uni.navigateTo({ url: '/pages/create/create' })
+            }
+        }
+    }
+</script>
+
+<style>
+    .head { padding-top: 8rpx; padding-bottom: 24rpx; }
+    .gap-left { margin-left: 20rpx; }
+    .empty { padding-top: 120rpx; }
+</style>

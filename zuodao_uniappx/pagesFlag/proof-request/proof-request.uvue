@@ -1,0 +1,142 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <view class="card">
+                <text class="sec-label">牵挂式点验</text>
+                <text class="h3 gap-12">有人牵挂你这面旗</text>
+                <text class="muted-lh gap-12">请在 2 小时内提交今日证据。图里会带上你的昵称与时间水印；不提交会扣 5 点信任分。</text>
+                <view v-for="(r, i) in requests" :key="r.id" class="box gap-16">
+                    <text class="dim">{{ r.type == 'witness' ? '见证人点验' : '系统抽检' }} · {{ r.status }}</text>
+                    <text class="small">截止 {{ r.dueAt.substring(0, 16) }}</text>
+                </view>
+            </view>
+
+            <view class="card">
+                <text class="sec-label">上传举证图</text>
+                <view class="btn btn-tonal gap-16" @click="pick">
+                    <text class="btn-text-gold-sm">{{ preview.length > 0 ? '已选择 · 重新选择' : '选择图片并加水印' }}</text>
+                </view>
+                <image v-if="preview.length > 0" class="preview" :src="preview" mode="widthFix"></image>
+                <text class="small gap-8">V1 采用上传模拟：相册选图后自动叠加昵称与时间，不强制实时拍摄。</text>
+                <view class="btn btn-outlined gap-16" @click="useCheckin">
+                    <text class="btn-text-green">一键引用今日打卡</text>
+                </view>
+                <view :class="busy ? 'btn btn-disabled gap-24' : 'btn btn-filled gap-24'" @click="submit">
+                    <text :class="busy ? 'btn-text-gray' : 'btn-text'">{{ busy ? '提交中…' : '提交举证' }}</text>
+                </view>
+                <text v-if="err.length > 0" class="err t-center gap-12">{{ err }}</text>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { myNick, errText, api } from '@/utils/api.uts'
+    import { proofStatus, requestProof, submitProof } from '@/utils/flag-api.uts'
+    import { proofRequestFrom, ProofRequest } from '@/utils/flag-models.uts'
+    import { chooseWatermarkedProof } from '@/utils/watermark.uts'
+    import { todayStr } from '@/utils/theme.uts'
+
+    export default {
+        data() {
+            return {
+                flagId: '',
+                goalId: '',
+                requests: [] as Array<ProofRequest>,
+                preview: '',
+                dataUrl: '',
+                requestId: '',
+                source: 'witness',
+                checkinId: '',
+                busy: false,
+                err: ''
+            }
+        },
+        onLoad(q: any) {
+            this.flagId = q == null ? '' : (q.flagId as string)
+            this.goalId = q == null ? '' : (q.goalId as string)
+            const rid = q == null ? '' : (q.requestId as string)
+            this.requestId = rid
+            this.source = q == null ? 'witness' : (q.source as string)
+            this.load()
+        },
+        methods: {
+            load() {
+                api('/api/proofs/requests?flagId=' + this.flagId)
+                    .then((res: UTSJSONObject) => {
+                        const list: Array<ProofRequest> = []
+                        const arr = res.getArray('requests')
+                        if (arr != null) {
+                            arr.forEach((e: any | null) => {
+                                if (e instanceof UTSJSONObject) {
+                                    const r = proofRequestFrom(e as UTSJSONObject)
+                                    if (this.requestId.length == 0 && r.status == 'pending') {
+                                        this.requestId = r.id
+                                        this.source = r.type
+                                    }
+                                    list.push(r)
+                                }
+                            })
+                        }
+                        this.requests = list
+                    })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            pick() {
+                chooseWatermarkedProof(myNick())
+                    .then((url: string) => {
+                        this.dataUrl = url
+                        this.preview = url
+                        this.checkinId = ''
+                        this.source = this.requestId.length > 0 ? this.source : 'checkin'
+                    })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            useCheckin() {
+                if (this.goalId.length == 0) { this.err = '缺少目标编号'; return }
+                api('/api/goals/' + this.goalId)
+                    .then((res: UTSJSONObject) => {
+                        const g = res.getJSON('goal')
+                        if (g == null) throw new Error('未找到目标')
+                        const arr = (g as UTSJSONObject).getArray('checkins')
+                        const day = todayStr()
+                        if (arr != null) {
+                            for (let i = 0; i < arr.length; i++) {
+                                const e = arr[i]
+                                if (e instanceof UTSJSONObject) {
+                                    const c = e as UTSJSONObject
+                                    if (c.getString('day', '') == day && c.getString('photo', '').startsWith('data:image/')) {
+                                        this.checkinId = c.getString('id', '')
+                                        this.dataUrl = c.getString('photo', '')
+                                        this.preview = this.dataUrl
+                                        this.source = 'checkin'
+                                        uni.showToast({ title: '已引用今日打卡', icon: 'success' })
+                                        return
+                                    }
+                                }
+                            }
+                        }
+                        this.err = '今日打卡没有图片证据，请先选择图片'
+                    })
+                    .catch((e: any | null) => { this.err = errText(e) })
+            },
+            submit() {
+                if (this.busy) return
+                if (this.dataUrl.length == 0) { this.err = '请先选择或引用一张图片'; return }
+                this.busy = true
+                this.err = ''
+                submitProof(this.flagId, this.dataUrl, this.source, this.requestId, this.checkinId)
+                    .then(() => {
+                        this.busy = false
+                        uni.showToast({ title: '举证已提交', icon: 'success' })
+                        uni.navigateBack()
+                    })
+                    .catch((e: any | null) => { this.busy = false; this.err = errText(e) })
+            }
+        }
+    }
+</script>
+
+<style>
+    .preview { width: 100%; border-radius: 20rpx; margin-top: 20rpx; }
+</style>

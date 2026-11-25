@@ -1,0 +1,120 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll" scroll-y>
+            <view class="side-tabs">
+                <view :class="tab == 'ledger' ? 'side-tab side-tab-active' : 'side-tab'" @click="setTab('ledger')">
+                    <text :class="tab == 'ledger' ? 'side-tab-text side-tab-text-active' : 'side-tab-text'">积分流水</text>
+                </view>
+                <view :class="tab == 'board' ? 'side-tab side-tab-active' : 'side-tab'" @click="setTab('board')">
+                    <text :class="tab == 'board' ? 'side-tab-text side-tab-text-active' : 'side-tab-text'">阵营榜</text>
+                </view>
+            </view>
+
+            <view v-if="tab == 'ledger'">
+                <view v-for="(it, i) in ledger" :key="it.id" class="card row ledger-row">
+                    <view class="col">
+                        <text class="body-text">{{ it.reason }}</text>
+                        <text class="small gap-8">{{ it.at.substring(0, 16) }} · {{ statusText(it.status) }}</text>
+                        <text class="small">{{ it.source }}</text>
+                    </view>
+                    <view class="spacer"></view>
+                    <text :class="it.amount >= 0 ? 'h3 amount-plus' : 'h3 amount-minus'">{{ it.amount >= 0 ? '+' : '' }}{{ it.amount }}</text>
+                </view>
+                <text v-if="ledger.length == 0" class="dim t-center gap-32">暂无流水</text>
+            </view>
+
+            <view v-else>
+                <text class="small gap-16">赛季 {{ season }} · 仅统计可计入榜单的旗</text>
+                <view v-for="(r, i) in board" :key="r.userId" class="card row ledger-row">
+                    <text class="h3">{{ i + 1 }}</text>
+                    <text class="body-text gap-left">{{ r.nickname }}</text>
+                    <view class="spacer"></view>
+                    <text class="h3 amount-plus">{{ r.score }}</text>
+                </view>
+            </view>
+        </scroll-view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { pointsLedger, leaderboard } from '@/utils/points-api.uts'
+    import { errText } from '@/utils/api.uts'
+
+    type LedgerItem = {
+        id: string, reason: string, source: string, status: string,
+        amount: number, at: string
+    }
+    type BoardRow = { userId: string, nickname: string, score: number }
+
+    export default {
+        data() {
+            return {
+                tab: 'ledger',
+                ledger: [] as Array<LedgerItem>,
+                board: [] as Array<BoardRow>,
+                season: '',
+                err: ''
+            }
+        },
+        onLoad(q: any) {
+            if (q != null && q.tab == 'board') this.tab = 'board'
+        },
+        onShow() { this.load() },
+        methods: {
+            setTab(t: string) { this.tab = t; this.load() },
+            statusText(s: string): string {
+                if (s == 'pending') return '结算中'
+                if (s == 'granted') return '已到账'
+                if (s == 'deducted') return '已扣除'
+                return s
+            },
+            load() {
+                if (this.tab == 'ledger') {
+                    pointsLedger()
+                        .then((res: UTSJSONObject) => {
+                            const list: Array<LedgerItem> = []
+                            const arr = res.getArray('ledger')
+                            if (arr != null) {
+                                arr.forEach((e: any | null) => {
+                                    if (e instanceof UTSJSONObject) {
+                                        const j = e as UTSJSONObject
+                                        list.push({
+                                            id: j.getString('id', ''), reason: j.getString('reason', ''),
+                                            source: j.getString('source', ''), status: j.getString('status', ''),
+                                            amount: j.getNumber('amount', 0), at: j.getString('at', '')
+                                        } as LedgerItem)
+                                    }
+                                })
+                            }
+                            this.ledger = list
+                        })
+                        .catch((e: any | null) => { this.err = errText(e) })
+                } else {
+                    leaderboard('defend')
+                        .then((res: UTSJSONObject) => {
+                            const list: Array<BoardRow> = []
+                            const arr = res.getArray('rows')
+                            if (arr != null) {
+                                arr.forEach((e: any | null) => {
+                                    if (e instanceof UTSJSONObject) {
+                                        const j = e as UTSJSONObject
+                                        list.push({ userId: j.getString('userId', ''), nickname: j.getString('nickname', ''), score: j.getNumber('score', 0) } as BoardRow)
+                                    }
+                                })
+                            }
+                            this.board = list
+                            this.season = res.getString('season', '')
+                        })
+                        .catch((e: any | null) => { this.err = errText(e) })
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    .ledger-row { align-items: flex-start; }
+    .gap-left { margin-left: 20rpx; }
+    .amount-plus { color: #1E4B3A; }
+    .amount-minus { color: #BA1A1A; }
+</style>

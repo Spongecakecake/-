@@ -1,0 +1,230 @@
+<template>
+    <view class="page">
+        <scroll-view class="scroll home-scroll" scroll-y>
+            <view class="row head">
+                <view class="col">
+                    <text class="dim">{{ nick }} 的</text>
+                    <text class="h2 gap-8">我的契约</text>
+                </view>
+                <view class="spacer"></view>
+                <view class="avatar" @click="goProfile">
+                    <text class="avatar-text">{{ avatarChar }}</text>
+                </view>
+            </view>
+            <view class="row code-row">
+                <input class="input code-input" v-model="code" type="number" maxlength="6"
+                    placeholder="输入六位邀请码加入契约" />
+                <view class="btn-sm btn-filled code-btn" @click="goInvite">
+                    <text class="btn-text-sm">加入</text>
+                </view>
+            </view>
+            <text v-if="err.length > 0" class="err code-err">{{ err }}</text>
+
+            <view class="card flag-entry" @click="goFlagField">
+                <view class="row">
+                    <text class="sec-label">社区战况</text>
+                    <view class="spacer"></view>
+                    <text class="dim">进入旗场 ›</text>
+                </view>
+                <text class="h3 gap-12">把目标插成一面旗</text>
+                <text class="small gap-8">围观的人可以护旗、拔旗、留言，一起把承诺走完</text>
+            </view>
+
+            <view v-if="goals.length == 0 && !loading" class="empty">
+                <text class="h3 t-center">还没有契约</text>
+                <text class="dim t-center empty-sub">创建一份契约，或用邀请码加入</text>
+            </view>
+
+            <view v-for="(g, i) in goals" :key="g.id" class="card goal-card" @click="openDetail(g.id)">
+                <view class="row">
+                    <view class="dot" :style="'background-color:' + tplColor(g.template)"></view>
+                    <text class="dim tpl-name">{{ tplName(g.template) }}</text>
+                    <text class="dim">{{ roleText(g.myRole) }}</text>
+                    <view class="spacer"></view>
+                    <view v-if="g.pendingToReview > 0" class="chip-badge chip-badge-red">
+                        <text class="chip-badge-text">{{ g.pendingToReview }} 待批阅</text>
+                    </view>
+                    <view v-else-if="g.status == 'achieved'" class="chip-badge chip-badge-gold">
+                        <text class="chip-badge-text">{{ statusText(g.status) }}</text>
+                    </view>
+                    <view v-else-if="g.status == 'failed'" class="chip-line chip-line-red">
+                        <text class="chip-line-text-red">{{ statusText(g.status) }}</text>
+                    </view>
+                    <view v-else class="chip-line">
+                        <text class="chip-line-text">{{ statusText(g.status) }}</text>
+                    </view>
+                </view>
+                <text class="h3 goal-title">{{ g.title }}</text>
+                <text class="dim gap-8">{{ g.startDate }} ～ {{ g.endDate.length > 0 ? g.endDate : '—' }}</text>
+                <view v-if="g.status == 'active'">
+                    <view class="bar gap-16">
+                        <view class="bar-fill"
+                            :style="'width:' + pct(g).toString() + '%; background-color:' + tplColor(g.template)">
+                        </view>
+                    </view>
+                    <text class="small gap-8">通过 {{ g.stats.approved }} · 在批 {{ g.stats.pending }} · 共 {{ g.stats.total }}</text>
+                </view>
+            </view>
+        </scroll-view>
+        <view class="fab" @click="goCreate">
+            <text class="fab-plus">＋</text>
+            <text class="fab-text">新建契约</text>
+        </view>
+    </view>
+</template>
+
+<script lang="uts">
+    import { api, myNick, errText } from '@/utils/api.uts'
+    import { tplName as tplNameOf, tplColor as tplColorOf, roleText as roleTextOf, statusText as statusTextOf } from '@/utils/theme.uts'
+    import { goalFrom, Goal } from '@/utils/models.uts'
+
+    export default {
+        data() {
+            return {
+                goals: [] as Array<Goal>,
+                loading: false,
+                err: '',
+                code: '',
+                nick: myNick() as string
+            }
+        },
+        onShow() {
+            this.nick = myNick()
+            this.load()
+        },
+        methods: {
+            tplName(s: string): string { return tplNameOf(s) },
+            tplColor(s: string): string { return tplColorOf(s) },
+            roleText(s: string): string { return roleTextOf(s) },
+            statusText(s: string): string { return statusTextOf(s) },
+            avatarChar(): string {
+                return this.nick.length > 0 ? this.nick.charAt(0) : '客'
+            },
+            pct(g: Goal): number {
+                const total = g.stats.total
+                if (total <= 0) return 0
+                let r = g.stats.approved * 1.0 / total
+                if (r < 0) r = 0
+                if (r > 1) r = 1
+                return Math.round(r * 100)
+            },
+            load() {
+                this.loading = true
+                this.err = ''
+                api('/api/goals')
+                    .then((res: UTSJSONObject) => {
+                        const list: Array<Goal> = []
+                        const arr = res.getArray('goals')
+                        if (arr != null) {
+                            arr.forEach((e: any | null) => {
+                                if (e instanceof UTSJSONObject) {
+                                    list.push(goalFrom(e as UTSJSONObject))
+                                }
+                            })
+                        }
+                        this.goals = list
+                        this.loading = false
+                    })
+                    .catch((e: any | null) => {
+                        this.loading = false
+                        this.err = errText(e)
+                    })
+            },
+            goInvite() {
+                const c = this.code.trim()
+                if (c.length != 6) {
+                    this.err = '请输入六位邀请码'
+                    return
+                }
+                this.err = ''
+                api('/api/invites/' + c)
+                    .then((res: UTSJSONObject) => {
+                        uni.navigateTo({ url: '/pages/invite/invite?code=' + c })
+                    })
+                    .catch((e: any | null) => {
+                        this.err = errText(e)
+                    })
+            },
+            openDetail(id: string) {
+                uni.navigateTo({ url: '/pages/detail/detail?id=' + id })
+            },
+            goCreate() {
+                uni.navigateTo({ url: '/pages/create/create' })
+            },
+            goProfile() {
+                uni.switchTab({ url: '/pages/profile/profile' })
+            },
+            goFlagField() {
+                uni.switchTab({ url: '/pages/flag-field/flag-field' })
+            }
+        }
+    }
+</script>
+
+<style>
+    .home-scroll {
+        padding-bottom: 240rpx;
+    }
+    .head {
+        padding-top: 8rpx;
+        padding-bottom: 28rpx;
+    }
+    .code-row {
+        margin-bottom: 12rpx;
+    }
+    .code-input {
+        flex: 1;
+    }
+    .code-btn {
+        margin-left: 20rpx;
+    }
+    .code-err {
+        margin-top: 8rpx;
+        margin-bottom: 8rpx;
+    }
+    .empty {
+        padding-top: 140rpx;
+        padding-bottom: 140rpx;
+    }
+    .empty-sub {
+        margin-top: 16rpx;
+    }
+    .goal-card {
+        margin-bottom: 24rpx;
+    }
+    .goal-title {
+        margin-top: 20rpx;
+    }
+    .tpl-name {
+        margin-left: 16rpx;
+        margin-right: 16rpx;
+    }
+    .fab {
+        position: absolute;
+        right: 36rpx;
+        bottom: 72rpx;
+        flex-direction: row;
+        align-items: center;
+        background-color: #B9E7CF;
+        border-radius: 999rpx;
+        padding: 24rpx 36rpx;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+    }
+    .fab-plus {
+        font-size: 34rpx;
+        font-weight: 700;
+        color: #0E2A1F;
+        margin-right: 10rpx;
+    }
+    .fab-text {
+        font-size: 28rpx;
+        font-weight: 600;
+        color: #0E2A1F;
+    }
+    .flag-entry {
+        background-color: #F3EAD6;
+        border-width: 2rpx;
+        border-color: #8A6B32;
+        border-style: solid;
+    }
+</style>

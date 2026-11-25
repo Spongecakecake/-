@@ -1,0 +1,101 @@
+// 后端 API 客户端（uni.request + token 持久化）
+// 默认线上后端；本地联调可在「我的-设置」中覆盖为 http://<电脑局域网IP>:3001
+export const kBaseUrl = 'http://139.224.56.248:3001'
+const kBaseUrlKey = 'zd_api_base'
+
+export function apiBaseUrl(): string {
+    const custom = getStoredStr(kBaseUrlKey)
+    return custom.length > 0 ? custom : kBaseUrl
+}
+
+export function setApiBaseUrl(url: string) {
+    const v = url.trim()
+    if (v.length == 0) uni.removeStorageSync(kBaseUrlKey)
+    else uni.setStorageSync(kBaseUrlKey, v)
+}
+
+export function getStoredStr(key: string): string {
+    const v = uni.getStorageSync(key)
+    if (v == null) return ''
+    return v as string
+}
+
+export function saveSession(token: string, user: UTSJSONObject) {
+    uni.setStorageSync('zd_token', token)
+    uni.setStorageSync('zd_uid', user.getString('id', ''))
+    uni.setStorageSync('zd_username', user.getString('username', ''))
+    uni.setStorageSync('zd_nick', user.getString('nickname', ''))
+}
+
+export function clearSession() {
+    uni.removeStorageSync('zd_token')
+    uni.removeStorageSync('zd_uid')
+    uni.removeStorageSync('zd_username')
+    uni.removeStorageSync('zd_nick')
+}
+
+export function isLogin(): boolean {
+    return getStoredStr('zd_token').length > 0
+}
+
+export function myId(): string {
+    return getStoredStr('zd_uid')
+}
+
+export function myNick(): string {
+    const n = getStoredStr('zd_nick')
+    return n.length > 0 ? n : '客'
+}
+
+export function myUsername(): string {
+    return getStoredStr('zd_username')
+}
+
+export function api(path: string, method: RequestMethod = 'GET', body: UTSJSONObject | null = null): Promise<UTSJSONObject> {
+    return new Promise<UTSJSONObject>((resolve, reject) => {
+        const t = getStoredStr('zd_token')
+        const header: UTSJSONObject = t.length > 0
+            ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t } as UTSJSONObject
+            : { 'Content-Type': 'application/json' } as UTSJSONObject
+        uni.request({
+            url: apiBaseUrl() + path,
+            method: method,
+            data: body,
+            header: header,
+            timeout: 15000,
+            success: (res: RequestSuccess<any>) => {
+                if (res.statusCode == 401) {
+                    clearSession()
+                    reject(new Error('登录已过期，请重新登录'))
+                    return
+                }
+                if (res.statusCode >= 400) {
+                    let msg = '请求失败(' + res.statusCode.toString() + ')'
+                    if (res.data instanceof UTSJSONObject) {
+                        const e = (res.data as UTSJSONObject).getString('error')
+                        if (e != null) msg = e as string
+                    }
+                    reject(new Error(msg))
+                } else {
+                    if (res.data instanceof UTSJSONObject) {
+                        resolve(res.data as UTSJSONObject)
+                    } else {
+                        const fallback = JSON.parseObject('{}')
+                        resolve(fallback == null ? ({} as UTSJSONObject) : fallback)
+                    }
+                }
+            },
+            fail: (_: RequestFail) => {
+                reject(new Error('网络异常，请确认后端服务已启动'))
+            }
+        } as RequestOptions)
+    })
+}
+
+export function errText(e: any | null): string {
+    if (e instanceof Error) {
+        const m = (e as Error).message
+        if (m.length > 0) return m
+    }
+    return '操作失败，请稍后再试'
+}
